@@ -2,10 +2,12 @@
 
 Making vim in the browser using Rust (WebAssembly)!!
 
-## Displaying
-After thorough consideration, this project will be using the HTML `<canvas>`.
-It may lead to slightly worse performance, but will massively simplify
-the project.
+## Libraries
+Leptos + Axum
+
+## Display Protocol
+In order to recreate Vim, a display protocol needs to be made.
+See [DISPLAY.md](/DISPLAY.md)
 
 ## Vim
  - Viewing only (IE only Normal and Visual/Visual Block modes).
