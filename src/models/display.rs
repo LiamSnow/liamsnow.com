@@ -1,6 +1,9 @@
-pub const CELL_WIDTH: u32 = 24;
-pub const CELL_HEIGHT: u32 = 24;
+//make sure these values match the CSS!!
+// pub const FONT_SIZE_PX: u32 = 32;
+pub const CELL_WIDTH: f64 = 19.2; //TODO formula (FONT_SIZE_PX * 3) / 5 ?
+pub const LINE_HEIGHT: f64 = 44.0;
 
+#[derive(Clone)]
 pub struct Cell {
     pub char: char,
     pub background: u8, //index -> color table
@@ -9,9 +12,15 @@ pub struct Cell {
     pub italic: bool,
 }
 
-pub struct GridInfo {
-    pub x_cells: u32,
-    pub y_cells: u32,
-    pub x_padding: u32,
-    pub y_padding: u32
+impl Cell {
+    pub fn empty() -> Cell {
+        Cell {
+            char: ' ',
+            background: 0,
+            foreground: 0,
+            bold: false,
+            italic: false
+        }
+    }
 }
+
