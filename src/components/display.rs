@@ -1,4 +1,4 @@
-use crate::models::display::{Grid, GridCoord, CELL_WIDTH, LINE_HEIGHT};
+use crate::models::grid::{Cell, Grid, GridCoord, CELL_WIDTH, LINE_HEIGHT};
 use leptos::html::Div;
 use leptos::*;
 use leptos_use::use_resize_observer;
@@ -8,6 +8,7 @@ pub fn Display(grid: ReadSignal<Grid>, grid_size: RwSignal<GridCoord>) -> impl I
     let (padding, set_padding) = create_signal((0.0, 0.0));
     let wrapper = create_node_ref::<Div>();
 
+    //TODO only resize once user has stopped resizing
     use_resize_observer(wrapper, move |entries, _observer| {
         let rect = entries[0].content_rect();
         let width = rect.width();
@@ -27,22 +28,32 @@ pub fn Display(grid: ReadSignal<Grid>, grid_size: RwSignal<GridCoord>) -> impl I
             <div class="display"
                 style:padding=move || format!("{}px {}px", padding.get().1, padding.get().0)
             >
-                <For each=move || 0..grid_size.get().1 key=|&y| y
-                    children=move |y| {
+                <For each=move || 0..grid_size.get().1 key=|&y| y children=move |y| {
                     view! {
                         <div class="line">
-                            <For each=move || 0..grid_size.get().0 key=|&x| x
-                                children=move |x| {
-                                view! {
-                                    <span class="cell">
-                                        {move || {
-                                            grid.with(|g| {
-                                                g.get(&(x, y))
-                                                    .map(|cell| cell.char.to_string())
-                                                    .unwrap_or_else(|| "".to_string())
-                                            })
-                                        }}
-                                    </span>
+                            <For each=move || 0..grid_size.get().0 key=|&x| x children=move |x| {
+                                move || {
+                                    grid.with(|g| {
+                                        match g.get(&(x, y)) {
+                                            Some(cell) => {
+                                                return view! {
+                                                    <span class="cell"
+                                                        style:color=cell.foreground.value()
+                                                        style:background-color=cell.background.value()
+                                                        style:font-weight=if cell.bold {"bold"} else {"normal"}
+                                                        style:font-style=if cell.italic {"italic"} else {"normal"}
+                                                    >
+                                                        {cell.char}
+                                                    </span>
+                                                };
+                                            },
+                                            None => {
+                                                return view! {
+                                                    <span class="cell"></span>
+                                                };
+                                            }
+                                        }
+                                    })
                                 }
                             }/>
                         </div>

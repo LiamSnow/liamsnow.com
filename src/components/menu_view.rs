@@ -1,11 +1,10 @@
 use std::time::Duration;
 
 use leptos::*;
-use log::info;
 
 use crate::{
     components::display::Display,
-    models::display::{Cell, Grid, GridCoord},
+    models::grid::{Cell, Grid, GridCoord, Color},
 };
 
 #[component]
@@ -23,10 +22,10 @@ pub fn MenuView() -> impl IntoView {
                     (i(), i()),
                     Cell {
                         char: 'x',
-                        background: 0,
-                        foreground: 0,
-                        bold: false,
-                        italic: false,
+                        background: Color::RED,
+                        foreground: Color::GREEN,
+                        bold: true,
+                        italic: true,
                     },
                 );
                 set_i(i() + 1);
