@@ -1,38 +1,54 @@
-use crate::models::display::{Cell, GridInfo, CELL_HEIGHT, CELL_WIDTH};
+use crate::models::display::{Grid, GridCoord, CELL_WIDTH, LINE_HEIGHT};
 use leptos::html::Div;
 use leptos::*;
 use leptos_use::use_resize_observer;
-use log::info;
 
 #[component]
-pub fn Display() -> impl IntoView {
-    let mut grid: Vec<Vec<Cell>>;
+pub fn Display(grid: ReadSignal<Grid>, grid_size: RwSignal<GridCoord>) -> impl IntoView {
+    let (padding, set_padding) = create_signal((0.0, 0.0));
+    let wrapper = create_node_ref::<Div>();
 
-    let display = create_node_ref::<Div>();
-    let (text, set_text) = create_signal("".to_string());
-
-    use_resize_observer(display, move |entries, observer| {
+    use_resize_observer(wrapper, move |entries, _observer| {
         let rect = entries[0].content_rect();
-        set_text.set(format!(
-            "width: {}\nheight: {}",
-            rect.width(),
-            rect.height()
-        ));
-        info!("12");
+        let width = rect.width();
+        let height = rect.height();
+        let x = width / CELL_WIDTH;
+        let y = height / LINE_HEIGHT;
+        let x_cells = x.floor() as usize;
+        let y_cells = y.floor() as usize;
+        grid_size.update(|size| *size = (x_cells, y_cells));
+        let x_padding = (width - (x_cells as f64 * CELL_WIDTH)) / 2.0;
+        let y_padding = (height - (y_cells as f64 * LINE_HEIGHT)) / 2.0;
+        set_padding((x_padding, y_padding));
     });
 
     view! {
-        <div class="display" node_ref=display>
-        { move || text.get() }
+        <div class="wrapper" node_ref=wrapper>
+            <div class="display"
+                style:padding=move || format!("{}px {}px", padding.get().1, padding.get().0)
+            >
+                <For each=move || 0..grid_size.get().1 key=|&y| y
+                    children=move |y| {
+                    view! {
+                        <div class="line">
+                            <For each=move || 0..grid_size.get().0 key=|&x| x
+                                children=move |x| {
+                                view! {
+                                    <span class="cell">
+                                        {move || {
+                                            grid.with(|g| {
+                                                g.get(&(x, y))
+                                                    .map(|cell| cell.char.to_string())
+                                                    .unwrap_or_else(|| "".to_string())
+                                            })
+                                        }}
+                                    </span>
+                                }
+                            }/>
+                        </div>
+                    }
+                }/>
+            </div>
         </div>
     }
-}
-
-fn calc_grid_info(screen_width: u32, screen_height: u32) -> GridInfo {
-    return GridInfo {
-        x_cells: screen_width / CELL_WIDTH,
-        y_cells: screen_height / CELL_HEIGHT,
-        x_padding: screen_width % CELL_WIDTH,
-        y_padding: screen_height % CELL_HEIGHT,
-    };
 }

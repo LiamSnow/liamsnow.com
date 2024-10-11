@@ -1,4 +1,4 @@
-use crate::components::display::Display;
+use crate::components::menu_view::MenuView;
 use leptos::*;
 
 /// Default Home Page
@@ -24,7 +24,7 @@ pub fn Home() -> impl IntoView {
             }
         }>
 
-            <Display />
+            <MenuView/>
 
         </ErrorBoundary>
     }

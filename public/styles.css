@@ -1,12 +1,28 @@
-html, body, .display {
+html, body, .wrapper {
+  width: 100vw;
+  height: 100vh;
+}
+
+html, body, .wrapper, .display {
   margin: 0;
   padding: 0;
   overflow: none;
-  width: 100vw;
-  height: 100vh;
+  background: red;
+}
+
+.display {
+  text-wrap: nowrap;
   font-family: monospace;
+  font-size: 32px;
   background: #121217;
   color: #ffffff;
-  font-size: 32px;
-  text-wrap: nowrap;
+}
+
+.line {
+  height: 44px;
+}
+
+.cell {
+  display: inline-block;
+  width: 19.2px;
 }
