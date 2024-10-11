@@ -1,26 +1,31 @@
-use crate::models::grid::{Cell, Grid, GridCoord, CELL_WIDTH, LINE_HEIGHT};
+use crate::models::grid::{Grid, GridCoord, CELL_WIDTH, LINE_HEIGHT};
 use leptos::html::Div;
 use leptos::*;
-use leptos_use::use_resize_observer;
+use leptos_use::{use_debounce_fn_with_arg, use_resize_observer};
 
 #[component]
 pub fn Display(grid: ReadSignal<Grid>, grid_size: RwSignal<GridCoord>) -> impl IntoView {
     let (padding, set_padding) = create_signal((0.0, 0.0));
     let wrapper = create_node_ref::<Div>();
 
-    //TODO only resize once user has stopped resizing
+    let handle_resize = use_debounce_fn_with_arg(
+        move |args: (f64, f64)| {
+            let (width, height) = args;
+            let x = width / CELL_WIDTH;
+            let y = height / LINE_HEIGHT;
+            let x_cells = x.floor() as usize;
+            let y_cells = y.floor() as usize;
+            grid_size.update(|size| *size = (x_cells, y_cells));
+            let x_padding = (width - (x_cells as f64 * CELL_WIDTH)) / 2.0;
+            let y_padding = (height - (y_cells as f64 * LINE_HEIGHT)) / 2.0;
+            set_padding((x_padding, y_padding));
+        },
+        500.0,
+    );
+
     use_resize_observer(wrapper, move |entries, _observer| {
         let rect = entries[0].content_rect();
-        let width = rect.width();
-        let height = rect.height();
-        let x = width / CELL_WIDTH;
-        let y = height / LINE_HEIGHT;
-        let x_cells = x.floor() as usize;
-        let y_cells = y.floor() as usize;
-        grid_size.update(|size| *size = (x_cells, y_cells));
-        let x_padding = (width - (x_cells as f64 * CELL_WIDTH)) / 2.0;
-        let y_padding = (height - (y_cells as f64 * LINE_HEIGHT)) / 2.0;
-        set_padding((x_padding, y_padding));
+        handle_resize((rect.width(), rect.height()));
     });
 
     view! {
