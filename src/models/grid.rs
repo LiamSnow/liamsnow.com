@@ -1,3 +1,4 @@
+use std::fmt;
 use std::collections::HashMap;
 
 //make sure these values match the CSS!!
@@ -5,7 +6,7 @@ use std::collections::HashMap;
 pub const CELL_WIDTH: f64 = 19.2; //TODO formula (FONT_SIZE_PX * 3) / 5 ?
 pub const LINE_HEIGHT: f64 = 44.0;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Cell {
     pub char: char,
     pub background: Color,

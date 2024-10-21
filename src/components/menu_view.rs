@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use leptos::*;
+use log::info;
 
 use crate::{
     components::display::Display,
@@ -8,24 +9,63 @@ use crate::{
 };
 
 #[component]
-    pub fn MenuView(links: Vec<MenuLink>) -> impl IntoView {
-    // let (grid, set_grid) = create_signal(Grid::new());
+pub fn MenuView(links: Vec<MenuLink>) -> impl IntoView {
     let grid_size = create_rw_signal((0, 0));
     let half_menu_width = calc_half_menu_width(&links);
 
-    let grid = create_memo(move |_| {
 
+    let grid = create_memo(move |_| {
+        let gs = grid_size.get();
+        let mx = gs.0;
+        let my = gs.1;
+        let mut g = Grid::new();
+
+        g.insert((0, 0), Cell {
+            char: 'a',
+            foreground: Color::WHITE,
+            background: Color::NONE,
+            italic: false,
+            bold: false
+        });
+
+        g.insert((mx/2, my/2), Cell {
+            char: 'a',
+            foreground: Color::WHITE,
+            background: Color::NONE,
+            italic: false,
+            bold: false
+        });
+
+        g.insert((mx-1, my-1), Cell {
+            char: 'a',
+            foreground: Color::WHITE,
+            background: Color::NONE,
+            italic: false,
+            bold: false
+        });
+
+        g.insert((mx-1, 0), Cell {
+            char: 'a',
+            foreground: Color::WHITE,
+            background: Color::NONE,
+            italic: false,
+            bold: false
+        });
+
+        g.insert((0, my-1), Cell {
+            char: 'a',
+            foreground: Color::WHITE,
+            background: Color::NONE,
+            italic: false,
+            bold: false
+        });
+
+        g
     });
 
     view! {
         <Display grid=grid grid_size=grid_size />
     }
-}
-
-fn set_cell(grid: &WriteSignal<Grid>, coord: GridCoord, cell: Cell) {
-    grid.update(|g| {
-        g.insert(coord, cell);
-    });
 }
 
 fn calc_half_menu_width(links: &Vec<MenuLink>) -> usize {
