@@ -1,7 +1,7 @@
 use crate::models::grid::{Cell, Grid, GridCoord, CELL_WIDTH, LINE_HEIGHT};
 use leptos::html::Div;
 use leptos::*;
-use leptos_use::{use_debounce_fn, use_debounce_fn_with_options, use_element_size, use_resize_observer, DebounceOptions, UseElementSizeReturn};
+use leptos_use::{use_debounce_fn_with_options, use_element_size, use_resize_observer, DebounceOptions, UseElementSizeReturn};
 
 #[component]
 pub fn Display(grid: Memo<Grid>, grid_size: RwSignal<GridCoord>) -> impl IntoView {
@@ -54,10 +54,10 @@ fn CellElement(cell: Memo<Option<Cell>>) -> impl IntoView {
         {move || match cell.get() {
             Some(c) => view! {
                 <span class="cell"
-                    style:color=c.foreground.value()
-                    style:background-color=c.background.value()
-                    style:font-weight=if c.bold {"bold"} else {"normal"}
-                    style:font-style=if c.italic {"italic"} else {"normal"}
+                    style:color=c.style.foreground.value()
+                    style:background-color=c.style.background.value()
+                    style:font-weight=if c.style.bold {"bold"} else {"normal"}
+                    style:font-style=if c.style.italic {"italic"} else {"normal"}
                 >
                     {c.char}
                 </span>

@@ -1,64 +1,42 @@
 use std::time::Duration;
 
 use leptos::*;
+use leptos_use::{use_interval, UseIntervalReturn};
 use log::info;
 
 use crate::{
     components::display::Display,
-    models::{grid::{Cell, Color, Grid, GridCoord}, menu::MenuLink},
+    models::{
+        grid::{insert_string, Cell, CellStyle, Color, Grid, GridCoord, TextAlign},
+        menu::MenuLink,
+    },
 };
 
 #[component]
 pub fn MenuView(links: Vec<MenuLink>) -> impl IntoView {
     let grid_size = create_rw_signal((0, 0));
     let half_menu_width = calc_half_menu_width(&links);
-
+    let UseIntervalReturn { counter, .. } = use_interval(500);
 
     let grid = create_memo(move |_| {
         let gs = grid_size.get();
         let mx = gs.0;
         let my = gs.1;
+
+        let v = counter.get() % 5;
+
         let mut g = Grid::new();
 
-        g.insert((0, 0), Cell {
-            char: 'a',
-            foreground: Color::WHITE,
-            background: Color::NONE,
-            italic: false,
-            bold: false
-        });
 
-        g.insert((mx/2, my/2), Cell {
-            char: 'a',
-            foreground: Color::WHITE,
-            background: Color::NONE,
+        let style = CellStyle {
+            background: Color::RED,
+            foreground: Color::BLUE,
+            bold: false,
             italic: false,
-            bold: false
-        });
+        };
 
-        g.insert((mx-1, my-1), Cell {
-            char: 'a',
-            foreground: Color::WHITE,
-            background: Color::NONE,
-            italic: false,
-            bold: false
-        });
-
-        g.insert((mx-1, 0), Cell {
-            char: 'a',
-            foreground: Color::WHITE,
-            background: Color::NONE,
-            italic: false,
-            bold: false
-        });
-
-        g.insert((0, my-1), Cell {
-            char: 'a',
-            foreground: Color::WHITE,
-            background: Color::NONE,
-            italic: false,
-            bold: false
-        });
+        insert_string(&mut g, (mx/2, my/2), "Hello", style, TextAlign::RIGHT);
+        g.insert((mx / 2, my / 2), Cell { char: 'x', style });
 
         g
     });

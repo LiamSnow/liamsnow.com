@@ -7,22 +7,29 @@ pub const CELL_WIDTH: f64 = 19.2; //TODO formula (FONT_SIZE_PX * 3) / 5 ?
 pub const LINE_HEIGHT: f64 = 44.0;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub struct Cell {
-    pub char: char,
+pub struct CellStyle {
     pub background: Color,
     pub foreground: Color,
     pub bold: bool,
     pub italic: bool,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct Cell {
+    pub char: char,
+    pub style: CellStyle
+}
+
 impl Cell {
     pub fn empty() -> Cell {
         Cell {
             char: ' ',
-            background: Color::NONE,
-            foreground: Color::WHITE,
-            bold: false,
-            italic: false,
+            style: CellStyle {
+                background: Color::NONE,
+                foreground: Color::WHITE,
+                bold: false,
+                italic: false,
+            }
         }
     }
 }
@@ -52,3 +59,23 @@ impl Color {
 
 pub type Grid = HashMap<(usize, usize), Cell>;
 pub type GridCoord = (usize, usize);
+pub enum TextAlign {
+    LEFT,
+    CENTER,
+    RIGHT
+}
+
+pub fn insert_string(grid: &mut Grid, coord: GridCoord, str: &str, style: CellStyle, align: TextAlign) {
+    let new_coord: GridCoord = match align {
+        TextAlign::LEFT => (coord.0, coord.1),
+        TextAlign::CENTER => (coord.0.saturating_sub(str.len() / 2), coord.1),
+        TextAlign::RIGHT => (coord.0.saturating_sub(str.len()-1), coord.1),
+    };
+
+    for (i, char) in str.chars().enumerate() {
+        grid.insert((new_coord.0 + i, new_coord.1), Cell {
+            char,
+            style
+        });
+    }
+}
