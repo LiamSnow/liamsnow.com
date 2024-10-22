@@ -14,7 +14,11 @@ pub fn Display(grid: Memo<Vec<Cell>>, grid_size: RwSignal<Coord>) -> impl IntoVi
             (height.get() / LINE_HEIGHT).floor() as usize
         ));
     };
-    let handle_resize_debounced = use_debounce_fn_with_options(handle_resize, 100.0, DebounceOptions::default().max_wait(Some(100.0)));
+    let handle_resize_debounced = use_debounce_fn_with_options(
+        handle_resize,
+        100.0,
+        DebounceOptions::default().max_wait(Some(100.0))
+    );
 
     // window_event_listener(resize, move |_| {
     use_resize_observer(wrapper, move |_entries, _observer| {

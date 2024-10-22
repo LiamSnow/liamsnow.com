@@ -1,7 +1,9 @@
+use log::info;
+
 //make sure these values match the CSS!!
 // pub const FONT_SIZE_PX: u32 = 32;
 pub const CELL_WIDTH: f64 = 19.2; //TODO formula (FONT_SIZE_PX * 3) / 5 ?
-pub const LINE_HEIGHT: f64 = 44.0;
+pub const LINE_HEIGHT: f64 = 38.4;
 
 pub type Coord = (usize, usize);
 
@@ -12,12 +14,22 @@ pub struct CellStyle {
     pub bold: bool,
     pub italic: bool,
 }
+impl CellStyle {
+    pub const fn basic(foreground: Color, background: Color) -> CellStyle {
+        return CellStyle {
+            foreground,
+            background,
+            bold: false,
+            italic: false,
+        };
+    }
+}
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Cell {
     pub char: char,
     pub style: CellStyle,
-    pub coord: Coord
+    pub coord: Coord,
 }
 
 #[allow(dead_code)]
@@ -47,32 +59,69 @@ impl Color {
 }
 
 #[allow(dead_code)]
+#[derive(PartialEq)]
 pub enum TextAlign {
     LEFT,
     CENTER,
-    RIGHT
+    RIGHT,
 }
 
-pub fn push_str_to_grid(grid: &mut Vec<Cell>, coord: Coord, str: &str, style: CellStyle, align: TextAlign) {
-    let new_coord: Coord = match align {
-        TextAlign::LEFT => (coord.0, coord.1),
-        TextAlign::CENTER => (coord.0.saturating_sub(str.len() / 2), coord.1),
-        TextAlign::RIGHT => (coord.0.saturating_sub(str.len()-1), coord.1),
-    };
-
+pub fn push_str_to_grid(
+    grid: &mut Vec<Cell>,
+    coord: Coord,
+    str: &str,
+    style: CellStyle,
+    align: TextAlign,
+) {
+    let new_coord = calc_align_coords(coord, str, align);
     for (i, char) in str.chars().enumerate() {
         grid.push(Cell {
             char,
             style,
-            coord: (new_coord.0 + i, new_coord.1)
+            coord: (new_coord.0 + i, new_coord.1),
         });
     }
 }
 
+pub fn push_block_to_grid(
+    grid: &mut Vec<Cell>,
+    coord: Coord,
+    str: &str,
+    style: CellStyle,
+    align: TextAlign,
+) {
+    let new_coord = calc_align_coords(coord, str, align);
+    for (i, char) in str.chars().enumerate() {
+        if char == '█' {
+            grid.push(Cell {
+                char: ' ',
+                style: CellStyle {
+                    foreground: Color::NONE,
+                    background: style.foreground,
+                    bold: false,
+                    italic: false,
+                },
+                coord: (new_coord.0 + i, new_coord.1),
+            });
+        } else {
+            grid.push(Cell {
+                char,
+                style,
+                coord: (new_coord.0 + i, new_coord.1),
+            });
+        }
+    }
+}
+
+fn calc_align_coords(coord: Coord, str: &str, align: TextAlign) -> Coord {
+    let num_chars = str.chars().count();
+    return match align {
+        TextAlign::LEFT => (coord.0, coord.1),
+        TextAlign::CENTER => (coord.0.saturating_sub(num_chars / 2), coord.1),
+        TextAlign::RIGHT => (coord.0.saturating_sub(num_chars - 1), coord.1),
+    };
+}
+
 pub fn push_char_to_grid(grid: &mut Vec<Cell>, coord: Coord, char: char, style: CellStyle) {
-    grid.push(Cell {
-        char,
-        style,
-        coord
-    });
+    grid.push(Cell { char, style, coord });
 }

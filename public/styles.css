@@ -21,10 +21,15 @@ html, body, .wrapper, .display {
   font-family: monospace;
   font-size: 32px;
   background: #121217;
+  line-height: 1.2em;
 }
 
 .cell {
   color: white;
+  padding: 0;
+  border: 0;
+  width: 19.2px;
+  height: 38.4px;
 }
 
 /* .line { */
