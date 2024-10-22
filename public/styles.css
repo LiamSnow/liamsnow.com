@@ -10,18 +10,28 @@ html, body, .wrapper, .display {
   background: #080808;
 }
 
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .display {
-  text-wrap: nowrap;
+  display: grid;
   font-family: monospace;
   font-size: 32px;
   background: #121217;
 }
 
-.line {
-  height: 44px;
+.cell {
+  color: white;
 }
 
-.cell {
-  display: inline-block;
-  width: 19.2px;
-}
+/* .line { */
+/*   height: 44px; */
+/* } */
+/**/
+/* .cell { */
+/*   display: inline-block; */
+/*   width: 19.2px; */
+/* } */

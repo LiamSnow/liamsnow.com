@@ -1,12 +1,11 @@
-use std::fmt;
-use std::collections::HashMap;
-
 //make sure these values match the CSS!!
 // pub const FONT_SIZE_PX: u32 = 32;
 pub const CELL_WIDTH: f64 = 19.2; //TODO formula (FONT_SIZE_PX * 3) / 5 ?
 pub const LINE_HEIGHT: f64 = 44.0;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+pub type Coord = (usize, usize);
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CellStyle {
     pub background: Color,
     pub foreground: Color,
@@ -14,27 +13,15 @@ pub struct CellStyle {
     pub italic: bool,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Cell {
     pub char: char,
-    pub style: CellStyle
+    pub style: CellStyle,
+    pub coord: Coord
 }
 
-impl Cell {
-    pub fn empty() -> Cell {
-        Cell {
-            char: ' ',
-            style: CellStyle {
-                background: Color::NONE,
-                foreground: Color::WHITE,
-                bold: false,
-                italic: false,
-            }
-        }
-    }
-}
-
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[allow(dead_code)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub enum Color {
     NONE,
     BLACK,
@@ -42,6 +29,7 @@ pub enum Color {
     RED,
     GREEN,
     BLUE,
+    ORANGE,
 }
 
 impl Color {
@@ -53,29 +41,38 @@ impl Color {
             Color::RED => "#ff0000".to_string(),
             Color::GREEN => "#00ff00".to_string(),
             Color::BLUE => "#0000ff".to_string(),
+            Color::ORANGE => "#ffa500".to_string(),
         }
     }
 }
 
-pub type Grid = HashMap<(usize, usize), Cell>;
-pub type GridCoord = (usize, usize);
+#[allow(dead_code)]
 pub enum TextAlign {
     LEFT,
     CENTER,
     RIGHT
 }
 
-pub fn insert_string(grid: &mut Grid, coord: GridCoord, str: &str, style: CellStyle, align: TextAlign) {
-    let new_coord: GridCoord = match align {
+pub fn push_str_to_grid(grid: &mut Vec<Cell>, coord: Coord, str: &str, style: CellStyle, align: TextAlign) {
+    let new_coord: Coord = match align {
         TextAlign::LEFT => (coord.0, coord.1),
         TextAlign::CENTER => (coord.0.saturating_sub(str.len() / 2), coord.1),
         TextAlign::RIGHT => (coord.0.saturating_sub(str.len()-1), coord.1),
     };
 
     for (i, char) in str.chars().enumerate() {
-        grid.insert((new_coord.0 + i, new_coord.1), Cell {
+        grid.push(Cell {
             char,
-            style
+            style,
+            coord: (new_coord.0 + i, new_coord.1)
         });
     }
+}
+
+pub fn push_char_to_grid(grid: &mut Vec<Cell>, coord: Coord, char: char, style: CellStyle) {
+    grid.push(Cell {
+        char,
+        style,
+        coord
+    });
 }

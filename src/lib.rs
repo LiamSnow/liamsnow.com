@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos_hotkeys::{provide_hotkeys_context, scopes, HotkeysContext};
 use leptos_meta::*;
 use leptos_router::*;
 
@@ -18,6 +19,9 @@ pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
+    let main_ref = create_node_ref::<html::Main>();
+    let HotkeysContext { .. } = provide_hotkeys_context(main_ref, false, scopes!());
+
     view! {
         <Html lang="en" dir="ltr" attr:data-theme="light"/>
 
@@ -29,11 +33,13 @@ pub fn App() -> impl IntoView {
         <Meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
         <Router>
-            <Routes>
-                <Route path="/" view=Home/>
-                <Route path="/about" view=About/>
-                <Route path="/*" view=NotFound/>
-            </Routes>
+            <main _ref=main_ref>
+                <Routes>
+                    <Route path="/" view=Home/>
+                    <Route path="/about" view=About/>
+                    <Route path="/*" view=NotFound/>
+                </Routes>
+            </main>
         </Router>
     }
 }
