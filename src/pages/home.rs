@@ -26,7 +26,7 @@ pub fn Home() -> impl IntoView {
         },
         MenuLink {
             text: "LinkedIn".to_string(),
-            link: "/https://www.linkedin.com/in/william-snow-iv-140438169/".to_string(),
+            link: "https://www.linkedin.com/in/william-snow-iv-140438169/".to_string(),
             shortcut: 'l'
         },
         MenuLink {

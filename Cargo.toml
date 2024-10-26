@@ -14,7 +14,6 @@ console_log = "1"
 log = "0.4"
 console_error_panic_hook = "0.1"
 leptos-use = "0.13.5"
-leptos_hotkeys = "0.2.2"
 
 # utils
 # strum = { version = "0.25", features = ["derive", "strum_macros"] }

@@ -32,6 +32,11 @@ html, body, .wrapper, .display {
   height: 38.4px;
 }
 
+* {
+  cursor: default;
+  user-select: none;
+}
+
 /* .line { */
 /*   height: 44px; */
 /* } */

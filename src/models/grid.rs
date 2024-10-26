@@ -23,6 +23,24 @@ impl CellStyle {
             italic: false,
         };
     }
+
+    pub const fn bold(foreground: Color, background: Color) -> CellStyle {
+        return CellStyle {
+            foreground,
+            background,
+            bold: true,
+            italic: false,
+        };
+    }
+
+    pub const fn italic(foreground: Color, background: Color) -> CellStyle {
+        return CellStyle {
+            foreground,
+            background,
+            bold: false,
+            italic: true,
+        };
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -38,6 +56,8 @@ pub enum Color {
     NONE,
     BLACK,
     WHITE,
+    GREY,
+    LIGHT_GREY,
     RED,
     GREEN,
     BLUE,
@@ -50,6 +70,8 @@ impl Color {
             Color::NONE => String::new(),
             Color::BLACK => "#000000".to_string(),
             Color::WHITE => "#ffffff".to_string(),
+            Color::GREY => "#888888".to_string(),
+            Color::LIGHT_GREY => "#aaaaaa".to_string(),
             Color::RED => "#ff0000".to_string(),
             Color::GREEN => "#00ff00".to_string(),
             Color::BLUE => "#0000ff".to_string(),
