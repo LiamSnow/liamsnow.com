@@ -1,3 +1,26 @@
+#content {
+  margin: 40px;
+  padding: 40px;
+  border: 1px dashed #333;
+}
+
+.mark {
+  position: absolute;
+  top: 11px;
+  font-size: 42px;
+  color: #333;
+  text-align: center;
+}
+
+#mark-tl {
+  left: 28px;
+}
+
+#mark-tr {
+  right: 28px;
+}
+
+
 h1 {
   font-size: 60px;
 }
@@ -51,7 +74,9 @@ pre:has(code) {
   border: 1px solid #222;
   border-radius: 5px;
   font-size: 14px;
-  padding: 10px;
+  padding: 20px;
+  background: none !important;
+  overflow-x: scroll;
 }
 
 /* inline code */
