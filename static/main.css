@@ -1,9 +1,14 @@
 html,
 body {
-  background: rgb(18, 18, 23);
   /* color: #e8e6e3; */
   color: white;
   font-family: monospace;
+
+  background: rgb(18, 18, 23);
+  /* background-image: radial-gradient(rgba(255, 165, 0, 0.5) 1px, transparent 0); */
+  /* background-size: 40px 40px; */
+  /* background-position: -19px -19px; */
+
 }
 
 html, body, #content, header, footer {
@@ -12,18 +17,44 @@ html, body, #content, header, footer {
 }
 
 #content {
+  background:
+    linear-gradient(to top, black, rgba(0,0,0,0.8)),
+    url(https://grainy-gradients.vercel.app/noise.svg);
+  /* filter: contrast(170%) brightness(1000%); */
+
   align-items: center;
-  min-height: calc(100vh - 28px);
+  min-height: calc(100vh - 24px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 32px;
+  font-size: 24px;
 }
 
 footer {
   background: black;
-  font-size: 16px;
-  height: 26px;
+  height: 20px;
   padding: 0 10px;
-  border-top: 2px solid #444;
+  border-top: 2px solid #222;
+  display: flex;
+  justify-content: space-between;
+}
+
+footer a, footer p {
+  font-size: 14px;
+}
+
+footer p {
+  margin: 0;
+}
+
+footer a {
+  margin: 0 0 0 20px;
+  color: white;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: rgb(255, 165, 0);
 }

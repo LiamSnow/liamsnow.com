@@ -20,11 +20,15 @@ h5 {
 
 p,
 code,
-a {
+a, li {
   font-size: 20px;
 }
 
-p {
+li::marker {
+  color: #706a63;
+}
+
+p, li {
   color: #ada69c;
 }
 
@@ -43,7 +47,7 @@ a:hover {
 }
 
 /* block code */
-pre code {
+pre:has(code) {
   border: 1px solid #222;
   border-radius: 5px;
   font-size: 14px;
@@ -52,7 +56,11 @@ pre code {
 
 /* inline code */
 code:not(pre code) {
-  color: #e8e6e3;
+   background: linear-gradient(to right, red, orange);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+  /* color: #e8e6e3; */
 }
 
 code:not(pre code)::before,
