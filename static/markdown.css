@@ -1,0 +1,61 @@
+h1 {
+  font-size: 60px;
+}
+
+h2 {
+  font-size: 48px;
+}
+
+h3 {
+  font-size: 38px;
+}
+
+h4 {
+  font-size: 30px;
+}
+
+h5 {
+  font-size: 24px;
+}
+
+p,
+code,
+a {
+  font-size: 20px;
+}
+
+p {
+  color: #ada69c;
+}
+
+a {
+  color: rgb(255, 165, 0);
+  text-decoration: none;
+  transition: background-color 50ms cubic-bezier(0.4, 0.0, 0.2, 1),
+    color 50ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+a:hover {
+  /* text-decoration: underline; */
+  /* text-decoration-style: wavy; */
+  background: rgb(255, 165, 0);
+  color: black;
+}
+
+/* block code */
+pre code {
+  border: 1px solid #222;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 10px;
+}
+
+/* inline code */
+code:not(pre code) {
+  color: #e8e6e3;
+}
+
+code:not(pre code)::before,
+code:not(pre code)::after {
+  content: "`";
+}
