@@ -1,22 +1,25 @@
 use maud::{html, Markup, DOCTYPE};
 
-
 pub fn footer() -> Markup {
     html! {
         footer {
-            p { "© 2024 William (Liam) Snow IV" }
             div {
-                a href="https://github.com/liamsnow/liamsnow.com" { "Source Code" }
-                a href="https://github.com/liamsnow" { "GitHub" }
-                a href="https://www.linkedin.com/in/william-snow-iv-140438169/" { "LinkedIn" }
+                p { "© 2024 William (Liam) Snow IV" }
+                a href="https://github.com/liamsnow/liamsnow.com" { "(Source Code)" }
+            }
+            div {
+              p { "Made with 🦀" }
+            }
+            div {
                 a href="mailto:mail@liamsnow.com" { "Email" }
-                a href="https://raw.githubusercontent.com/LiamSnow/resume/refs/heads/main/resume.pdf" { "Resume" }
+                a href="https://www.linkedin.com/in/william-snow-iv-140438169/" { "LinkedIn" }
+                a href="https://github.com/liamsnow" { "GitHub" }
             }
         }
     }
 }
 
-pub fn make_page(title: &str, content: Markup, head: Markup) -> Markup {
+pub fn make_page(url: &str, title: &str, content: Markup, head: Markup) -> Markup {
     html! {
         (DOCTYPE)
         html lang = "en" {
@@ -27,7 +30,25 @@ pub fn make_page(title: &str, content: Markup, head: Markup) -> Markup {
                 (head)
             }
             body {
-                (content)
+                main {
+                    #content {
+                        @if url == "/" {
+                            .mark .top .left { "+" }
+                        }
+                        @else {
+                            a .mark .top .back href="../" { "〈〈〈" }
+                            .mark .url { (url) }
+                        }
+
+                        .mark .top .right { "+" }
+                        .mark .bottom .left { "+" }
+                        .mark .bottom .right { "+" }
+
+                        #box {
+                            (content)
+                        }
+                    }
+                }
 
                 (footer())
             }

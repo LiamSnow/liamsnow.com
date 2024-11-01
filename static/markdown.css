@@ -1,25 +1,10 @@
-#content {
-  margin: 40px;
-  padding: 40px;
-  border: 1px dashed #333;
+#box {
+  padding: 0 40px;
 }
 
-.mark {
-  position: absolute;
-  top: 11px;
-  font-size: 42px;
-  color: #333;
-  text-align: center;
+h1, h2, h3, h4, h5 {
+  font-family: "mem 5x6";
 }
-
-#mark-tl {
-  left: 28px;
-}
-
-#mark-tr {
-  right: 28px;
-}
-
 
 h1 {
   font-size: 60px;
@@ -81,7 +66,7 @@ pre:has(code) {
 
 /* inline code */
 code:not(pre code) {
-   background: linear-gradient(to right, red, orange);
+   background: linear-gradient(to left, #33ffccee, #33ccffee);
     -webkit-background-clip: text;
             background-clip: text;
     -webkit-text-fill-color: transparent;

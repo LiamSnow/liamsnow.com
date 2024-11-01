@@ -1,43 +1,115 @@
-html,
-body {
-  /* color: #e8e6e3; */
-  color: white;
-  font-family: "Atkinson Hyperlegible";
-
-  background: rgb(18, 18, 23);
-  /* background-image: radial-gradient(rgba(255, 165, 0, 0.5) 1px, transparent 0); */
-  /* background-size: 40px 40px; */
-  /* background-position: -19px -19px; */
-
+* {
+  box-sizing: border-box;
 }
 
-html, body, #content, header, footer {
+html,
+body {
+  color: white;
+  font-family: "Atkinson Hyperlegible";
+  background: black;
+}
+
+html, body, main, header, footer {
   margin: 0;
   padding: 0;
 }
 
 main {
-  background:
-    linear-gradient(to top, black, rgba(0,0,0,0.8)),
-    url(https://grainy-gradients.vercel.app/noise.svg);
-  /* filter: contrast(170%) brightness(1000%); */
-
-  align-items: center;
-  min-height: calc(100vh - 24px);
+  /* background: */
+  /*   linear-gradient(to top, black, rgba(255,165,0,0.2)), */
+  /*   url(https://grainy-gradients.vercel.app/noise.svg); */
+  /* min-height: calc(100vh - 64px); */
   font-size: 24px;
+  display: block;
 }
+
+#content {
+  margin: 40px;
+  padding: 40px;
+  border: 1px dashed #333;
+  background: black;
+  position: relative;
+  min-height: calc(100vh - 106px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mark {
+  font-family: monospace;
+  position: absolute;
+  font-size: 42px;
+  color: #333;
+  display: block;
+  text-wrap: nowrap;
+  font-weight: 300;
+}
+
+.mark.top {
+  top: -31px;
+}
+
+.mark.bottom {
+  bottom: -27px;
+}
+
+.mark.left {
+  left: -12.6px;
+}
+
+.mark.right {
+  text-align: right;
+  right: -12.6px;
+}
+
+.mark.back {
+  font-size: 26px;
+  font-weight: 800;
+  left: 20px;
+  top: -20px;
+  letter-spacing: -5px;
+  background: black;
+  padding-right: 10px;
+}
+
+.mark.back:hover {
+  color: white;
+}
+
+.mark.url {
+  font-size: 24px;
+  font-family: "mem 5x6";
+  background: black;
+  padding: 0 40px;
+  top: -14px;
+}
+
+#box {
+  /* border: 1px solid #222; */
+}
+
+/* FOOTER */
 
 footer {
   background: black;
   height: 20px;
   padding: 0 10px;
   border-top: 2px solid #222;
-  display: flex;
-  justify-content: space-between;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
 }
 
-footer a, footer p {
-  font-size: 14px;
+footer > div:nth-child(1) {
+  justify-self: start;
+}
+
+footer > div:nth-child(3) {
+  justify-self: end;
+}
+
+footer div {
+  display: flex;
 }
 
 footer p {
@@ -45,9 +117,9 @@ footer p {
 }
 
 footer a {
-  margin: 0 0 0 20px;
   color: white;
   text-decoration: none;
+  margin: 0 0 0 20px;
 }
 
 footer a:hover {
