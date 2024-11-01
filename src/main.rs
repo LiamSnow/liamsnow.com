@@ -18,6 +18,7 @@ async fn handle_404() -> Markup {
 
 #[tokio::main]
 async fn main() {
+    home::init();
     blog::init();
 
     let app = Router::new()

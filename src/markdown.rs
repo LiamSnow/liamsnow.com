@@ -1,10 +1,20 @@
-use std::{collections::HashMap, fs, io::BufWriter, path::PathBuf};
+use std::{collections::HashMap, fs, path::PathBuf};
 
-use comrak::{format_html_with_plugins, markdown_to_html_with_plugins, parse_document, plugins::syntect::SyntectAdapter, Arena, Options, Plugins};
+use comrak::{markdown_to_html_with_plugins, plugins::syntect::SyntectAdapter, Options, Plugins};
 use maud::{Markup, PreEscaped};
 
+use serde_yaml;
+
 pub struct BlogPage {
-    content: Markup,
+    pub html: Markup,
+    pub meta: BlogPageMeta,
+}
+
+#[derive(Debug, serde::Deserialize, Clone)]
+pub struct BlogPageMeta {
+    pub title: String,
+    pub desc: String,
+    pub date: String,
 }
 
 pub fn process_dir(path: &str) -> HashMap<String, BlogPage> {
@@ -37,17 +47,28 @@ fn process_file(path: &PathBuf, options: &Options, plugins: &Plugins) -> Option<
     match content_opt {
         Err(_) => None,
         Ok(content) => {
-            let arena = Arena::new();
-            let root = parse_document(&arena, content.as_str(), options);
-            let mut bw = BufWriter::new(Vec::new());
-            format_html_with_plugins(root, options, &mut bw, plugins).unwrap();
-            let html = String::from_utf8(bw.into_inner().unwrap()).unwrap();
+            let html = PreEscaped(markdown_to_html_with_plugins(
+                content.as_str(),
+                &options,
+                &plugins,
+            ));
+            let meta = process_front_matter(&content);
+            if meta.is_none() {
+                return None;
+            }
 
             Some(BlogPage {
-                content: PreEscaped(html)
+                meta: meta.unwrap(),
+                html,
             })
-        },
+        }
     }
 }
 
-// content: PreEscaped(markdown_to_html_with_plugins(c.as_str(), &options, &plugins)),
+fn process_front_matter(content: &String) -> Option<BlogPageMeta> {
+    let yaml_str = content.split("---").nth(1).map(|s| s.trim());
+    if yaml_str.is_none() {
+        return None;
+    }
+    serde_yaml::from_str(yaml_str.unwrap()).ok()
+}

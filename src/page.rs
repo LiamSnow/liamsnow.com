@@ -19,6 +19,9 @@ pub fn footer() -> Markup {
     }
 }
 
+const DEFAULT_CSS: &str = "/static/main.css";
+
+// TODO take list of CSS file names, and inject
 pub fn make_page(url: &str, title: &str, content: Markup, head: Markup) -> Markup {
     html! {
         (DOCTYPE)

@@ -1,8 +1,16 @@
+use std::sync::OnceLock;
+
 use maud::{html, Markup};
 
 use crate::page::make_page;
 
-pub async fn get_home() -> Markup {
+static HOME_HTML: OnceLock<Markup> = OnceLock::new();
+
+pub fn init() {
+    HOME_HTML.get_or_init(|| make_home_html());
+}
+
+pub fn make_home_html() -> Markup {
     make_page(
         "/",
         "Home",
@@ -61,4 +69,8 @@ pub async fn get_home() -> Markup {
             link rel="stylesheet" href="/static/home.css";
         },
     )
+}
+
+pub async fn get_home() -> Markup {
+    HOME_HTML.get().unwrap().clone()
 }
