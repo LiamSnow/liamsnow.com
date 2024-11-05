@@ -43,6 +43,7 @@ main {
   display: block;
   text-wrap: nowrap;
   font-weight: 300;
+  text-decoration: none;
 }
 
 .mark.top {
@@ -82,10 +83,6 @@ main {
   background: black;
   padding: 0 40px;
   top: -14px;
-}
-
-#box {
-  /* border: 1px solid #222; */
 }
 
 /* FOOTER */

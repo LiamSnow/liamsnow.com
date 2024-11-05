@@ -1,0 +1,95 @@
+#box {
+  padding: 0 40px;
+}
+
+#box h1,
+#box h2,
+#box h3,
+#box h4,
+#box h5 {
+  font-family: "mem 5x6";
+}
+
+#box h1:before,
+#box h2:before,
+#box h3:before,
+#box h4:before,
+#box h5:before {
+  content: "| ";
+  color: #333;
+}
+
+#box h1 {
+  font-size: 60px;
+}
+
+#box h2 {
+  font-size: 48px;
+}
+
+#box h3 {
+  font-size: 38px;
+}
+
+#box h4 {
+  font-size: 30px;
+}
+
+#box h5 {
+  font-size: 24px;
+}
+
+#box p,
+#box code,
+#box a,
+#box li {
+  font-size: 20px;
+}
+
+#box li::marker {
+  color: #706a63;
+}
+
+#box p,
+#box li {
+  color: #ada69c;
+}
+
+#box a {
+  color: rgb(255, 165, 0);
+  text-decoration: none;
+  transition:
+    background-color 50ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 50ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#box a:hover {
+  /* text-decoration: underline; */
+  /* text-decoration-style: wavy; */
+  background: rgb(255, 165, 0);
+  color: black;
+}
+
+/* block code */
+#box pre:has(code) {
+  border: 1px solid #222;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 20px;
+  background: none !important;
+  overflow-x: scroll;
+}
+
+/* inline code */
+#box code:not(pre code) {
+  background: linear-gradient(to left, #33ffccee, #33ccffee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* color: #e8e6e3; */
+}
+
+#box code:not(pre code)::before,
+#box code:not(pre code)::after {
+  content: "`";
+}

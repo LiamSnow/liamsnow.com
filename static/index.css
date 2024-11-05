@@ -1,0 +1,27 @@
+.post {
+  text-decoration: none;
+  display: flex;
+  color: #ada69c;
+  border: 1px dashed #333;
+  padding: 0 40px;
+  margin: 20px 0;
+}
+
+.post .title {
+  font-family: "mem 5x6";
+  color: white;
+}
+
+.post .desc {
+}
+
+.post .date {
+}
+
+.post:hover {
+  color: purple;
+}
+
+.post:hover .title {
+  color: purple;
+}
