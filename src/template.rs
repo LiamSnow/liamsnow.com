@@ -4,10 +4,11 @@ use maud::{html, Markup, PreEscaped, DOCTYPE};
 
 pub const CSS_MAIN: &str = "main";
 pub const CSS_HOME: &str = "home";
+pub const JS_HOME: &str = "home";
 pub const CSS_INDEX: &str = "index";
 pub const CSS_POST: &str = "post";
 
-pub fn apply(url: &str, title: &str, content: Markup, css: &[&str]) -> Markup {
+pub fn apply(_url: &str, title: &str, content: Markup, css: &[&str], js: &[&str]) -> Markup {
     html! {
         (DOCTYPE)
         html lang = "en" {
@@ -19,25 +20,12 @@ pub fn apply(url: &str, title: &str, content: Markup, css: &[&str]) -> Markup {
             body {
                 main {
                     #content {
-                        @if url == "/" {
-                            .mark .top .left { "+" }
-                        }
-                        @else {
-                            a .mark .top .back href=(get_back_link(url)) { "〈〈〈" }
-                            .mark .url { (url) }
-                        }
-
-                        .mark .top .right { "+" }
-                        .mark .bottom .left { "+" }
-                        .mark .bottom .right { "+" }
-
-                        #box {
-                            (content)
-                        }
+                        (content)
                     }
                 }
 
                 (footer())
+                (inject_js(js))
             }
         }
     }
@@ -58,9 +46,6 @@ fn footer() -> Markup {
                 a href="https://github.com/liamsnow/liamsnow.com" { "(Source Code)" }
             }
             div {
-              p { "Made with 🦀" }
-            }
-            div {
                 a href="mailto:mail@liamsnow.com" { "Email" }
                 a href="https://www.linkedin.com/in/william-snow-iv-140438169/" { "LinkedIn" }
                 a href="https://github.com/liamsnow" { "GitHub" }
@@ -74,6 +59,15 @@ fn inject_css(files: &[&str]) -> Markup {
     html! {
         @for file in files {
             link rel="stylesheet" href=(format!("/static/{file}.css"));
+        }
+    }
+}
+
+//TODO non dev
+fn inject_js(files: &[&str]) -> Markup {
+    html! {
+        @for file in files {
+            script type="text/javascript" src=(format!("/static/{file}.js")) {}
         }
     }
 }

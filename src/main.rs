@@ -1,16 +1,16 @@
 use std::{collections::HashMap, sync::OnceLock};
 
 use axum::{
+    Router,
     extract::Path,
     routing::{get, get_service},
-    Router,
 };
 use post::PostCollection;
 use tower_http::services::{ServeDir, ServeFile};
 
-mod template;
-mod post;
 mod home;
+mod post;
+mod template;
 
 static BLOGS: OnceLock<PostCollection> = OnceLock::new();
 static PROJECTS: OnceLock<PostCollection> = OnceLock::new();
@@ -25,14 +25,14 @@ async fn main() {
         .route("/", get(home::get_home))
         .route("/blog", get(BLOGS.get().unwrap().index.clone()))
         .route(
-            "/blog/:id",
+            "/blog/{id}",
             get(|Path(params): Path<HashMap<String, String>>| async {
                 BLOGS.get().unwrap().get_post(params)
             }),
         )
         .route("/projects", get(PROJECTS.get().unwrap().index.clone()))
         .route(
-            "/projects/:id",
+            "/projects/{id}",
             get(|Path(params): Path<HashMap<String, String>>| async {
                 PROJECTS.get().unwrap().get_post(params)
             }),

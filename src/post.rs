@@ -43,6 +43,7 @@ impl PostCollection {
 
             },
             &[template::CSS_MAIN, template::CSS_INDEX],
+            &[]
         );
 
         PostCollection { posts, index }
@@ -116,6 +117,7 @@ fn process_file(
                     (markdown)
                 },
                 &[template::CSS_MAIN, template::CSS_POST],
+                &[]
             );
 
             Some(Post { meta, html })
