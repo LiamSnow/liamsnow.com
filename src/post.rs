@@ -52,7 +52,7 @@ impl PostCollection {
             "index",
             html! {},
             html! {
-                (link("RSS", "/rss.xml"))
+                (link("RSS", &format!("/{collection_lower}/rss.xml")))
 
                 #posts {
                     @for (key, meta) in &posts_sorted {
