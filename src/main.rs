@@ -17,9 +17,13 @@ static PROJECTS: OnceLock<PostCollection> = OnceLock::new();
 
 #[tokio::main]
 async fn main() {
-    BLOGS.get_or_init(|| PostCollection::new("Blog".to_string()));
-    PROJECTS.get_or_init(|| PostCollection::new("Projects".to_string()));
-    home::init();
+    let (blogs_collection, recent_blogs) = PostCollection::new("Blog".to_string());
+    let (projects_collection, recent_projects) = PostCollection::new("Projects".to_string());
+
+    BLOGS.get_or_init(|| blogs_collection);
+    PROJECTS.get_or_init(|| projects_collection);
+
+    home::init(recent_projects, recent_blogs);
 
     let app = Router::new()
         .route("/", get(home::get_home))

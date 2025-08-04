@@ -1,27 +1,28 @@
-.post {
-  text-decoration: none;
+#content {
   display: flex;
-  color: #ada69c;
-  border: 1px dashed #333;
-  padding: 0 40px;
-  margin: 20px 0;
+  justify-content: center;
+  padding: 2rem 1rem;
+  flex-wrap: wrap;
 }
 
-.post .title {
-  font-family: "mem 5x6";
-  color: white;
-}
-
-.post .desc {
-}
-
-.post .date {
+.post {
+  background: white;
+  margin: 1rem;
+  border: 1px solid black;
+  text-decoration: none;
+  padding: 1rem 1rem;
+  transition: background-color 0.2s ease;
+  max-width: 300px;
 }
 
 .post:hover {
-  color: purple;
+  background-color: #e9ee7f;
 }
 
-.post:hover .title {
-  color: purple;
+.post:link {
+  color: black;
+}
+
+.post:visited {
+  color: #222;
 }

@@ -1,6 +1,4 @@
 # liamsnow.com
 
-
-## Libraries
 TODO
 
