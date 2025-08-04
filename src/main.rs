@@ -16,11 +16,13 @@ mod home;
 mod markdown;
 mod post;
 mod scss;
+mod sitemap;
 mod template;
 
 const HOST: &str = "0.0.0.0:3232";
 static BLOGS: OnceLock<PostCollection> = OnceLock::new();
 static PROJECTS: OnceLock<PostCollection> = OnceLock::new();
+static SITEMAP: OnceLock<String> = OnceLock::new();
 
 #[tokio::main]
 async fn main() {
@@ -29,10 +31,12 @@ async fn main() {
     // generate pages from markdown files
     let (blogs_collection, recent_blogs) = PostCollection::new("Blog".to_string());
     let (projects_collection, recent_projects) = PostCollection::new("Projects".to_string());
+    let sitemap = sitemap::generate(&blogs_collection, &projects_collection);
 
     // init shared structure here so we can unwrap later
     BLOGS.get_or_init(|| blogs_collection);
     PROJECTS.get_or_init(|| projects_collection);
+    SITEMAP.get_or_init(|| sitemap);
 
     // generate homepage
     home::init(recent_projects, recent_blogs);
@@ -62,6 +66,15 @@ async fn main() {
         .route(
             "/robots.txt",
             get_service(ServeFile::new("./static/robots.txt")),
+        )
+        .route(
+            "/sitemap.xml",
+            get(|| async {
+                axum::response::Response::builder()
+                    .header("Content-Type", "application/xml")
+                    .body(SITEMAP.get().unwrap().clone())
+                    .unwrap()
+            }),
         )
         .route(
             "/favicon.ico",
