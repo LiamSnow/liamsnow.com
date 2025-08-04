@@ -7,25 +7,61 @@ use crate::scss;
 
 static PRELOAD_JS: OnceLock<PreEscaped<String>> = OnceLock::new();
 
+const SCHEMA: &str = r#"{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Liam Snow",
+    "url": "https://liamsnow.com",
+}"#;
+
 pub fn apply(
     path: &str,
     title: &str,
-    content: Markup,
-    header_content: Markup,
+    desc: &str,
     scss: &str,
+    header_content: Markup,
+    content: Markup,
+    jsonld: Option<&str>,
 ) -> Markup {
+    let canonical_url = format!("https://liamsnow.com{path}");
+
     html! {
         (DOCTYPE)
         html lang = "en" {
             head {
+                title { (title) }
                 meta charset="utf-8";
                 meta name="viewport" content="width=device-width, initial-scale=1.0";
-                title { (title) }
+                meta name="description" content=(desc);
+                meta name="author" content="William Snow IV";
+                link rel="canonical" href=(canonical_url);
+
+                meta property="og:title" content=(title);
+                meta property="og:description" content=(desc);
+                meta property="og:type" content="website";
+                meta property="og:url" content=(canonical_url);
+                meta property="og:site_name" content="Liam Snow";
+
+                meta name="twitter:card" content="summary";
+                meta name="twitter:title" content=(title);
+                meta name="twitter:description" content=(desc);
+
                 link rel="preload" href="/static/fonts/SpaceMono-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous";
                 link rel="preload" href="/static/fonts/SpaceMono-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous";
                 link rel="preload" href="/static/fonts/SpaceGrotesk-Regular.otf" as="font" type="font/otf" crossorigin="anonymous";
+
                 (inject_scss(scss))
                 (header_content)
+
+                script type="application/ld+json" {
+                    (PreEscaped(SCHEMA))
+                }
+
+                @if let Some(json_ld) = jsonld {
+                    script type="application/ld+json" {
+                        (PreEscaped(json_ld))
+                    }
+                }
             }
             body {
                 (header(path))

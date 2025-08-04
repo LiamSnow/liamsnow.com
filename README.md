@@ -12,4 +12,5 @@ Fast portfolio website made with Axum & Maud.
  - Clean HTML using [maud](https://crates.io/crates/maud) macros
  - Blog posts and projects generated from markdown files using [comrak](https://crates.io/crates/comrak) and [syntect](https://crates.io/crates/syntect) syntax highlighting
  - Injects and minifies CSS and JS
+ - `sitemap.xml` generation
 

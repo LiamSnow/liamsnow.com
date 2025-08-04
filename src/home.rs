@@ -3,7 +3,7 @@ use std::sync::OnceLock;
 use maud::{Markup, html};
 
 use crate::{
-    post::{PostMeta, format_date},
+    post::{PostMeta, fancy_date_format},
     template::{self, link_new_tab},
 };
 
@@ -25,6 +25,25 @@ I enjoy learning in all areas of CS and have experience in many languages:
 Rust, Golang, C, C++, Python, Java, C#, TypeScript, JavaScript, Lua, Swift, and others.
 ";
 
+const SCHEMA: &str = r#"{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "William Snow IV",
+    "alternateName": "Liam Snow",
+    "url": "https://liamsnow.com",
+    "email": "mail@liamsnow.com",
+    "jobTitle": "Software Engineer",
+    "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Worcester Polytechnic Institute"
+    },
+    "sameAs": [
+        "https://github.com/liamsnow",
+        "https://www.linkedin.com/in/william-snow-iv-140438169/"
+    ],
+    "description": "Computer Science MS and Electrical & Computer Engineering BS student with a passion for systems programming and backend development."
+}"#;
+
 pub fn make_home_html(
     recent_projects: Vec<(String, PostMeta)>,
     recent_blogs: Vec<(String, PostMeta)>,
@@ -32,6 +51,9 @@ pub fn make_home_html(
     template::apply(
         "/",
         "Home",
+        "Liam Snow's personal website! Programming, systems, backend, Rust and more.",
+        "home",
+        html! {},
         html! {
             #hero {
                 h1.desktop {
@@ -62,8 +84,7 @@ pub fn make_home_html(
                 (make_section("BLOG", &recent_blogs))
             }
         },
-        html! {},
-        "home",
+        Some(SCHEMA),
     )
 }
 
@@ -79,7 +100,7 @@ fn make_section(name: &str, items: &Vec<(String, PostMeta)>) -> Markup {
                    a href=(format!("/{}/{key}", name.to_lowercase())) {
                        h3 { (meta.title) }
                        p.desc { (meta.desc) }
-                       p.date { (format_date(&meta.date)) }
+                       p.date { (fancy_date_format(&meta.date)) }
                    }
                 }
             }

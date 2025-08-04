@@ -44,19 +44,21 @@ impl PostCollection {
 
         let index = template::apply(
             &format!("/{collection_lower}"),
-            &collection,
+            &format!("Liam Snow's {collection}"),
+            &format!("Liam Snow's {collection}. Programming, systems, backend, Rust and more."),
+            "index",
+            html! {},
             html! {
               @for (key, meta) in &posts_sorted {
                  a .post href=(format!("/{collection_lower}/{key}")) {
                      h2.title { (meta.title) }
                      p.desc { (meta.desc) }
-                     p.date { (format_date(&meta.date)) }
+                     p.date { (fancy_date_format(&meta.date)) }
                  }
               }
 
             },
-            html! {},
-            "index",
+            None,
         );
 
         let homepage_posts: Vec<(String, PostMeta)> = posts_sorted
@@ -101,27 +103,70 @@ impl Post {
         let md = fs::read_to_string(path).expect("Could not read markdown file");
         let meta = PostMeta::from_markdown(&md);
         let content = markdown::to_html(&md);
+        let needs_katex = content.0.contains("data-math-style");
+
+        let schema_type = if collection.to_lowercase() == "blog" {
+            "Article"
+        } else {
+            "CreativeWork"
+        };
+
+        let structured_data = format!(
+            r#"{{
+                "@context": "https://schema.org",
+                "@type": "{}",
+                "headline": "{}",
+                "description": "{}",
+                "datePublished": "{}",
+                "dateModified": "{}",
+                "author": {{
+                    "@type": "Person",
+                    "name": "William Snow IV",
+                    "url": "https://liamsnow.com"
+                }},
+                "publisher": {{
+                    "@type": "Person",
+                    "name": "William Snow IV",
+                    "url": "https://liamsnow.com"
+                }},
+                "url": "https://liamsnow.com/{}/{}"
+            }}"#,
+            schema_type,
+            meta.title.replace('"', r#"\""#),
+            meta.desc.replace('"', r#"\""#),
+            meta.date.strftime("%Y-%m-%d"),
+            meta.date.strftime("%Y-%m-%d"),
+            collection.to_lowercase(),
+            filename
+        );
 
         let html = template::apply(
             &format!("/{}/{}", collection.to_lowercase(), filename),
             &meta.title,
+            &meta.desc,
+            "post",
             html! {
-                a.post-back href=(format!("/{}", collection.to_lowercase())) { "← Back" }
-                h1.post-title { (meta.title) }
-                p.post-date { (format_date(&meta.date)) }
-
-                (content)
-
-                script {
-                    (get_katex_run_js())
+                @if needs_katex {
+                    link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous";
+                    link rel="preload" as="style" href=(KATEX_CSS) integrity=(KATEX_CSS_HASH) crossorigin="anonymous";
+                    link rel="stylesheet" href=(KATEX_CSS) integrity=(KATEX_CSS_HASH) crossorigin="anonymous" media="print" onload="this.media='all'";
+                    script defer src=(KATEX_JS) integrity=(KATEX_JS_HASH) crossorigin="anonymous" {}
                 }
             },
             html! {
-                link rel="stylesheet" href=(KATEX_CSS) integrity=(KATEX_CSS_HASH) crossorigin="anonymous";
-                script defer src=(KATEX_JS) integrity=(KATEX_JS_HASH) crossorigin="anonymous" {}
-                meta name="description" content=(meta.desc);
+                a.post-back href=(format!("/{}", collection.to_lowercase())) { "← Back" }
+                h1.post-title { (meta.title) }
+                p.post-date { (fancy_date_format(&meta.date)) }
+
+                (content)
+
+                @if needs_katex {
+                    script {
+                        (get_katex_run_js())
+                    }
+                }
             },
-            "post",
+            Some(&structured_data),
         );
 
         Post { meta, html }
@@ -139,7 +184,8 @@ impl PostMeta {
     }
 }
 
-pub fn format_date(dt: &DateTime) -> String {
+/// returns: Aug 3st 2025
+pub fn fancy_date_format(dt: &DateTime) -> String {
     let day = dt.day();
 
     let suffix = match day {
