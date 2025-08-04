@@ -2,6 +2,7 @@
 title: virtex
 desc: 815fps FPGA-based IR machine vision camera
 date: 2022-05-27
+homepage: false
 ---
 
 I decided I wanted to compete with [LimeLight](https://limelightvision.io/)

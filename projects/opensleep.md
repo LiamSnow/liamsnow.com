@@ -2,6 +2,7 @@
 title: opensleep
 desc: Open source firmware for the Eight Sleep Pod 3
 date: 2025-06-10
+homepage: true
 ---
 
 [GitHub Repo](https://github.com/liamsnow/opensleep)

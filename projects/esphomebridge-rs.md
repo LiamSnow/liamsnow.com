@@ -2,6 +2,7 @@
 title: esphomebridge-rs
 desc: ESPHome client API written in Rust
 date: 2025-01-15
+homepage: true
 ---
 
 [GitHub Repo](https://github.com/liamsnow/esphomebridge-rs)

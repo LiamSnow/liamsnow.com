@@ -1,0 +1,144 @@
+@use 'variables' as *;
+@use 'fonts' as *;
+@use 'mixins' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Space Mono', monospace;
+  line-height: 1.6;
+  color: $gray;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image: radial-gradient(circle, $light-gray 1px, transparent 1px);
+  background-size: $grid-size $grid-size;
+  background-position: 0 0;
+}
+
+p,
+li {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  background-color: $primary-yellow;
+  z-index: 1000;
+  border-bottom: 1px solid $black;
+
+  >.container {
+    @include container($max-width, 1rem 3rem);
+    @include flex-center(row, space-between, center);
+  }
+
+  .left a {
+    font-weight: 500;
+    font-size: 24px;
+    letter-spacing: -3px;
+  }
+
+  img {
+    height: 40px;
+    width: auto;
+  }
+
+  .nav {
+    @include flex-center(row, center, center);
+    gap: 2rem;
+
+    &.mobile {
+      display: none;
+    }
+  }
+
+  a {
+    @include uppercase-text();
+    text-decoration: none;
+    color: $black;
+    @include transition(opacity);
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  button {
+    @include uppercase-text();
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    @include transition(opacity);
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+main {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+footer {
+  background-color: $primary-yellow;
+  padding: 2rem 0;
+  margin-top: auto;
+  border-top: 1px solid $black;
+
+  >.container {
+    @include container();
+    @include flex-center(row, space-between, center);
+
+    >.left {
+      @include flex-center();
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  }
+
+  a {
+    @include button();
+  }
+
+  .right {
+    font-size: 0.875rem;
+    color: $black;
+    text-align: right;
+  }
+}
+
+@media (max-width: 768px) {
+  header .container {
+    padding: 1rem;
+  }
+
+  footer>.container {
+    flex-direction: column-reverse;
+    gap: 1.5rem;
+    padding: 0 1rem;
+    text-align: center;
+
+    .left {
+      justify-content: center;
+    }
+
+    a {
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+    }
+
+    .right {
+      text-align: center;
+    }
+  }
+}

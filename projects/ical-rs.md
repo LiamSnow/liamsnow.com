@@ -2,6 +2,7 @@
 title: ical-rs
 desc: A flexbile and typed iCalendar (RFC 5545) library 
 date: 2024-11-10
+homepage: true
 ---
 
 ## Background

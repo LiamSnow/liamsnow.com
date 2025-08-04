@@ -4,7 +4,7 @@ use maud::{Markup, html};
 
 use crate::{
     post::{PostMeta, format_date},
-    template,
+    template::{self, link_new_tab},
 };
 
 static HOME_HTML: OnceLock<Markup> = OnceLock::new();
@@ -49,74 +49,40 @@ pub fn make_home_html(
                     .right {
                         h2 { "About me" }
                         p { (ABOUT_ME) }
-                        a href="mailto:mail@liamsnow.com" { "EMAIL" }
-                        a target="_blank" href="https://www.linkedin.com/in/william-snow-iv-140438169/" { "LINKEDIN" }
-                        a target="_blank" href="https://github.com/liamsnow" { "GITHUB" }
-                        a target="_blank" href="https://github.com/LiamSnow/resume/blob/main/resume.pdf" { "RESUME" }
+                        (link_new_tab("EMAIL", "mailto:mail@liamsnow.com"))
+                        (link_new_tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/"))
+                        (link_new_tab("GITHUB", "https://github.com/liamsnow"))
+                        (link_new_tab("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf"))
                     }
                 }
             }
 
             #sections {
-                // section {
-                //     .header {
-                //         span { "/ SKILLS" }
-                //         span { "■" }
-                //     }
-                //     .grid {
-                //         div {
-                //             h3 { "Systems Programming" }
-                //             p {
-                //                 "Networking, protocols, and concurrent systems. Check out "
-                //                 a href="/projects/esphomebridge-rs" { "esphomebridge-rs" }
-                //                 " & "
-                //                 a href="/projects/opensleep" { "opensleep" }
-                //             }
-                //         }
-                //         div {
-                //             h3 { "Backend Development" }
-                //             p {
-                //                 "Fast APIs, SQL, NoSQL, embedded databases, REST, WebSockets, GraphQL"
-                //             }
-                //         }
-                //     }
-                // }
-
-                section {
-                    .header {
-                        span { "/ PROJECTS" }
-                        span { "■" }
-                    }
-                    .lined-grid {
-                        @for (key, meta) in &recent_projects {
-                           a href=(format!("/projects/{key}")) {
-                               h3 { (meta.title) }
-                               p.desc { (meta.desc) }
-                               p.date { (format_date(&meta.date)) }
-                           }
-                        }
-                    }
-                }
-
-                section {
-                    .header {
-                        span { "/ BLOG" }
-                        span { "■" }
-                    }
-                    .lined-grid {
-                        @for (key, meta) in &recent_blogs {
-                           a href=(format!("/blog/{key}")) {
-                               h3 { (meta.title) }
-                               p.desc { (meta.desc) }
-                               p.date { (format_date(&meta.date)) }
-                           }
-                        }
-                    }
-                }
+                (make_section("PROJECTS", &recent_projects))
+                (make_section("BLOG", &recent_blogs))
             }
         },
-        &[template::CSS_MAIN, template::CSS_HOME],
-        &[],
-        false,
+        html! {},
+        "home",
     )
+}
+
+fn make_section(name: &str, items: &Vec<(String, PostMeta)>) -> Markup {
+    html! {
+        section {
+            .header {
+                span { "/ " (name) }
+                span { "■" }
+            }
+            .grid {
+                @for (key, meta) in items {
+                   a href=(format!("/{}/{key}", name.to_lowercase())) {
+                       h3 { (meta.title) }
+                       p.desc { (meta.desc) }
+                       p.date { (format_date(&meta.date)) }
+                   }
+                }
+            }
+        }
+    }
 }

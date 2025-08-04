@@ -1,0 +1,24 @@
+@use 'variables' as *;
+@use 'main' as *;
+@use 'mixins' as *;
+
+#content {
+  @include flex-center(row, center, stretch);
+  padding: 2rem 1rem;
+  flex-wrap: wrap;
+}
+
+.post {
+  @include card($white, $hover-yellow, 1rem);
+  margin: 1rem;
+  text-decoration: none;
+  max-width: 300px;
+  
+  &:link {
+    color: $black;
+  }
+  
+  &:visited {
+    color: #222;
+  }
+}

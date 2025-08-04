@@ -2,6 +2,7 @@
 title: igloo
 desc: An intuitive smart home automation platform
 date: 2025-05-06
+homepage: true
 ---
 
 [GitHub Repo](https://github.com/liamsnow/igloo)
