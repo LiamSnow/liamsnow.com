@@ -22,6 +22,6 @@ serde_yaml = "0.9.34"
 # code syntax highlighting
 syntect = "5.2.0"
 tokio = { version = "1.47.1", features = ["full"] }
-tower-http = { version = "0.6.6", features = ["fs", "trace", "compression-gzip", "set-header"] }
+tower-http = { version = "0.6.6", features = ["fs", "trace", "compression-full", "set-header"] }
 notify = { version = "8.2.0", optional = true }
 minify-js = "0.6.0"
