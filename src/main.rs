@@ -77,6 +77,24 @@ async fn main() {
             }),
         )
         .route(
+            "/blog/rss.xml",
+            get(|| async {
+                axum::response::Response::builder()
+                    .header("Content-Type", "application/rss+xml")
+                    .body(BLOGS.get().unwrap().rss.clone())
+                    .unwrap()
+            }),
+        )
+        .route(
+            "/projects/rss.xml",
+            get(|| async {
+                axum::response::Response::builder()
+                    .header("Content-Type", "application/rss+xml")
+                    .body(PROJECTS.get().unwrap().rss.clone())
+                    .unwrap()
+            }),
+        )
+        .route(
             "/favicon.ico",
             get_service(ServeFile::new("./static/favicon.ico")),
         )

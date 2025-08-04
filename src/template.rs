@@ -46,6 +46,9 @@ pub fn apply(
                 meta name="twitter:title" content=(title);
                 meta name="twitter:description" content=(desc);
 
+                link rel="alternate" type="application/rss+xml" title="Liam Snow's Blog" href="/blog/rss.xml";
+                link rel="alternate" type="application/rss+xml" title="Liam Snow's Projects" href="/projects/rss.xml";
+
                 link rel="preload" href="/static/fonts/SpaceMono-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous";
                 link rel="preload" href="/static/fonts/SpaceMono-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous";
                 link rel="preload" href="/static/fonts/SpaceGrotesk-Regular.otf" as="font" type="font/otf" crossorigin="anonymous";
@@ -122,7 +125,7 @@ fn footer() -> Markup {
                 p.right {
                     "© 2025 William Snow IV"
                     br;
-                    "Made with Rust 🦀"
+                    (link_new_tab("Made with Rust 🦀", "https://github.com/liamsnow/liamsnow.com"))
                 }
             }
         }

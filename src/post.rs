@@ -1,20 +1,23 @@
 use jiff::civil::DateTime;
 use maud::{Markup, html};
+use rss::{ChannelBuilder, ItemBuilder};
 use std::{collections::HashMap, fs, path::PathBuf};
 
 use crate::{
     markdown::{self, KATEX_CSS, KATEX_CSS_HASH, KATEX_JS, KATEX_JS_HASH, get_katex_run_js},
-    template,
+    template::{self, link},
 };
 
 pub struct PostCollection {
     pub posts: HashMap<String, Post>,
     pub index: Markup,
+    pub rss: String,
 }
 
 pub struct Post {
     pub html: Markup,
     pub meta: PostMeta,
+    pub content_html: String,
 }
 
 #[derive(Debug, serde::Deserialize, Clone)]
@@ -49,24 +52,29 @@ impl PostCollection {
             "index",
             html! {},
             html! {
-              @for (key, meta) in &posts_sorted {
-                 a .post href=(format!("/{collection_lower}/{key}")) {
-                     h2.title { (meta.title) }
-                     p.desc { (meta.desc) }
-                     p.date { (fancy_date_format(&meta.date)) }
-                 }
-              }
+                (link("RSS", "/rss.xml"))
 
+                #posts {
+                    @for (key, meta) in &posts_sorted {
+                        a .post href=(format!("/{collection_lower}/{key}")) {
+                            h2.title { (meta.title) }
+                            p.desc { (meta.desc) }
+                            p.date { (fancy_date_format(&meta.date)) }
+                        }
+                    }
+                }
             },
             None,
         );
+
+        let rss = Self::generate_rss(&posts, &collection, &posts_sorted);
 
         let homepage_posts: Vec<(String, PostMeta)> = posts_sorted
             .into_iter()
             .filter(|(_, meta)| meta.homepage)
             .collect();
 
-        (PostCollection { posts, index }, homepage_posts)
+        (PostCollection { posts, index, rss }, homepage_posts)
     }
 
     pub fn get_post(&self, params: HashMap<String, String>) -> Markup {
@@ -95,6 +103,53 @@ impl PostCollection {
             map.insert(filename, post);
         }
         map
+    }
+
+    fn generate_rss(
+        posts: &HashMap<String, Post>,
+        collection: &str,
+        posts_sorted: &[(String, PostMeta)],
+    ) -> String {
+        let mut items = Vec::new();
+
+        for (key, meta) in posts_sorted {
+            if let Some(post) = posts.get(key) {
+                let item = ItemBuilder::default()
+                    .title(Some(meta.title.clone()))
+                    .link(Some(format!(
+                        "https://liamsnow.com/{}/{}",
+                        collection.to_lowercase(),
+                        key
+                    )))
+                    .description(Some(meta.desc.clone()))
+                    .content(Some(post.content_html.clone()))
+                    .pub_date(Some(format_rfc2822(&meta.date)))
+                    .guid(Some(rss::Guid {
+                        value: format!(
+                            "https://liamsnow.com/{}/{}",
+                            collection.to_lowercase(),
+                            key
+                        ),
+                        permalink: true,
+                    }))
+                    .author(Some("mail@liamsnow.com (William Snow IV)".to_string()))
+                    .build();
+                items.push(item);
+            }
+        }
+
+        let channel = ChannelBuilder::default()
+            .title(format!("Liam Snow's {collection}"))
+            .link(format!(
+                "https://liamsnow.com/{}",
+                collection.to_lowercase()
+            ))
+            .description("Programming, systems, backend, Rust and more.")
+            .language(Some("en-us".to_string()))
+            .items(items)
+            .build();
+
+        channel.to_string()
     }
 }
 
@@ -169,7 +224,11 @@ impl Post {
             Some(&structured_data),
         );
 
-        Post { meta, html }
+        Post {
+            meta,
+            html,
+            content_html: content.0.clone(),
+        }
     }
 }
 
@@ -196,4 +255,23 @@ pub fn fancy_date_format(dt: &DateTime) -> String {
     };
 
     format!("{} {}{} {}", dt.strftime("%b"), day, suffix, dt.year())
+}
+
+/// returns: "Mon, 06 Sep 2021 00:00:00 GMT"
+fn format_rfc2822(dt: &DateTime) -> String {
+    let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+
+    let weekday = days[dt.weekday().to_sunday_zero_offset() as usize];
+    let month = months[(dt.month() - 1) as usize];
+
+    format!(
+        "{}, {:02} {} {} 00:00:00 GMT",
+        weekday,
+        dt.day(),
+        month,
+        dt.year()
+    )
 }

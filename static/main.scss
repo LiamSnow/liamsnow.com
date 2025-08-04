@@ -103,17 +103,21 @@ footer {
       @include flex-center();
       gap: 1rem;
       flex-wrap: wrap;
+
+      a {
+        @include button();
+      }
     }
-  }
 
-  a {
-    @include button();
-  }
+    >.right {
+      font-size: 0.875rem;
+      color: $black;
+      text-align: right;
 
-  .right {
-    font-size: 0.875rem;
-    color: $black;
-    text-align: right;
+      a {
+        text-decoration: none;
+      }
+    }
   }
 }
 

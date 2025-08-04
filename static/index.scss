@@ -3,22 +3,33 @@
 @use 'mixins' as *;
 
 #content {
+  a {
+    text-align: center;
+    width: 100%;
+    display: block;
+    color: black;
+    text-decoration: none;
+    margin-top: 3px;
+  }
+}
+
+#posts {
   @include flex-center(row, center, stretch);
   padding: 2rem 1rem;
   flex-wrap: wrap;
-}
 
-.post {
-  @include card($white, $hover-yellow, 1rem);
-  margin: 1rem;
-  text-decoration: none;
-  max-width: 300px;
-  
-  &:link {
-    color: $black;
-  }
-  
-  &:visited {
-    color: #222;
+  .post {
+    @include card($white, $hover-yellow, 1rem);
+    margin: 1rem;
+    text-decoration: none;
+    max-width: 300px;
+
+    &:link {
+      color: $black;
+    }
+
+    &:visited {
+      color: #222;
+    }
   }
 }
