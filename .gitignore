@@ -1,3 +1,4 @@
 /target
 /static/dist
-
+/result
+flake.lock
