@@ -95,3 +95,6 @@ Otherwise, I didn't actually have to do much more optimization. The server
 already has the pages generated a boot time, so its just shipping off a string
 as fast as it can.
 
+## Results
+
+![](/static/images/liamsnow_com_pagespeed.png)

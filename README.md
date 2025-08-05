@@ -1,5 +1,7 @@
 # liamsnow.com
 
+![](https://liamsnow.com/static/images/liamsnow_com_pagespeed.png)
+
 Fast personal website made in Rust with Axum.
 
  - 100/100 performance and 100/100 accessibility on [PageSpeed Insights](https://pagespeed.web.dev)
