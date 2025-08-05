@@ -46,6 +46,7 @@ impl PostCollection {
         posts_sorted.sort_by(|a, b| b.1.date.cmp(&a.1.date));
 
         let index = template::apply(
+            base_dir,
             &format!("/{collection_lower}"),
             &format!("Liam Snow's {collection}"),
             &format!("Liam Snow's {collection}. Programming, systems, backend, Rust and more."),
@@ -99,7 +100,7 @@ impl PostCollection {
         for pathres in paths {
             let path = pathres.unwrap().path();
             let filename = path.file_stem().unwrap().to_str().unwrap().to_string();
-            let post = Post::from_file(collection, &filename, &path);
+            let post = Post::from_file(base_dir, collection, &filename, &path);
             map.insert(filename, post);
         }
         map
@@ -154,7 +155,7 @@ impl PostCollection {
 }
 
 impl Post {
-    fn from_file(collection: &str, filename: &str, path: &PathBuf) -> Post {
+    fn from_file(base_dir: &str, collection: &str, filename: &str, path: &PathBuf) -> Post {
         let md = fs::read_to_string(path).expect("Could not read markdown file");
         let meta = PostMeta::from_markdown(&md);
         let content = markdown::to_html(&md);
@@ -196,6 +197,7 @@ impl Post {
         );
 
         let html = template::apply(
+            base_dir,
             &format!("/{}/{}", collection.to_lowercase(), filename),
             &meta.title,
             &meta.desc,
@@ -217,7 +219,7 @@ impl Post {
 
                 @if needs_katex {
                     script {
-                        (get_katex_run_js())
+                        (get_katex_run_js(base_dir))
                     }
                 }
             },

@@ -75,6 +75,6 @@ pub fn to_html(content: &str) -> PreEscaped<String> {
     ))
 }
 
-pub fn get_katex_run_js() -> &'static PreEscaped<String> {
-    KATEX_RUN_JS.get_or_init(|| load_js("katex_run"))
+pub fn get_katex_run_js(base_dir: &str) -> &'static PreEscaped<String> {
+    KATEX_RUN_JS.get_or_init(|| load_js(base_dir, "katex_run"))
 }

@@ -15,6 +15,7 @@ const SCHEMA: &str = r#"{
 }"#;
 
 pub fn apply(
+    base_dir: &str,
     path: &str,
     title: &str,
     desc: &str,
@@ -55,7 +56,7 @@ pub fn apply(
                 link rel="preload" href="/static/fonts/SpaceMono-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous";
                 link rel="preload" href="/static/fonts/SpaceGrotesk-Regular.otf" as="font" type="font/otf" crossorigin="anonymous";
 
-                (inject_scss(scss))
+                (inject_scss(base_dir, scss))
                 (header_content)
 
                 script type="application/ld+json" {
@@ -80,7 +81,7 @@ pub fn apply(
                 (footer())
 
                 script {
-                    (get_preload_js())
+                    (get_preload_js(base_dir))
                 }
             }
         }
@@ -147,15 +148,15 @@ pub fn link_new_tab(text: &str, href: &str) -> Markup {
 }
 
 #[cfg(feature = "dev")]
-fn inject_scss(name: &str) -> Markup {
+fn inject_scss(_base_dir: &str, name: &str) -> Markup {
     html! {
         link rel="stylesheet" href=(format!("/static/dist/{name}.css"));
     }
 }
 
 #[cfg(not(feature = "dev"))]
-fn inject_scss(name: &str) -> Markup {
-    let css = scss::compile_file(name);
+fn inject_scss(base_dir: &str, name: &str) -> Markup {
+    let css = scss::compile_file(base_dir, name);
     html! {
         style {
             (PreEscaped(css))
@@ -163,8 +164,8 @@ fn inject_scss(name: &str) -> Markup {
     }
 }
 
-pub fn load_js(name: &str) -> PreEscaped<String> {
-    let file_path = format!("./static/{name}.js");
+pub fn load_js(base_dir: &str, name: &str) -> PreEscaped<String> {
+    let file_path = format!("{base_dir}/static/{name}.js");
     let code = fs::read(&file_path).expect("Failed to read JavaScript file");
     let session = Session::new();
     let mut output = Vec::new();
@@ -172,6 +173,6 @@ pub fn load_js(name: &str) -> PreEscaped<String> {
     PreEscaped(String::from_utf8(output).expect("in minify-js output"))
 }
 
-pub fn get_preload_js() -> &'static PreEscaped<String> {
-    PRELOAD_JS.get_or_init(|| load_js("preload"))
+pub fn get_preload_js(base_dir: &str) -> &'static PreEscaped<String> {
+    PRELOAD_JS.get_or_init(|| load_js(base_dir, "preload"))
 }

@@ -9,8 +9,12 @@ use crate::{
 
 static HOME_HTML: OnceLock<Markup> = OnceLock::new();
 
-pub fn init(recent_projects: Vec<(String, PostMeta)>, recent_blogs: Vec<(String, PostMeta)>) {
-    HOME_HTML.get_or_init(|| make_home_html(recent_projects, recent_blogs));
+pub fn init(
+    base_dir: &str,
+    recent_projects: Vec<(String, PostMeta)>,
+    recent_blogs: Vec<(String, PostMeta)>,
+) {
+    HOME_HTML.get_or_init(|| make_home_html(base_dir, recent_projects, recent_blogs));
 }
 
 pub async fn get_home() -> Markup {
@@ -45,10 +49,12 @@ const SCHEMA: &str = r#"{
 }"#;
 
 pub fn make_home_html(
+    base_dir: &str,
     recent_projects: Vec<(String, PostMeta)>,
     recent_blogs: Vec<(String, PostMeta)>,
 ) -> Markup {
     template::apply(
+        base_dir,
         "/",
         "Home",
         "Liam Snow's personal website! Programming, systems, backend, Rust and more.",

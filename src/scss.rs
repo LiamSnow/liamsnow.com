@@ -9,17 +9,17 @@ use {
 use grass::OutputStyle;
 
 #[cfg(not(feature = "dev"))]
-pub fn compile_file(name: &str) -> String {
+pub fn compile_file(base_dir: &str, name: &str) -> String {
     let opts = grass::Options::default().style(OutputStyle::Compressed);
-    grass::from_path(format!("static/{name}.scss"), &opts).unwrap()
+    grass::from_path(format!("{base_dir}/static/{name}.scss"), &opts).unwrap()
 }
 
 #[cfg(feature = "dev")]
-pub fn watch() {
-    fs::create_dir_all("static/dist").ok();
-    compile_all_scss_files();
+pub fn watch(base_dir: String) {
+    fs::create_dir_all(format!("{base_dir}/static/dist")).ok();
+    compile_all_scss_files(&base_dir);
 
-    tokio::spawn(async {
+    tokio::spawn(async move {
         let (tx, mut rx) = mpsc::channel(100);
 
         let mut watcher = RecommendedWatcher::new(
@@ -33,7 +33,10 @@ pub fn watch() {
         .unwrap();
 
         watcher
-            .watch(Path::new("static"), RecursiveMode::NonRecursive)
+            .watch(
+                Path::new(&format!("{base_dir}/static")),
+                RecursiveMode::NonRecursive,
+            )
             .unwrap();
 
         while let Some(event) = rx.recv().await {
@@ -49,14 +52,14 @@ pub fn watch() {
                 .any(|p| p.extension().and_then(|s| s.to_str()) == Some("scss"));
 
             if is_modify && has_scss {
-                compile_all_scss_files();
+                compile_all_scss_files(&base_dir);
             }
         }
     });
 }
 
 #[cfg(feature = "dev")]
-fn compile_all_scss_files() {
+fn compile_all_scss_files(base_dir: &str) {
     println!("Recompiling scss..");
 
     let Ok(entries) = fs::read_dir("static") else {
@@ -81,7 +84,7 @@ fn compile_all_scss_files() {
         match grass::from_path(&path, &grass::Options::default()) {
             Ok(css) => {
                 let css_name = name.replace(".scss", ".css");
-                let output_path = format!("static/dist/{css_name}");
+                let output_path = format!("{base_dir}/static/dist/{css_name}");
 
                 if let Err(e) = fs::write(&output_path, css) {
                     eprintln!("Failed to write {output_path}: {e}");

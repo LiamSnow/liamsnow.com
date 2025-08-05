@@ -58,12 +58,12 @@ async fn main() {
     SITEMAP.get_or_init(|| sitemap);
 
     // generate homepage
-    home::init(recent_projects, recent_blogs);
+    home::init(&args.working_directory, recent_projects, recent_blogs);
 
     // watch scss files if in dev mode
     #[cfg(feature = "dev")]
     {
-        scss::watch();
+        scss::watch(args.working_directory.clone());
     }
 
     let static_dir = format!("{}/static", args.working_directory);
