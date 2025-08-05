@@ -32,6 +32,10 @@ struct Args {
     port: u16,
     #[arg(short, long, default_value = "0.0.0.0")]
     address: String,
+    /// working directory, no trailing slash
+    /// For example "." or "/home/liams"
+    #[arg(short, long, default_value = ".")]
+    working_director: String,
 }
 
 #[tokio::main]
@@ -42,8 +46,10 @@ async fn main() {
     println!("Generating pages...");
 
     // generate pages from markdown files
-    let (blogs_collection, recent_blogs) = PostCollection::new("Blog".to_string());
-    let (projects_collection, recent_projects) = PostCollection::new("Projects".to_string());
+    let (blogs_collection, recent_blogs) =
+        PostCollection::new(&args.working_director, "Blog".to_string());
+    let (projects_collection, recent_projects) =
+        PostCollection::new(&args.working_director, "Projects".to_string());
     let sitemap = sitemap::generate(&blogs_collection, &projects_collection);
 
     // init shared structure here so we can unwrap later
@@ -59,6 +65,8 @@ async fn main() {
     {
         scss::watch();
     }
+
+    let static_dir = format!("{}/static", args.working_director);
 
     let app = Router::new()
         .route("/", get(home::get_home))
@@ -78,7 +86,7 @@ async fn main() {
         )
         .route(
             "/robots.txt",
-            get_service(ServeFile::new("./static/robots.txt")),
+            get_service(ServeFile::new(format!("{static_dir}/robots.txt"))),
         )
         .route(
             "/sitemap.xml",
@@ -109,12 +117,12 @@ async fn main() {
         )
         .route(
             "/favicon.ico",
-            get_service(ServeFile::new("./static/favicon.ico")),
+            get_service(ServeFile::new(format!("{static_dir}/favicon.ico"))),
         )
         .nest_service(
             "/static",
             axum::Router::new()
-                .fallback_service(ServeDir::new("static"))
+                .fallback_service(ServeDir::new(static_dir))
                 .layer(SetResponseHeaderLayer::if_not_present(
                     axum::http::header::CACHE_CONTROL,
                     axum::http::HeaderValue::from_static("public, max-age=31536000, immutable"),

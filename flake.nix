@@ -32,9 +32,6 @@
               fi
               cp -r $dir $out/share/${pname}/
             done
-            
-            wrapProgram $out/bin/${pname} \
-              --set LIAMSNOW_DATA_DIR $out/share/${pname}
           '';
         };
       }
@@ -65,6 +62,12 @@
               description = "Address to bind to";
             };
             
+            workingDir = mkOption {
+              type = types.str;
+              default = "${cfg.package}/share/liamsnow-com";
+              description = "Working directory containing static, blog, and projects directories";
+            };
+            
             openFirewall = mkOption {
               type = types.bool;
               default = false;
@@ -81,7 +84,7 @@
               after = [ "network.target" ];
               
               serviceConfig = {
-                ExecStart = "${cfg.package}/bin/liamsnow-com --port ${toString cfg.port} --address ${cfg.address}";
+                ExecStart = "${cfg.package}/bin/liamsnow-com --port ${toString cfg.port} --address ${cfg.address} --working-director ${cfg.workingDir}";
                 Restart = "always";
                 RestartSec = 5;
                 Type = "simple";

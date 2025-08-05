@@ -35,9 +35,9 @@ pub struct PostMeta {
 /// all the pages (index + individual pages)
 impl PostCollection {
     /// returns a new PostCollection + posts marked for homepage
-    pub fn new(collection: String) -> (Self, Vec<(String, PostMeta)>) {
+    pub fn new(base_dir: &str, collection: String) -> (Self, Vec<(String, PostMeta)>) {
         let collection_lower = collection.to_lowercase();
-        let posts = Self::process_dir(&collection);
+        let posts = Self::process_dir(base_dir, &collection);
 
         let mut posts_sorted: Vec<(String, PostMeta)> = posts
             .iter()
@@ -93,9 +93,9 @@ impl PostCollection {
         post.html.clone()
     }
 
-    fn process_dir(collection: &str) -> HashMap<String, Post> {
+    fn process_dir(base_dir: &str, collection: &str) -> HashMap<String, Post> {
         let mut map = HashMap::new();
-        let paths = fs::read_dir(format!("./{}", collection.to_lowercase())).unwrap();
+        let paths = fs::read_dir(format!("{base_dir}/{}", collection.to_lowercase())).unwrap();
         for pathres in paths {
             let path = pathres.unwrap().path();
             let filename = path.file_stem().unwrap().to_str().unwrap().to_string();
