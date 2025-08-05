@@ -46,6 +46,8 @@ pub fn apply(
                 meta name="twitter:title" content=(title);
                 meta name="twitter:description" content=(desc);
 
+                meta name="theme-color" content="#f0fb29";
+
                 link rel="alternate" type="application/rss+xml" title="Liam Snow's Blog" href="/blog/rss.xml";
                 link rel="alternate" type="application/rss+xml" title="Liam Snow's Projects" href="/projects/rss.xml";
 
