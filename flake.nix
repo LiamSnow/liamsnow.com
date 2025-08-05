@@ -84,7 +84,7 @@
               after = [ "network.target" ];
               
               serviceConfig = {
-                ExecStart = "${cfg.package}/bin/liamsnow-com --port ${toString cfg.port} --address ${cfg.address} --working-director ${cfg.workingDir}";
+                ExecStart = "${cfg.package}/bin/liamsnow-com --port ${toString cfg.port} --address ${cfg.address} --working-directory ${cfg.workingDir}";
                 Restart = "always";
                 RestartSec = 5;
                 Type = "simple";

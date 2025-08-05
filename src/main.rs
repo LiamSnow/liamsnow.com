@@ -35,7 +35,7 @@ struct Args {
     /// working directory, no trailing slash
     /// For example "." or "/home/liams"
     #[arg(short, long, default_value = ".")]
-    working_director: String,
+    working_directory: String,
 }
 
 #[tokio::main]
@@ -47,9 +47,9 @@ async fn main() {
 
     // generate pages from markdown files
     let (blogs_collection, recent_blogs) =
-        PostCollection::new(&args.working_director, "Blog".to_string());
+        PostCollection::new(&args.working_directory, "Blog".to_string());
     let (projects_collection, recent_projects) =
-        PostCollection::new(&args.working_director, "Projects".to_string());
+        PostCollection::new(&args.working_directory, "Projects".to_string());
     let sitemap = sitemap::generate(&blogs_collection, &projects_collection);
 
     // init shared structure here so we can unwrap later
@@ -66,7 +66,7 @@ async fn main() {
         scss::watch();
     }
 
-    let static_dir = format!("{}/static", args.working_director);
+    let static_dir = format!("{}/static", args.working_directory);
 
     let app = Router::new()
         .route("/", get(home::get_home))
