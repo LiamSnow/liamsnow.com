@@ -25,6 +25,11 @@ for speed and clean code.
  - Highly ranked on [PageSpeed Insights](https://pagespeed.web.dev/)
  - Blogs and project pages written in Markdown or Typst
 
+## Results
+
+![](/static/images/liamsnow_com_pagespeed.png)
+![](/static/images/liamsnow_com_gt.png)
+
 ## Development
 
 ### Typst
@@ -95,6 +100,3 @@ Otherwise, I didn't actually have to do much more optimization. The server
 already has the pages generated a boot time, so its just shipping off a string
 as fast as it can.
 
-## Results
-
-![](/static/images/liamsnow_com_pagespeed.png)
