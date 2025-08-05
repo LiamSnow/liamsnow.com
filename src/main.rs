@@ -5,6 +5,7 @@ use axum::{
     extract::Path,
     routing::{get, get_service},
 };
+use clap::Parser;
 use post::PostCollection;
 use tower_http::{
     compression::CompressionLayer,
@@ -19,13 +20,25 @@ mod scss;
 mod sitemap;
 mod template;
 
-const HOST: &str = "0.0.0.0:3232";
 static BLOGS: OnceLock<PostCollection> = OnceLock::new();
 static PROJECTS: OnceLock<PostCollection> = OnceLock::new();
 static SITEMAP: OnceLock<String> = OnceLock::new();
 
+#[derive(Parser, Debug)]
+#[command(name = "web-server")]
+#[command(about = "A simple web server for blogs and projects", long_about = None)]
+struct Args {
+    #[arg(short, long, default_value_t = 3232)]
+    port: u16,
+    #[arg(short, long, default_value = "0.0.0.0")]
+    address: String,
+}
+
 #[tokio::main]
 async fn main() {
+    let args = Args::parse();
+    let host = format!("{}:{}", args.address, args.port);
+
     println!("Generating pages...");
 
     // generate pages from markdown files
@@ -110,8 +123,8 @@ async fn main() {
         .layer(CompressionLayer::new())
         .fallback("404");
 
-    let listener = tokio::net::TcpListener::bind(HOST).await.unwrap();
-    println!("Hosting at {HOST}!");
+    let listener = tokio::net::TcpListener::bind(&host).await.unwrap();
+    println!("Hosting at {host}!");
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
