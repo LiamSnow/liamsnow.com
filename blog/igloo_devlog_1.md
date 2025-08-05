@@ -6,7 +6,3 @@ homepage: true
 ---
 
 WIP
-
-$$
-\frac{1}{2}
-$$
