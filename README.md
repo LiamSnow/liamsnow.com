@@ -13,4 +13,4 @@ Fast personal website made in Rust with Axum.
  - Sass compiler (using [grass](https://crates.io/crates/grass)) + file watching feature with `-F dev`
  - Clean HTML using [maud](https://crates.io/crates/maud) macros
 
-[See More](https://liamsnow.com/projects/liamsnow.com)
+[See More](https://liamsnow.com/projects/liamsnow_com)
