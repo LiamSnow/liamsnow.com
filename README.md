@@ -1,13 +1,9 @@
 # liamsnow.com
 
-![](https://liamsnow.com/static/images/liamsnow_com_pagespeed.png)
+![PageSpeed Insights 100/100 Performance 100/100 Accessibility 100/100 Best Practices 100/100 SEO](https://liamsnow.com/static/images/liamsnow_com_pagespeed.png)
 ![](https://liamsnow.com/static/images/liamsnow_com_gt.png)
 
 Fast personal website made in Rust with Axum.
-
- - 100/100 performance and 100/100 accessibility on [PageSpeed Insights](https://pagespeed.web.dev)
- - 300ms speed index
- - 7-10kB pages (except longer posts)
 
 ## Features
  - Pre-generates all pages
@@ -16,3 +12,5 @@ Fast personal website made in Rust with Axum.
  - Sitemap and RSS feed generation
  - Sass compiler (using [grass](https://crates.io/crates/grass)) + file watching feature with `-F dev`
  - Clean HTML using [maud](https://crates.io/crates/maud) macros
+
+[See More](https://liamsnow.com/projects/liamsnow.com)
