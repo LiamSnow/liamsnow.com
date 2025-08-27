@@ -16,10 +16,9 @@ and active community are truly impressive.
 
 However, that doesn't mean it comes without flaws:
  1. **Clunky and Poorly Designed UI**: the organization system of the UI is confusing. I find myself having to click into 6 different subpages for simple things. It sounds like a small problem but is consistently annoying. This also makes it really tedious to make automations, which I think is a core part of smart homes.
- 2. **Feature Hell**: It seems like they just keep tacking on features that just make it all confusing. Having integrations, devices, entities, helper, areas, labels, zones, addons, dashboards, tags, and more is way overly complex. Furthermore, its common to add more to HASS by adding HACS so now you have another system.
- 4. **Constantly Breaking**: Just leaving Home Assistant running on its own, it will eventually just break itself and require manual intervention.
- 5. **Mixing of GUI and YAML Configuration**: The configuration system just seems like a mess of tech debt. Editing in the UI should be easy but doesnt give you all the features and is consistently buggy. Then when you try to edit in YAML is a mess of digging through documentation.
- 6. **Slow**: Its crazy that for the workload in my house it basically requires that I have a Raspi 5 with a fan and heatsinks on it AND the website still loads slow.
+ 2. **Constantly Breaking**: Just leaving Home Assistant running on its own, it will eventually just break itself and require manual intervention.
+ 3. **Mixing of GUI and YAML Configuration**: The configuration system just seems like a mess of tech debt. Editing in the UI should be easy but doesnt give you all the features and is consistently buggy. Then when you try to edit in YAML is a mess of digging through documentation.
+ 4. **Slow**: Its crazy that for the workload in my house it basically requires that I have a Raspi 5 with a fan and heatsinks on it AND the website still loads slow.
 
 
 ## Igloo
