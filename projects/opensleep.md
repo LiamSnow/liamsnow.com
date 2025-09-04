@@ -79,10 +79,7 @@ would allow for a lot of cool things in a smart home like having automations
 trigger when you get into/out of bed.
 
 ## A New Version
-I have spent countless hours sifting through `strace` in order to completely
-reimplement the frank to frozen and frank to sensor protocols. Its not standard
-at all and quite tediuos, but I have made great progress. I'm not quite
-ready to release it yet, but I have a lot of information to dump here.
+I have spent countless hours implementing the Frank <-> Frozen and Frank <-> Sensor protocols.
 
 Sensor communicates over USART at `/dev/ttymxc0` and frozen at `/dev/ttymxc2`.
 
