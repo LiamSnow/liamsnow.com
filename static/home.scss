@@ -14,47 +14,47 @@ header {
   background-image: radial-gradient(circle, $hover-yellow 1px, transparent 1px);
   background-size: $grid-size $grid-size;
   background-position: 0 0;
-  
-  > h1 {
+
+  >h1 {
     font-weight: 700;
     text-align: center;
     margin-bottom: 1rem;
     line-height: 1;
-    
+
     &.desktop {
       font-size: 192px;
-      
+
       @media (max-width: 990px) {
         display: none;
       }
     }
-    
+
     &.mobile {
       font-size: min(35vw, 120px);
       display: none;
-      
+
       @media (max-width: 990px) {
         display: block;
       }
     }
   }
-  
-  > .content {
+
+  >.content {
     @include container(800px, 0 2rem);
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
   }
-  
+
   h2 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
   }
-  
+
   p {
     margin-bottom: 2rem;
   }
-  
+
   a {
     @include button();
     margin: 10px 0 0 10px;
@@ -66,48 +66,55 @@ header {
   flex-direction: column;
   align-items: center;
   padding: 0 2rem;
-  
-  > section {
+
+  >section {
     padding: 14px 0 4rem 0;
     width: 100%;
-    
+
     &:not(:first-child) {
       border-top: 1px solid $black;
     }
-    
-    > .header {
+
+    >.header {
       @include container($max-width, 0);
       @include flex-center(row, space-between, center);
       @include uppercase-text();
       margin-bottom: 3rem;
     }
   }
-  
+
   .grid {
     @include flex-center(row, center, stretch);
     flex-wrap: wrap;
     padding: 0;
     margin: 0;
-  }
-  
-  .grid > a {
-    @include card();
-    max-width: 280px;
-    text-decoration: none;
-    color: inherit;
-    margin: -0.5px;
-    cursor: pointer;
-    
-    .date {
-      margin-bottom: 0;
+
+    >a {
+      @include card();
+      max-width: 280px;
+      text-decoration: none;
+      color: inherit;
+      margin: -0.5px;
+      cursor: pointer;
+      border-radius: 3px;
+
+      .date {
+        margin-bottom: 0;
+      }
+
+      &.highlight {
+        border: 2px solid black;
+        border-radius: 3px;
+        /* background: #f3f5d4 */
+      }
     }
   }
-  
+
   h3 {
     margin-bottom: 1rem;
     font-size: 1.25rem;
   }
-  
+
   p {
     margin-bottom: 1rem;
   }

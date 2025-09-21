@@ -5,8 +5,8 @@ date: 2024-11-10
 homepage: true
 ---
 
-## Background
-### Why
+# Background
+## Why
 For a long time I've used python CLI tools ([todoman](https://github.com/pimutils/todoman)
 and [khal](https://github.com/pimutils/khal)) to interact with
 my CalDAV calendar and todo lists in Linux. I'm pretty happy with them,
@@ -21,7 +21,7 @@ Now, I'm not affraid to say that I'm quite a Python hater for big projects.
 So I didn't want to go out and rewrite `todoman` in Python again.
 I decided to go with my favorite choice here which was Rust.
 
-### Rust iCalendar Libraries
+## Rust iCalendar Libraries
 There are two rust libraries that exist:
  1. [ical-rs](https://github.com/Peltoche/ical-rs): cool library
 but archived in 2024. Seems to be a great library for making iCalendar
@@ -30,12 +30,12 @@ files, but not for reading or editing ones.
 
 Now realistically, I could have been very successful with either library.
 
-### The Real Reason Why
+## The Real Reason Why
 I was super interested in this old format, it was cool to be that it had
 a super defined spec (RFC 5545). I was also taking a programming langauges
 class, I needed a project for the masters extension that handled parsing.
 
-## Results
+# Results
 After probably rewriting this library 3 times, I can say I'm almost happy
 with the result. I taught me a LOT about using Rust macros, and also
 their disadvantages. I think having a system like macros in Zig would have
@@ -44,15 +44,15 @@ on code generation in a `build.rs` (something I didn't realize was possible
 at the time).
 
 
-### Features
+## Features
 
  - Full implemenation of every ICalendar type
  - Generated methods for every ICalendar property with all allowed types
  - Support for X & IANA properties and parameters
 
-### Usage
+## Usage
 
-#### Modify Existing
+### Modify Existing
 I built the library around this idea, I would I say
 I definetly achieved it. Here you can see that in 4
 lines of code, I can parse an iCalendar string, edit
@@ -66,7 +66,7 @@ vtodo.summary("New Summary".to_string());
 let new_ics_str = vcal.to_ics();
 ```
 
-#### Make New
+### Make New
 ```rust
 let dtstamp = Tz::America__New_York.with_ymd_and_hms(1992, 12, 17, 12, 34, 56)?;
 let vcal = ICalComponent::vcalendar_with_vtodo(
@@ -79,7 +79,7 @@ let vcal = ICalComponent::vcalendar_with_vtodo(
 let ics_str = vcal.to_ics();
 ```
 
-#### X & IANA Properties
+### X & IANA Properties
 
 Convert Value:
 ```rust

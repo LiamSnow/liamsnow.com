@@ -19,20 +19,20 @@ but eventually realized I think I had it right from the start. The combination
 of Axum and Maud is really nice for simple websites, especially if you looking
 for speed and clean code.
 
-## Goals
+# Goals
  - Basically fully SSR
  - Small page size
  - Highly ranked on [PageSpeed Insights](https://pagespeed.web.dev/)
  - Blogs and project pages written in Markdown or Typst
 
-## Results
+# Results
 
 ![](/static/images/liamsnow_com_pagespeed.png)
 ![](/static/images/liamsnow_com_gt.png)
 
-## Development
+# Development
 
-### Typst
+## Typst
 I spent awhile trying to get Typst HTML generation to work, but its really
 just not there yet. I was firm on having features like code
 syntax highlighting and displaying math well which Typst just can't achieve
@@ -41,7 +41,7 @@ its current state.
 Its kind of sad, I think Typst is an amazing tool and love using it for my
 notes. I hope that soon I will be able to transition over.
 
-### Markdown
+## Markdown
 Since Typst wasn't going to work, the obvious choice was to go with Markdown.
 I chose [comrak](https://crates.io/crates/comrak) since it matches GitHub
 and has a ton of plugins. One of them I was really excited about was
@@ -52,7 +52,7 @@ It was pretty easy to get setup and running. I some code in `src/post.rs`
 which will read a directory (either `projects/` or `blog/`), parse all
 the markdown files, and generate the page content.
 
-### Maud
+## Maud
 As I said before I think Maud is just an amazing experience. Its really easy
 to work with and I was able to make some really cooler functions. I have
 `src/template.rs` which takes in some page metadata, content, etc. and wraps
@@ -79,13 +79,13 @@ fn header(path: &str) -> Markup {
 }
 ```
 
-### SCSS
+## SCSS
 Originally I had written everything with CSS, but with all the nested rules it
 was becoming really annoying. I setup [grass](https://crates.io/crates/grass)
 which makes it super easy. Then I made a simple script in `src/scss.rs` which
 watches the `.scss` files in `static/` and generates the files on change. 
 
-### Optimizations
+## Optimizations
 Since I was looking for fast load times and I knew that my CSS and JS were
 very small, I decided to inline everything. Each page has its own
 SCSS file which imports the main SCSS file. This way I can just have `grass`

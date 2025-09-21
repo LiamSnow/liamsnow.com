@@ -26,8 +26,8 @@ This seems to be a default for new ESPHome devices (including all the ones
 I had). I wasn't able to find much documentation for it, but after digging through
 aioesphomeapi for long enough I was able to reverse-engineer it.
 
-## Brief ESPHome Overview
-### Noise Protocol
+# Brief ESPHome Overview
+## Noise Protocol
 
 Luckily I was able to offload a lot of the work to the
 [snow](https://crates.io/crates/snow) which I just had to plugin
@@ -40,7 +40,7 @@ waiting for the handshake to complete.
 
 Then from there on out, it's just like working with a normal/non-noise connection.
 
-### Protobuf
+## Protobuf
 After completing all connection setup, then comes the protobuf protocol.
 
 Here you introduce yourself as the client, with your name and supported versions.
@@ -55,7 +55,7 @@ On side note, I feel like ESPHome's naming scheme is quite weird. In my mind
 a device should be an entity and what they call entities (light, switch, number, etc.)
 should be components.
 
-## My Implementation
+# My Implementation
 
 I played around with a bunch of ways to do this, but landed on something
 I'm pretty happy with.
@@ -101,7 +101,7 @@ let req = api::LightCommandRequest {
 dev.light_command(req).await?;
 ```
 
-### Entities
+## Entities
 Theres some big, very opinated decisions I made for this crates around entities.
 Looking for the best performance, I decided that `ESPHomeDevice` would store
 two things for entities: `entities` and `entity_index_lut`.
@@ -118,7 +118,7 @@ actions on entities repeatidly, you can just store their key. If you want to
 consistently lookup an entities data, you can just store the index.
 
 
-### Smaller Decisions
+## Smaller Decisions
 Theres also some smaller interesting decisions I made:
  1. **Use of channels**: If you subscribe to state updates or logs for a device, you put in a channel size and get back a `tokio::mpsc::Reciever<EntityStateUpdate>`. While I totally understand other people wanting a callback, I found this method to make the most sense for most applications, especially Igloo.
  2. **Enum over Trait**: I decided to have `ESPHomeDevice` store an enum `AnyConnection` which can be either `Noise` or `Plain`. Funny enough I actually do have a trait for connections, but I decided to go down this route to avoid using `dyn`.

@@ -39,7 +39,7 @@ pub fn make_options() -> Options<'static> {
             autolink: false,
             tasklist: true,
             superscript: true,
-            header_ids: None,
+            header_ids: Some("".to_string()),
             footnotes: true,
             description_lists: true,
             front_matter_delimiter: Some("---".to_owned()),

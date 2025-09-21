@@ -1,15 +1,29 @@
 ---
 title: Igloo Devlog 1
-desc: WIP
+desc: Penguin Work
 date: 2025-08-27
 homepage: true
 ---
 
 [Project Page](https://liamsnow.com/projects/igloo)
 
+# Table of Contents
+<!--toc:start-->
+- [Renaming](#renaming)
+- [Penguin/Language](#penguinlanguage)
+  - [Prototype 1](#prototype-1)
+  - [Changing Course](#changing-course)
+  - [Prototype 2](#prototype-2)
+    - [Background](#background)
+    - [Planning](#planning)
+    - [Many Prototypes](#many-prototypes)
+    - [Results](#results)
+- [Next Steps](#next-steps)
+<!--toc:end-->
+
 # Renaming
 After some though, I have decided to stick with the original project name Igloo (was Zaemon).
-The programming/configuration language for it will be Penguin (was ZCL - Zaemon Configruation Language).
+The programming/configuration language for it will be Penguin (was ZCL - Zaemon Configuration Language).
 
 # Penguin/Language
 ## Prototype 1
@@ -41,7 +55,7 @@ Some are absolutely amazing ([Unreal Engine Blueprints](https://dev.epicgames.co
 [Blockly](https://developers.google.com/blockly))
 and some are horrible ([LabVIEW](https://www.ni.com/en/shop/labview.html)).
 
-Theres certainly a lot more nuance to this, but I think the big differentiator between
+There's certainly a lot more nuance to this, but I think the big differentiator between
 good VPLs and bad ones, is simply how it feels to use the GUI. As dumb as it sounds, it
 really makes a big impact. LabVIEW is extremely powerful, but I would never use it again
 because of how annoying it is.
@@ -63,11 +77,11 @@ work on my part for relatively little benefit. I found that the Dioxus (basicall
 had good performance and was very easy to work with.
 
 ### Results
-Right now, I have the dioxus version working such that you can add, delete, select, drag, pan, zoom, and wire:
+Right now, I have the Dioxus version working such that you can add, delete, select, drag, pan, zoom, and wire:
 
 ![](/static/images/penguin_prototype.png)
 
-## Next Steps
+# Next Steps
 
 Over the next few months I plan to:
 

@@ -7,7 +7,7 @@ homepage: true
 
 [GitHub Repo](https://github.com/liamsnow/igloo)
 
-## Why
+# Why
 I want to start out by saying that I think
 [Home Assistant](https://www.home-assistant.io/)
 is a groundbreaking tool and the most critical
@@ -21,7 +21,7 @@ However, that doesn't mean it comes without flaws:
  4. **Slow**: Its crazy that for the workload in my house it basically requires that I have a Raspi 5 with a fan and heatsinks on it AND the website still loads slow.
 
 
-## Igloo
+# Igloo
 
 With all of these pain points in mind, I decided to build
 a competing smart home platform called Igloo.
@@ -34,7 +34,7 @@ to find a good architecture for this platform. But, its also really fun.
 I'm really happy that I spent the time to make a prototype and just get
 something working, because it taught me so much.
 
-### The Prototype
+# The Prototype
 
 In this prototype, I was really fixated on the idea of configuring it
 like NixOS and easily writing scripts for it. However, looking back
@@ -52,12 +52,12 @@ Anyway, here's an executive summary of the Igloo prototype:
 I built it using Rust (Tokio + Axum) and SolidJS. I was pretty happy with this stack, but it was sometimes annoying having to copy interfaces into SolidJS.
 
 
-#### Screenshot
+## Screenshot
 ![](/static/images/igloo_proto.png)
 
 
 
-### Next Steps
+# Next Steps
 
 This year I will have a lot of time to dedicate to Igloo as it will be a part of my MQP (Major Qualifying Project) at WPI. In this version I am planning a complete rewrite, learning from mistakes:
  1. Configuration is all UI based. The layout must be heavily thought out and tested with other people to verify it is intuitive.

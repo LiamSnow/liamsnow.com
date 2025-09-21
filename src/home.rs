@@ -103,7 +103,7 @@ fn make_section(name: &str, items: &Vec<(String, PostMeta)>) -> Markup {
             }
             .grid {
                 @for (key, meta) in items {
-                   a href=(format!("/{}/{key}", name.to_lowercase())) {
+                   a .highlight[meta.highlight] href=(format!("/{}/{key}", name.to_lowercase())) {
                        h3 { (meta.title) }
                        p.desc { (meta.desc) }
                        p.date { (fancy_date_format(&meta.date)) }

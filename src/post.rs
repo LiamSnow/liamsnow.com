@@ -27,6 +27,8 @@ pub struct PostMeta {
     pub date: DateTime,
     #[serde(default)]
     pub homepage: bool,
+    #[serde(default)]
+    pub highlight: bool,
 }
 
 /// This collection is used for both blogs and projects
@@ -57,7 +59,7 @@ impl PostCollection {
 
                 #posts {
                     @for (key, meta) in &posts_sorted {
-                        a .post href=(format!("/{collection_lower}/{key}")) {
+                        a .post .highlight[meta.highlight] href=(format!("/{collection_lower}/{key}")) {
                             h2.title { (meta.title) }
                             p.desc { (meta.desc) }
                             p.date { (fancy_date_format(&meta.date)) }
@@ -212,7 +214,7 @@ impl Post {
             },
             html! {
                 a.post-back href=(format!("/{}", collection.to_lowercase())) { "← Back" }
-                h1.post-title { (meta.title) }
+                .post-title { (meta.title) }
                 p.post-date { (fancy_date_format(&meta.date)) }
 
                 (content)
