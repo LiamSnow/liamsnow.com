@@ -1,6 +1,6 @@
 ---
 title: Igloo Devlog 1
-desc: Penguin Work
+desc: Prototyping Penguin - A visual programming language for the smart home world.
 date: 2025-08-27
 homepage: true
 ---

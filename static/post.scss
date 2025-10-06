@@ -57,6 +57,10 @@ main {
     color: #706a63;
   }
 
+  p {
+    margin-top: 18px;
+  }
+
   a {
     text-decoration: none;
     position: relative;
@@ -123,6 +127,7 @@ main {
   font-size: 2.5em;
   line-height: 1;
   margin: 0 0 8px 0;
+  font-weight: 800;
 }
 
 .post-date {

@@ -1,13 +1,11 @@
 ---
 title: Igloo Devlog 2
-desc: Planning
+desc: Planning out ECS model, extensions, and more 
 date: 2025-09-20
 homepage: true
 ---
 
 [Project Page](https://liamsnow.com/projects/igloo)
-
-
 
 I have spent the last month working on planning Igloo in more detail and confirming
 or changing some of my past decisions. Spending extra time on this planning stage
