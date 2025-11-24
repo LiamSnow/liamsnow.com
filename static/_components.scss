@@ -5,7 +5,7 @@
 }
 
 .btn-primary {
-  @include button($primary-yellow, $black, $black, $primary-yellow);
+  @include button(white, black, black, white);
 }
 
 .container {
@@ -28,7 +28,7 @@
 }
 
 .card-compact {
-  @include card($white, $hover-yellow, 1rem);
+  @include card(white, #333, 1rem);
 }
 
 .section-header {

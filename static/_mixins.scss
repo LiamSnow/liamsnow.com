@@ -1,36 +1,34 @@
-@use 'variables' as *;
-
-@mixin button($bg-color: transparent, $text-color: $black, $hover-bg: $black, $hover-text: $primary-yellow) {
+@mixin button($bg-color: transparent, $text-color: white, $hover-bg: #333, $hover-text: #555) {
   display: inline-block;
   padding: 0.75rem 1.25rem;
   background-color: $bg-color;
-  border: 1px solid $black;
+  border: 1px solid white;
   color: $text-color;
   text-decoration: none;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: all $transition-speed ease;
+  transition: all 0.2s ease;
   cursor: pointer;
-  
+
   &:hover {
     background-color: $hover-bg;
     color: $hover-text;
   }
 }
 
-@mixin container($max-width: $max-width, $padding: 0 2rem) {
+@mixin container($max-width: 1200px, $padding: 0 2rem) {
   max-width: $max-width;
   margin: 0 auto;
   padding: $padding;
 }
 
-@mixin card($bg-color: $white, $hover-bg: $hover-yellow, $padding: 2rem) {
+@mixin card($bg-color: black, $hover-bg: #222, $padding: 2rem) {
   background: $bg-color;
-  border: 1px solid $black;
+  border: 1px solid white;
   padding: $padding;
-  transition: background-color $transition-speed ease;
-  
+  transition: background-color 0.2s ease;
+
   &:hover {
     background-color: $hover-bg;
   }
@@ -49,10 +47,10 @@
   align-items: $align;
 }
 
-@mixin border-box($border-color: $black, $border-width: 1px) {
+@mixin border-box($border-color: black, $border-width: 1px) {
   border: $border-width solid $border-color;
 }
 
-@mixin transition($property: all, $duration: $transition-speed, $timing: ease) {
+@mixin transition($property: all, $duration: 0.2s, $timing: ease) {
   transition: $property $duration $timing;
 }

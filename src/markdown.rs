@@ -1,12 +1,10 @@
-use std::sync::OnceLock;
-
+use crate::template::load_js;
 use comrak::{
     ExtensionOptions, Options, ParseOptions, Plugins, RenderOptions, markdown_to_html_with_plugins,
     plugins::syntect::SyntectAdapter,
 };
 use maud::PreEscaped;
-
-use crate::template::load_js;
+use std::sync::OnceLock;
 
 pub const KATEX_CSS: &str = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css";
 pub const KATEX_CSS_HASH: &str =
@@ -21,7 +19,7 @@ static OPTIONS: OnceLock<Options> = OnceLock::new();
 static SYNTECT: OnceLock<SyntectAdapter> = OnceLock::new();
 
 pub fn get_syntect_adapter() -> &'static SyntectAdapter {
-    SYNTECT.get_or_init(|| SyntectAdapter::new(Some("base16-ocean.light")))
+    SYNTECT.get_or_init(|| SyntectAdapter::new(Some("base16-ocean.dark")))
 }
 
 pub fn make_plugins() -> Plugins<'static> {

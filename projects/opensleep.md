@@ -1,5 +1,5 @@
 ---
-title: opensleep 81★
+title: opensleep 112★
 desc: Open source firmware for the Eight Sleep Pod 3
 date: 2025-09-04
 homepage: true
