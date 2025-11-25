@@ -103,12 +103,9 @@ fn header(path: &str) -> Markup {
                 .left {
                     (link("IV", &get_base_url(path)))
                 }
-                .nav.desktop {
+                .nav {
                     (link("BLOG", "/blog"))
                     (link("PROJECTS", "/projects"))
-                }
-                .nav.mobile {
-                    button { "MENU" }
                 }
             }
         }
