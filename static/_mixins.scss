@@ -1,19 +1,20 @@
-@mixin button($bg-color: transparent, $text-color: white, $hover-bg: #333, $hover-text: #555) {
+@mixin button() {
   display: inline-block;
   padding: 0.75rem 1.25rem;
-  background-color: $bg-color;
-  border: 1px solid white;
-  color: $text-color;
+  border: 1px solid #252525;
+  border-radius: 5px;
+  color: #33ffcc;
   text-decoration: none;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, border-radius 0.2s ease;
   cursor: pointer;
+  box-shadow: inset 0 0 10px 4px black;
 
   &:hover {
-    background-color: $hover-bg;
-    color: $hover-text;
+    color: #33ccff;
+    border-radius: 16px;
   }
 }
 
@@ -23,14 +24,21 @@
   padding: $padding;
 }
 
-@mixin card($bg-color: black, $hover-bg: #222, $padding: 2rem) {
-  background: $bg-color;
-  border: 1px solid white;
-  padding: $padding;
-  transition: background-color 0.2s ease;
+@mixin card() {
+  border: 1px solid #252525;
+  transition: border-radius 0.2s ease;
+  color: white;
 
   &:hover {
-    background-color: $hover-bg;
+    border-radius: 20px;
+  }
+
+  * {
+    transition: color 0.3s ease;
+  }
+
+  &:hover * {
+    color: #8cd9f2;
   }
 }
 
@@ -45,12 +53,4 @@
   flex-direction: $direction;
   justify-content: $justify;
   align-items: $align;
-}
-
-@mixin border-box($border-color: black, $border-width: 1px) {
-  border: $border-width solid $border-color;
-}
-
-@mixin transition($property: all, $duration: 0.2s, $timing: ease) {
-  transition: $property $duration $timing;
 }

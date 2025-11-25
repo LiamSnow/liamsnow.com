@@ -4,7 +4,7 @@ use maud::{Markup, html};
 
 use crate::{
     post::{PostMeta, fancy_date_format},
-    template::{self, link_new_tab},
+    template::{self, link_new_tab, link_new_tab_highlight},
 };
 
 static HOME_HTML: OnceLock<Markup> = OnceLock::new();
@@ -62,13 +62,9 @@ pub fn make_home_html(
         html! {},
         html! {
             #hero {
-                h1.desktop {
-                    "LIAMSNOW"
-                }
-
-                h1.mobile{
+                h1{
                     "LIAM"
-                    br;
+                    wbr;
                     "SNOW"
                 }
 
@@ -80,7 +76,7 @@ pub fn make_home_html(
                         (link_new_tab("EMAIL", "mailto:mail@liamsnow.com"))
                         (link_new_tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/"))
                         (link_new_tab("GITHUB", "https://github.com/liamsnow"))
-                        (link_new_tab("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf"))
+                        (link_new_tab_highlight("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf"))
                     }
                 }
             }

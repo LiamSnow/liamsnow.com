@@ -123,7 +123,7 @@ fn footer() -> Markup {
                     (link_new_tab("EMAIL", "mailto:mail@liamsnow.com"))
                     (link_new_tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/"))
                     (link_new_tab("GITHUB", "https://github.com/liamsnow"))
-                    (link_new_tab("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf"))
+                    (link_new_tab_highlight("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf"))
                 }
                 p.right {
                     "© 2025 William Snow IV"
@@ -144,6 +144,12 @@ pub fn link(text: &str, href: &str) -> Markup {
 pub fn link_new_tab(text: &str, href: &str) -> Markup {
     html! {
         a target="_blank" href=(href) { (text) }
+    }
+}
+
+pub fn link_new_tab_highlight(text: &str, href: &str) -> Markup {
+    html! {
+        a target="_blank" class="highlight" href=(href) { (text) }
     }
 }
 

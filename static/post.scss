@@ -3,13 +3,33 @@
 
 main {
   @include flex-center(column, flex-start, center);
+  padding: 4rem 1.5rem;
 }
 
 #content {
   width: 100%;
   max-width: 800px;
-  padding: 4rem 15px;
+  padding: 0;
   background: black;
+  border-radius: 20px;
+  box-shadow:
+    -50px 0 50px 20px black,
+    50px 0 50px 20px black,
+    0 -50px 50px 20px black,
+    0 50px 50px 20px black;
+
+  h1,
+  h2,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a,
+  p,
+  li {
+    background: black;
+  }
 
   h1 {
     font-size: 2em;
@@ -63,7 +83,7 @@ main {
   a {
     text-decoration: none;
     position: relative;
-    background: linear-gradient(to left, #d4af37, #f02929);
+    background: linear-gradient(to left, #ff33cc, #ab18dc);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -79,7 +99,7 @@ main {
       font-size: 0.8em;
       margin-left: 0.2em;
       display: inline-block;
-      background: linear-gradient(to left, #d4af37, #f02929);
+      background: linear-gradient(to left, #ff33cc, #ab18dc);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -91,17 +111,17 @@ main {
   // block code
   pre:has(code) {
     margin: 2rem 0;
-    border-radius: 4px;
-    @include border-box();
+    border-radius: 6px;
+    border: 1px solid #555;
     padding: 1rem;
-    background: #181818 !important;
+    background: #090909 !important;
     overflow-x: scroll;
     font-size: 16px;
   }
 
   // inline code
   code:not(pre code) {
-    background: linear-gradient(to left, #d4af37, #f02929);
+    background: linear-gradient(to left, #ff33cc, #ab18dc);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

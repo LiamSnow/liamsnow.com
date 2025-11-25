@@ -10,6 +10,14 @@
     text-decoration: none;
     margin-top: 3px;
   }
+
+  >a {
+    font-size: 18px;
+    background: linear-gradient(to left, #33ccff, #33ffcc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 #posts {
@@ -18,18 +26,21 @@
   flex-wrap: wrap;
 
   .post {
-    @include card(black, #222, 1rem);
+    @include card();
+    padding: 1rem;
     margin: 1rem;
     text-decoration: none;
     max-width: 300px;
-    border-radius: 3px;
+    border-radius: 10px;
+    box-shadow: 0 0 80px 40px black,
+      inset 0 0 20px 40px black;
 
     &:link {
       color: white;
     }
 
-    &:visited {
-      color: #c8c4ff;
-    }
+    /* &:visited { */
+    /* color: #f9e4f4; */
+    /* } */
   }
 }
