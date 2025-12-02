@@ -1,44 +1,78 @@
 ---
-title: Igloo Devlog 0
-desc: My first attempt - Smart homes are hard
+title: First Igloo Prototype
+desc: Smart home platforms are hard
 date: 2025-03-14
 homepage: true
 ---
 
-[Project Page](https://liamsnow.com/projects/igloo)
+[Project Page](../projects/igloo)
 
-I spent around six months making a prototype of Igloo and turns
-out these smart home platforms are quite a lot harder than I thought.
-There's a ton of big decisions to make all the time. It's really hard
-to find a good architecture for this platform. But, its also really fun.
+I spent six months building an Igloo prototype. Smart home platforms are significantly harder than I anticipated, but the prototype taught me what doesn't work and why.
 
-I'm really happy that I spent the time to make a prototype and just get
-something working, because it taught me so much.
+# What I Built
 
-In this prototype, I was really fixated on the idea of configuring it
-like NixOS and easily writing scripts for it. However, looking back
-now, if my goal is to make an intuitive smart home platform this is
-definitely not the right approach.
+The prototype used an immutable configuration approach inspired by NixOS:
 
-Anyway, here's an executive summary of the Igloo prototype:
- 1. Zones contain Devices contain Entities (Entities closely resemble Home Assistant ones)
- 2. There is two interfaces to the system, API and websocket (used for the frontend for realtime updates)
- 3. CLI-based protocol for both interfaces. Might seem weird but is actually a really clean way for working with a smart home. For example, `list devices kitchen`, `light all off`, `light kitchen.sink off`
- 4. Everything is configured in a RON file (users, user groups, permissions, provider configs, devices and zones, ui elements, scripts). While it can definetly be a pain its nice that its all in one clear place.
-   - This makes it immutable and ephemeral. To add or remove devices you must restart the program.
- 5. Scripting is super easy with the use of the CLI protocol
+**Architecture:**
+- Zones contain Devices contain Entities (similar to Home Assistant's model)
+- Two interfaces: REST API and WebSocket
+- CLI-based protocol for both interfaces:
+  - `list devices kitchen`
+  - `light all off`
+  - `light kitchen.sink off`
+- Everything configured in a single Ron file: users, permissions, provider configs, devices, zones, UI elements, and scripts
+- Immutable and ephemeral: No data is saved between runs, nothing is ever changed once running. The config file is the center of truth.
 
-I built it using Rust (Tokio + Axum) and SolidJS. I was pretty happy with this stack, but it was sometimes annoying having to copy interfaces into SolidJS.
+**Tech Stack:**
+- Backend: Rust with Tokio and Axum
+- Frontend: SolidJS
 
+The CLI protocol was elegant for scripting, and the configuration-as-code approach felt clean on paper.
 
-## Screenshot
 ![](/static/images/igloo_proto.png)
 
+# What I Learned
 
-# Next Steps
+## Scale and Complexity
 
-This year I will have a lot of time to dedicate to Igloo as it will be a part of my MQP (Major Qualifying Project) at WPI. In this version I am planning a complete rewrite, learning from mistakes:
- 1. Configuration is all UI based. The layout must be heavily thought out and tested with other people to verify it is intuitive.
- 2. A visual programming language to allow users to easily create automations and scripts. People and providers can make their own nodes using Python or other languages.
- 3. Intuitive architecture
- 4. Standard provider interface such that providers can be easily written in any reasonable language
+This was my first substantial Tokio project. Managing providers, devices, entities, channels, concurrent tasks, dashboards, frontend, authentication, API, and scripting simultaneously was more complex than I anticipated. Implementing the [ESPHome provider](../projects/esphomebridge-rs) alone was very complicated.
+
+## Configuration Conflicts with Intuition
+
+The NixOS-inspired approach directly conflicted with my goal of building an intuitive platform. Users had to:
+- Generate password hashes manually with `igloo hash PASSWD`
+- Edit a Ron file for all configuration changes
+- Restart the system to add or remove devices
+- Understand the configuration file structure before using the system
+
+This approach might work for power users, but it creates a steep learning curve for everyone else.
+In either case, it requires users reading a ton of documentation to set up their smart home.
+If the goal is intuitive, configuration must happen through the UI, not a file.
+
+## Architectural Problems
+
+The prototype used hard-coded entity types, which created cascading complexity. For each entity type, I needed to define:
+- A struct to store the entity's state
+- An enum for commands (requests to the entity)
+- An enum for state updates from the entity
+
+This meant adding a new entity type required changes throughout the codebase. Worse, providers were built directly into Igloo like Linux kernel drivers, resulting in slow compilation times and tight coupling between providers and the core system.
+
+## The CLI Protocol Trade-off
+
+The CLI-based protocol (`light kitchen off`) was clean for scripting but was limiting and again
+requires users to learn a new system and read through documentation.
+A good GUI can provide autocomplete, visual feedback, and discovery which a CLI could never match.
+While the CLI protocol worked well for automation scripts, it was the wrong primary interface for users.
+
+# V2 Direction
+
+For my WPI Major Qualifying Project this year, I'm doing a complete rewrite that addresses these lessons:
+
+1. **UI-based configuration**: All setup happens through the interface. The layout will be tested with users to ensure good UX.
+
+2. **Visual programming for automations**: Home Assistant demonstrated that many users prefer visual interfaces for creating automations over YAML configuration. A full visual programming language will provide more power while remaining accessible. Users and providers can create custom nodes using Python or other languages.
+
+3. **Flexible architecture**: Moving away from hard-coded entity types to reduce coupling and complexity.
+
+4. **Standard provider interface**: Providers will be separate from the core system, allowing them to be written in any reasonable language without slow compilation or tight coupling.

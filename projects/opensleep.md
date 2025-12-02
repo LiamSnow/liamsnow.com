@@ -8,24 +8,6 @@ highlight: true
 
 [GitHub Repo](https://github.com/liamsnow/opensleep)
 
-# Table of Contents
-<!--toc:start-->
-- [Table of Contents](#table-of-contents)
-- [Disclaimer](#disclaimer)
-- [Background](#background)
-- [Version 1](#version-1)
-- [Version 2](#version-2)
-  - [Features](#features)
-  - [Technical Challenges](#technical-challenges)
-    - [Deserializing](#deserializing)
-    - [Baud Switching](#baud-switching)
-    - [Reliability](#reliability)
-  - [Additional Components](#additional-components)
-  - [Release & Community Response](#release--community-response)
-    - [Lessons Learned](#lessons-learned)
-- [Outcome](#outcome)
-<!--toc:end-->
-
 # Disclaimer
 This project is for educational and research purposes only. It is for personal, non-commercial use and is not affiliated with, endorsed by, or sponsored by Eight Sleep. The Eight Sleep name and Pod are trademarks of Eight Sleep, Inc.
 
