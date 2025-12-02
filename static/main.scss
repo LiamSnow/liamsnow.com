@@ -1,6 +1,10 @@
 @use 'fonts' as *;
 @use 'mixins' as *;
 
+@view-transition {
+  navigation: auto;
+}
+
 * {
   margin: 0;
   padding: 0;

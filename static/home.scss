@@ -12,11 +12,12 @@ header {
   box-shadow: 0 25px 25px 10px black;
 
   >h1 {
+    font-family: 'Space Mono';
     font-weight: 700;
     text-align: center;
     margin: 1rem 1rem 1rem 1rem;
     line-height: 1;
-    text-shadow: 2px 2px #33ffcc, -2px -2px #ab18dc;
+    text-shadow: 3px 2px #33ffcc, -3px -2px #ab18dc;
     font-size: min(35vw, 200px);
   }
 
@@ -39,14 +40,6 @@ header {
   a {
     @include button();
     margin: 10px 0 0 10px;
-
-    /* &.highlight:not(:hover) { */
-    /* border-image: linear-gradient(to left, #ff33cc, #ab18dc) 1; */
-    /* } */
-
-    /* &.highlight:hover { */
-    /* border-color: #ab18dc; */
-    /* } */
   }
 }
 
@@ -74,6 +67,7 @@ header {
       @include flex-center(row, space-between, center);
       @include uppercase-text();
       margin-bottom: 3rem;
+      font-weight: 600;
     }
   }
 
@@ -101,6 +95,10 @@ header {
       &.highlight {
         z-index: 20;
         border-color: #ab18dc;
+      }
+
+      &.highlight:hover * {
+        color: #b957da;
       }
     }
   }
