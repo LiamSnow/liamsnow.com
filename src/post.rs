@@ -213,7 +213,7 @@ impl Post {
                 }
             },
             html! {
-                a.post-back href=(format!("/{}", collection.to_lowercase())) { "← Back" }
+                a.post-back href=(format!("/{}", collection.to_lowercase())) { "← " (collection) }
                 .post-title { (meta.title) }
                 p.post-date { (fancy_date_format(&meta.date)) }
 
