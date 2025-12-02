@@ -5,22 +5,25 @@ date: 2022-05-27
 homepage: false
 ---
 
-I decided I wanted to compete with [LimeLight](https://limelightvision.io/)
-during COVID-19 so I designed a tiny camera that can
-track retro-reflective targets at 815fps (!!) using FPGA-based vision
-processing.
+During COVID-19, I designed an FPGA-based vision camera for FIRST Robotics Competition to address latency issues in existing solutions like LimeLight. LimeLight had 50-100ms latency, which required control algorithms to compensate for outdated position data. For example, a turret tracking a target needs to account for where the target was 50ms ago, not where it is now.
 
-Crazy project to say the least. One day I'll get around to cleaning
-up and releasing the devlog.
+Virtex achieved 815fps retro-reflective target tracking with minimal latency, eliminating the need for latency compensation in control systems.
 
-Sadly FIRST Robotics Competition switched to using April tags instead
-of retro-reflective tape to I had to abandon the project.
+## Technical Approach
+
+The main challenge was implementing vision processing entirely in the FPGA pipeline without external RAM. Traditional vision processing uses multiple stages with intermediate buffering, but I had to design a single-pass pipeline that processed each frame in one shot. This constraint required reimagining standard vision algorithms to work within the FPGA's block RAM limitations.
+
+The hardware consisted of a compact 1.5" x 2" eight-layer PCB integrating an Artix-7 FPGA (XC7A35T), FTDI USB chip, and Onsemi image sensor.
+
+## Outcome
+
+I successfully demonstrated 815fps tracking, but FIRST Robotics Competition switched from retro-reflective tape to AprilTags before the project could be deployed. This architectural change made the specialized hardware obsolete, and I shelved the project.
 
 # Sources
- - [Virtex HDL](https://github.com/34-Engineering/Virtex-HDL): Xilinx Vivado project for the Artix-7 (XC7A35T-1FTG256C) FPGA on Virtex
- - [Virtex PCBs](https://github.com/34-Engineering/Virtex-PCBs): Altium source for Virtex's PCBs and adapter board (34V0-CB-A, 34V0-CB-B, 34V0-CB-C, and 34AB0-CB)
- - [Virtex CAD](https://github.com/34-Engineering/Virtex-CAD): Fusion 360 CAD files for Virte and its adapter board (34V0 and 34AB0)
- - [Virtex App](https://github.com/34-Engineering/Virtex-App): Angular + Electron desktop application used for updating, viewing the camera stream of, and configuring Virtex.
+ - [Virtex HDL](https://github.com/34-Engineering/Virtex-HDL): Xilinx Vivado project for the Artix-7 FPGA
+ - [Virtex PCBs](https://github.com/34-Engineering/Virtex-PCBs): Altium source for PCBs and adapter board
+ - [Virtex CAD](https://github.com/34-Engineering/Virtex-CAD): Fusion 360 CAD files
+ - [Virtex App](https://github.com/34-Engineering/Virtex-App): Angular + Electron desktop application for configuration and camera stream viewing
 
 # Images
 ![](/static/images/virtex2_on.jpeg)
@@ -29,10 +32,8 @@ of retro-reflective tape to I had to abandon the project.
 
 ## PCB
 
-This was an actually rediculous 8-layer PCB cramming
-a USB chip, FPGA, and image sensor onto one tiny board.
+Eight-layer PCB integrating FTDI USB chip, Artix-7 FPGA, and Onsemi image sensor:
 
 ![](/static/images/virtex_main_pcb_back.jpeg)
 
 ![](/static/images/virtex_main_pcb_front.jpeg)
-

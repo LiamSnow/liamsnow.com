@@ -7,46 +7,42 @@ homepage: true
 
 [GitHub Repo](https://github.com/liamsnow/liamsnow.com)
 
+# Why Build This?
+
+I wanted full control over my personal website and to not be limited by existing static site generators (SSGs).
+While, I'm sure existing SSGs would have worked fine, making it myself both gave me more freedom and the opportunity to make another Rust project.
+
 # Goals
- - Basically fully SSR
- - Small page size
- - Highly ranked on [PageSpeed Insights](https://pagespeed.web.dev/)
- - Blogs and project pages written in Markdown or Typst
 
-These are pretty strict goals, but I think they really led me in the
-right direction. After trying out a few ways to do this with different
-templating engines, I eventually landed on Axum + Maud which I think
-is a great combination. It allows me to keep everything in Rust,
-have type-safe templates, and just be really fast.
+When starting this project, I set strict performance targets:
 
+- **Static site generation**: Pre-render all content at startup, serve instantly on each request
+- **Small page size**: Target minimal transfer size for fast loading and reduced bounce rates
+- **High PageSpeed scores**: Optimize for Google's Core Web Vitals, which directly impact SEO rankings
+- **Markup-based content**: Write blogs and project pages in markup language
+- **Aesthetic but Readable**: It must look good while still being easy to read and navigate
+
+These goals are interconnected. Small page sizes reduce load times, which improves user experience and helps with search engine rankings. Fast initial loads prevent visitors from bouncing before the page even renders. The site currently weighs 13.39kB uncompressed (4.68kB compressed), which helps achieve these objectives.
 
 # Results
 
 ![](/static/images/liamsnow_com_pagespeed.png)
 ![](/static/images/liamsnow_com_gt.png)
 
+The site achieves excellent PageSpeed scores and consistently fast load times. More importantly, the architecture makes adding new content straightforward: write Markdown, push to GitHub, and the site rebuilds automatically via git-ops on my NixOS homelab.
+
 # Development
 
-## Typst
-I spent a while trying to get Typst HTML generation to work, but its really
-just not there yet. I was firm on having features like code
-syntax highlighting and displaying math well which Typst just can't achieve
-its current state.
+## Choosing a Templating Engine
 
-Its kind of sad, I think Typst is an amazing tool and love using it for my
-notes. I hope that soon I will be able to transition over.
+I evaluated several Rust templating options before settling on my approach.
+I tried
+[minijinja](https://crates.io/crates/minijinja) and [handlebars-rust](https://crates.io/crates/handlebars)
+first which both are solid libraries. However, I ultimately chose Maud for two reasons: type safety and reducing the number of files in the project.
 
-## Markdown
-Since Typst wasn't going to work, the obvious choice was to go with Markdown.
-I chose [comrak](https://crates.io/crates/comrak) since it matches GitHub
-and has a ton of plugins. Notably, the [syntect](https://crates.io/crates/syntect)
-plugin which makes it really easy to do syntax highlighting.
+Maud lets you write HTML directly in Rust, which means the compiler catches errors that would slip through other templating systems. Instead of maintaining separate template files, everything stays in Rust.
 
-## Maud
-As I said before I think Maud is just an amazing experience. It is really easy
-to work with and I was able to make some really cool functions. I have
-`src/template.rs` which takes in some page metadata, content, etc. and wraps
-it in an HTML page. Then I also made some components like header:
+Here's an example of a Maud component:
 
 ```rust
 fn header(path: &str) -> Markup {
@@ -69,23 +65,46 @@ fn header(path: &str) -> Markup {
 }
 ```
 
+I built a template system in `src/template.rs` that takes page metadata and content, wrapping them in complete HTML pages. This approach makes it easy to create reusable components.
+
+## Markup
+### Typst
+
+Initially, I wanted to use Typst for rendering content. Typst is a massive improvement over Markdown, and I use it extensively for personal notes. I spent considerable time trying to make Typst's HTML generation work for this site.
+
+Unfortunately, Typst's HTML support is still early-stage. It lacks equation rendering, syntax highlighting, and other features necessary for my website. There's an [active GitHub issue](https://github.com/typst/typst/issues/721) tracking HTML generation progress. I hope to revisit this once HTML generation matures.
+
+### Markdown
+
+With Typst not viable, I went with Markdown. I chose [comrak](https://crates.io/crates/comrak)
+because it's the same Markdown flavor as GitHub and has extensive plugin support. The syntect plugin handles syntax highlighting, which was essential for my website.
+
 ## SCSS
-Originally I had written everything with CSS, but with all the nested rules it
-was becoming really annoying. I setup [grass](https://crates.io/crates/grass)
-which makes it super easy. Then I made a simple script in `src/scss.rs` which
-watches the `.scss` files in `static/` and generates the files on change. 
 
-## Optimizations
-Since I was looking for fast load times and I knew that my CSS and JS were
-very small, I decided to inline everything. While this does loose on caching,
-it enables excelling first-page load speed, which I think is more important
-for most visitors.
+I originally wrote all styling in plain CSS, but nested rules quickly became cumbersome. I set up
+[grass](https://crates.io/crates/grass), a Rust SCSS compiler, which simplified the styling workflow.
+For development, I created a script in `src/scss.rs` that watches `.scss` files in `static/` and regenerates CSS when files are changed.
 
-Each page has its own
-SCSS file which imports the main SCSS file. This way I can just have `grass`
-process one file and easily inline it with `OutputStyle::Compressed`.
-Its pretty similar for JS, except I used `minify-js` which does a bit more
-optimization. 
+Each page has its own SCSS file that imports the main stylesheet. This structure allows me to compile one file per page and inline it easily using `OutputStyle::Compressed`.
 
-Then I added a few things like preload links and a simple Javascript file to prefetch
-pages when hovering over them (like [McMaster-Carr](https://www.mcmaster.com/)). 
+## Inlining Everything
+
+One controversial optimization I made was inlining all CSS and JavaScript. This trades away caching benefits for faster first-page loads.
+
+This works because my assets are tiny. The entire site weighs 13.39kB uncompressed (4.68kB compressed). For most visitors, the usage pattern is either landing on the homepage and maybe reading one blog post, or arriving via a direct link to a specific post. In these cases, inlining delivers content faster than making separate requests for tiny CSS and JS files.
+
+The tradeoff is that heavy navigation around the site doesn't benefit from caching. But that's not the typical use case for a personal website, and I optimized for the common path.
+
+For JavaScript, I used [minify-js](https://crates.io/crates/minify-js) to compress the code further before inlining.
+
+## Prefetch on Hover
+
+One feature I'm particularly happy with is prefetching pages when users hover over links. I borrowed this idea from [McMaster-Carr](https://www.mcmaster.com/), which has excellent UX partly because of this technique.
+
+The implementation is straightforward: when you hover over an internal link for more than 100ms, the browser prefetches that page in the background. By the time you click, the page is likely already cached. This makes navigation feel instantaneous.
+
+The 100ms delay prevents prefetching when users accidentally hover over links while scrolling. The script also tracks which URLs have been prefetched to avoid redundant requests. Combined with the small page sizes, this makes the site feel snappy.
+
+## Deployment
+
+The site deploys automatically to my NixOS homelab using git-ops. When I push changes to GitHub, a webhook triggers a rebuild and deployment.

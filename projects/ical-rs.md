@@ -1,62 +1,45 @@
 ---
 title: ical-rs
-desc: A flexbile and typed iCalendar (RFC 5545) library 
+desc: A flexible and typed iCalendar (RFC 5545) library 
 date: 2024-11-10
 homepage: true
 ---
 
-# Background
-## Why
-For a long time I've used python CLI tools ([todoman](https://github.com/pimutils/todoman)
-and [khal](https://github.com/pimutils/khal)) to interact with
-my CalDAV calendar and todo lists in Linux. I'm pretty happy with them,
-but I could see a lot of room for improvements, especially with todoman.
+**NOTE:** This is one of my earlier Rust projects. I'm planning a rewrite that uses code generation in `build.rs` instead of macros for more comprehensive type coverage and better ergonomics.
 
-These tools actually don't interact with CalDAV directory, but instead
-work directly on iCalendar (`.ics`) file and require [vdirsyncer](https://github.com/pimutils/vdirsyncer)
-(now replaced by [pimsync](https://pimsync.whynothugo.nl/)) to sync a CalDAV
-server to local iCalendar files.
+# Motivation
 
-Now, I'm not affraid to say that I'm quite a Python hater for big projects.
-So I didn't want to go out and rewrite `todoman` in Python again.
-I decided to go with my favorite choice here which was Rust.
+For a while I've used Python CLI tools, [todoman](https://github.com/pimutils/todoman) and [khal](https://github.com/pimutils/khal), to manage my CalDAV calendar and to-do lists. While functional, todoman had limitations: no TUI, cumbersome multi-command workflows for editing, no integration with status bars like waybar, no notification system, and limited customization.
 
-## Rust iCalendar Libraries
-There are two rust libraries that exist:
- 1. [ical-rs](https://github.com/Peltoche/ical-rs): cool library
-but archived in 2024. Seems to be a great library for making iCalendar
-files, but not for reading or editing ones.
- 2. [icalendar](https://github.com/hoodie/icalendar): cool library, well maintained but again seems to not focus on editing
+These tools work with iCalendar (`.ics`) files stored in directories and require [vdirsyncer](https://github.com/pimutils/vdirsyncer) (now [pimsync](https://pimsync.whynothugo.nl/)) as a middleman to sync with CalDAV servers. I wanted to build a single Rust tool that handles todos, calendar events, and talks directly to CalDAV servers without the syncing middleman.
 
-Now realistically, I could have been very successful with either library.
+To build this, I needed a Rust iCalendar library capable of editing files while preserving all existing data.
 
-## The Real Reason Why
-I was super interested in this old format, it was cool to be that it had
-a super defined spec (RFC 5545). I was also taking a programming langauges
-class, I needed a project for the masters extension that handled parsing.
+# The Editing Challenge
 
-# Results
-After probably rewriting this library 3 times, I can say I'm almost happy
-with the result. I taught me a LOT about using Rust macros, and also
-their disadvantages. I think having a system like macros in Zig would have
-been best here. In my opinion, the ideal implementation of this library relies
-on code generation in a `build.rs` (something I didn't realize was possible
-at the time).
+Creating iCalendar files is straightforward, but editing them presents challenges. When you modify a file, you must preserve all existing data, including properties and parameters your implementation doesn't understand. Apple Calendar, for instance, uses extensive X-properties for their features built on top of normal iCalendar ones. In most cases you need to parse a file, modify one field, and write it back with everything else remaining intact.
 
+The iCalendar type system adds complexity. RFC 5545 defines 14 value types (DATE, DATE-TIME, TEXT, INTEGER, etc.). Each property has a default type, but the VALUE parameter can override it. For example, DTSTART defaults to DATE-TIME, but VALUE=DATE makes it a date. A proper library must parse parameters and infer the correct type automatically.
 
-## Features
+The RFC is extensive, with multiple extensions, which means handling many edge cases.
 
- - Full implemenation of every ICalendar type
- - Generated methods for every ICalendar property with all allowed types
- - Support for X & IANA properties and parameters
+# Existing Rust Libraries
 
-## Usage
+Two Rust iCalendar libraries existed when I started:
+ - [ical-rs](https://github.com/Peltoche/ical-rs): solid for creating files, but archived in 2024 and not designed for editing
+ - [icalendar](https://github.com/hoodie/icalendar): well-maintained and good for creating files, but doesn't handle type inference from parameters automatically
 
-### Modify Existing
-I built the library around this idea, I would I say
-I definetly achieved it. Here you can see that in 4
-lines of code, I can parse an iCalendar string, edit
-it and then save it back to a string. 
+With these libraries, users must handle the type system and parameter parsing themselves. I needed something that parsed parameters and provided a typed API automatically.
+
+# My Approach
+
+I built a library that parses iCalendar parameters and infers types automatically, providing typed methods for each property while preserving unknown properties and parameters. The implementation uses Rust macros to generate methods for iCalendar properties, though this approach has limitations. A future rewrite using `build.rs` would enable more comprehensive type generation.
+
+The library focuses on making editing straightforward: parse a file, modify what you need, serialize it back with everything preserved.
+
+# Usage
+
+## Modify Existing
 
 ```rust
 let ics_str = "BEGIN:VCALENDAR...";
@@ -66,7 +49,7 @@ vtodo.summary("New Summary".to_string());
 let new_ics_str = vcal.to_ics();
 ```
 
-### Make New
+## Create New
 ```rust
 let dtstamp = Tz::America__New_York.with_ymd_and_hms(1992, 12, 17, 12, 34, 56)?;
 let vcal = ICalComponent::vcalendar_with_vtodo(
@@ -79,9 +62,8 @@ let vcal = ICalComponent::vcalendar_with_vtodo(
 let ics_str = vcal.to_ics();
 ```
 
-### X & IANA Properties
+## X & IANA Properties
 
-Convert Value:
 ```rust
 let in_ics = r#"BEGIN:VCALENDAR
 X-EXAMPLE:19921217T123456
@@ -91,9 +73,9 @@ let x_example = vcal.get_prop("X-EXAMPLE")?
     .convert_value::<ICalDateTime>()?;
 ```
 
-Read Later:
+Read later:
 ```rust
 let value = vcal.get_prop("X-EXAMPLE")?
-    .get_as::<ICalDateTime>()?);
+    .get_as::<ICalDateTime>()?;
 println!("{}", value); // 1992-12-17 12:34:56
 ```

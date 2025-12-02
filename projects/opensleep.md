@@ -1,5 +1,5 @@
 ---
-title: opensleep 112★
+title: opensleep 113★
 desc: Open source firmware for the Eight Sleep Pod 3
 date: 2025-09-04
 homepage: true
@@ -12,194 +12,133 @@ highlight: true
 <!--toc:start-->
 - [Table of Contents](#table-of-contents)
 - [Disclaimer](#disclaimer)
-- [Quick Background](#quick-background)
+- [Background](#background)
 - [Version 1](#version-1)
 - [Version 2](#version-2)
   - [Features](#features)
-  - [Difficulties](#difficulties)
+  - [Technical Challenges](#technical-challenges)
     - [Deserializing](#deserializing)
     - [Baud Switching](#baud-switching)
     - [Reliability](#reliability)
-  - [Random](#random)
-  - [Publishing](#publishing)
-    - [Mistakes](#mistakes)
+  - [Additional Components](#additional-components)
+  - [Release & Community Response](#release--community-response)
+    - [Lessons Learned](#lessons-learned)
 - [Outcome](#outcome)
 <!--toc:end-->
 
 # Disclaimer
-This project is purely intended educational and research purposes. It is for personal, non-commercial use only.
-It is not affiliated with, endorsed by, or sponsored by Eight Sleep.
-The Eight Sleep name and Pod are trademarks of Eight Sleep, Inc.
+This project is for educational and research purposes only. It is for personal, non-commercial use and is not affiliated with, endorsed by, or sponsored by Eight Sleep. The Eight Sleep name and Pod are trademarks of Eight Sleep, Inc.
 
-# Quick Background
-The Eight Sleep Pod 3 is a temperature controlled (using water) mattress cover with sleep tracking.
+# Background
+
+The Eight Sleep Pod 3 is a smart mattress cover that uses water circulation to control temperature (ranging from 55°F to 110°F). Temperature regulation during sleep has been shown to improve sleep quality, increasing deep sleep by up to 14 minutes and REM sleep by up to 9 minutes. The Pod also tracks sleep metrics like heart rate, HRV, and sleep stages.
+
+However, Eight Sleep's closed-source firmware has many privacy concerns.
+By default, raw sleep tracking data is streamed directly to Eight Sleep's
+servers. Eight Sleep can see when you're in bed, how many people are in bed,
+your sleep patterns, and more.
+
+I got a used Eight Sleep Pod and, after using it for a while, wanted more control.
+I discovered [ninesleep](https://github.com/bobobo1618/ninesleep) which provided a foundation, but I needed features like automatic alarm scheduling, temperature profiles, and heat alarms that the original firmware offered.
 
 # Version 1
-I got a used Eight Sleep and used it for a while, but eventually wanted to have more control over it.
 
-I heard about the [Nine Sleep Project](https://github.com/bobobo1618/ninesleep) and was super interested in it.
-I got it setup and running but was a little frustrated with manually controlling it.
-Furthermore, I really wanted to have all the features that original firmware had like
-automatically setting alarms, temperature profiles, heat alarms, etc. 
+I forked Nine Sleep, reorganized the code, and implemented all the features I wanted.
+Version 1 (and ninesleep) pretends to be the Device-API-Client (DAC).
+The DAC is the interface between the Eight Sleep servers and the lower
+level firmware.
 
-I made a fork of the repo, reorganized the code and implemented all those features.
-I've been super happy with it and have been using it for about a year.
+I used this version happily for about a year. You can check it out [here](https://github.com/LiamSnow/opensleep/tree/89ec7f39edceb2ad016dabdfdc469139db87eea7).
 
-Basically, it pretends to be the Device-API-Client (DAC - the command interface to the Eight Sleep servers)
-and sends commands to set the bed temperature, alarms, etc.
-It's really not too complicated, most of the complexity is in keeping reliable communications and sleep
-scheduling.
-
-You can check it out [here](https://github.com/LiamSnow/opensleep/tree/89ec7f39edceb2ad016dabdfdc469139db87eea7).
+While this version works great, it doesn't allow access to the raw sleep tracking
+data immediately. Instead, it only receives batched updates. 
 
 # Version 2
-Version 2 was a TON (over ~6 months) of work to get right. It's a lot to explain exactly the difference
-(I would check out the [README](https://github.com/LiamSnow/opensleep/blob/main/README.md))
-but basically instead of pretending to be one of the Eight Sleep services and interacting
-with the others, it just replaces ALL of the Eight Sleep services:
+
+Version 2 took approximately six months to complete and represents a complete reimplementation. Instead of pretending to be one Eight Sleep service (the DAC) and interacting with the others, it replaces all Eight Sleep services entirely:
 
 ![opensleep comparison diagram](https://raw.githubusercontent.com/LiamSnow/opensleep/refs/heads/main/images/main.svg)
 
-(Note that in this diagram ninesleep is the same as opensleep V1)
+(Note that in this diagram ninesleep is equivalent to opensleep V1)
 
 ## Features
 
-With opensleep V2 you can use your Pod 3 with complete privacy and make cool Home Assistant automations for
-when you get in and out of bed. Personally I have it set up to read my daily calendar when I get out of
-bed in the morning and remind to go to bed when its late. 
+With opensleep V2, you can use your Pod 3 with complete privacy and create Home Assistant automations for bed presence. I have mine configured to read my daily calendar when I get out of bed in the morning and remind me to go to bed when it's late.
 
-1.  **MQTT** interface for remotely updating config and monitoring state
-2.  Configuration via **[Ron](https://github.com/ron-rs/ron)** file
-3.  Presence detection
-4.  Custom temperature profile with as many points as you want. It will spready out this profile between `sleep` and `wake` time.
-5.  Vibration alarms relative to `wake` time (offsets and vibration settings can be configured)
-6.  `Solo` or `Couples` modes
-7.  LED control & cool effects
-8.  Daily priming
+1. **MQTT** interface for remote configuration and state monitoring
+2. Configuration via **[Ron](https://github.com/ron-rs/ron)** file
+3. Presence detection
+4. Custom temperature profiles with unlimited points, automatically distributed between `sleep` and `wake` times
+5. Vibration alarms relative to `wake` time (offsets and vibration settings are configurable)
+6. `Solo` or `Couples` modes
+7. LED control with custom effects
+8. Daily priming
 
-## Difficulties
-_I'm going to do my best to explain this assuming you haven't read the background in the README._
+## Technical Challenges
 
-My original version that pretends to be the DAC interfaces with frankenfirmware (a C++ binary). Frank
-then has USART communication to two STM32s called Sensor (manages all bed sensors) and Frozen (manages
-temperature control system and everything water related).
+Version 1 interfaces with frankenfirmware (a C++ binary), which communicates via USART to two STM32 microcontrollers: "Sensor" (manages bed sensors) and "Frozen" (manages temperature control and water systems).
 
-Completing Version 2 of opensleep, meant figured out what the custom USART protocol is for Sensor and Frozen.
+Completing Version 2 meant reverse-engineering the custom USART protocol for Sensor and Frozen. I tried several approaches before building a harness for frankenfirmware using [lurk](https://github.com/JakWai01/lurk), a modern Rust alternative to strace for monitoring system calls. This harness, which I called Fiona (a modified version of opensleep V1), let me send commands to frankenfirmware and observe its responses. Over several months of incremental improvements, I decoded most of the protocol.
 
-I had a combination of different efforts at first, but eventually landed on making a harness for frankenfirmware that
-would monitor system calls leveraging [lurk](https://github.com/JakWai01/lurk). In this hardness, which I called Fiona (edited
-version of opensleep V1), I can send commands to Frank and see how Frank responds. After some time with figuring
-out the details of the protocol and incrementally improving Fiona, I managed to figure out most of the protocol.
-
-It follows this basic structure:
+The protocol follows this structure:
 ```
 7E [Length] [Command] [Data...] [CRC-CCITT 0x1D0F Checksum (2 bytes)]
 ```
 
-Most of the complexity lies in:
- - What are the commands and what do they respond with
- - Deserializing the responses
- - Baud switching (Sensor starts at a lower baud rate and switches to a higher baud once you tell it to)
- - **Making it reliable**
-
-### Deserializing
-In order to deserialize really fast and reliably, I landed on just using raw indexing.
-I totally understand cringing a little when you hear that, but I managed to make it reliable
-with extensive testing, and it is just really fast.
-
-Here's an example:
-```rust
-fn parse_capacitance(buf: BytesMut) -> Result<Self, PacketError> {
-    validate_packet_size("Sensor/Capacitance", &buf, 27)?;
-
-    let indices_valid = buf[9] == 0
-        && buf[12] == 1
-        && buf[15] == 2
-        && buf[18] == 3
-        && buf[21] == 4
-        && buf[24] == 5;
-
-    if !indices_valid {
-        return Err(invalid_structure(
-            "Sensor/Capacitance",
-            "invalid indices".to_string(),
-            buf,
-        ));
-    }
-
-    Ok(Self::Capacitance(CapacitanceData {
-        sequence: u32::from_be_bytes([buf[1], buf[2], buf[3], buf[4]]),
-        values: [
-            u16::from_be_bytes([buf[10], buf[11]]),
-            u16::from_be_bytes([buf[13], buf[14]]),
-            u16::from_be_bytes([buf[16], buf[17]]),
-            u16::from_be_bytes([buf[19], buf[20]]),
-            u16::from_be_bytes([buf[22], buf[23]]),
-            u16::from_be_bytes([buf[25], buf[26]]),
-        ],
-    }))
-}
-```
+The main complexity involved:
+- Finding out the protocol structure
+- Determining available commands and their responses
+- Deserializing responses accurately
+- Handling baud rate switching (Sensor starts at a lower baud rate and switches after initialization)
+- Making communication reliable
 
 ### Baud Switching
-I managed to make the baud switching super reliable, actually more so than Frank.
 
-When Sensor boots up I run something that I called "discovery" where it tries
-at the lower (bootloader) baud rate for a few pings, if that doesn't work it switches
-to the higher (firmware) baud rate for some pings. If both fail then I know it's disconnected/broken.
+Baud switching is more reliable than frankenfirmware's implementation. When Sensor boots, I run a "discovery" process: try pings at the lower (bootloader) baud rate, then switch to the higher (firmware) baud rate if that fails. Both failing indicates disconnection.
 
-The reason you would get in a situation with it already at a higher baud rate, is if Frank or opensleep
-was running already, then stopped, and restarted. Frank cannot really recover from this problem but
-opensleep handles it perfectly.
+This handles the case where frankenfirmware or opensleep was already running, stopped, and restarted in a short amount of time. Frankenfirmware cannot recover from this, because it only tries at the bootloader baud. Opensleep handles it seamlessly.
 
 ### Reliability
-My first prototype would simply just read single bytes until it found a start byte,
-then try and read a packet. Sometimes it would just get stuck in an infinite loop
-of being stuck in the middle of packets (thinking its finding start bytes but actually not).
 
-In trying to fix this system I actually improved other parts of the code to. I am now using
-a `Framed<SerialStream, PacketCodec<P>>` which means you can simply call `port.next()` and just
-get back packets!
+My first prototype read bytes sequentially until finding a start byte, then attempted to parse a packet. It would sometimes get stuck in infinite loops, thinking it found start bytes in the middle of packets.
 
-This codec is pretty awesome, basically what it does is:
- 1. Advance bytes until it finds a start bytes
- 2. Reads the packet
- 3. Checks the checksum
-   - If Valid -> Consume bytes and parse packet 
-   - If Invalid -> Skip only the start byte and try again
+The solution uses a `Framed<SerialStream, PacketCodec<P>>` which provides packets directly via `port.next()`. The codec:
+1. Advances bytes until finding a start byte
+2. Reads the packet
+3. Checks the checksum
+   - If valid → consume bytes and parse packet
+   - If invalid → skip only the start byte and retry
 
-Basically, it won't get "stuck in the middle" because it will only skip the start byte
-if the checksum was bad instead of the whole packet (or what it thought was a packet).
+This prevents getting stuck in the middle of packets because it only skips the start byte on checksum failures, not the entire (potentially incorrect) packet.
 
-## Random
-In this project I also made the first Rust controller for the IS31FL3194 LED controller
-which was more difficult than I thought.
+## Additional Components
 
-It was also the first complex MQTT project I had done which was really awesome. I think I
-made a really solid system that's super easy to interface with Home Assistant.
+I also implemented the first Rust controller for the IS31FL3194 LED controller, which was more challenging than anticipated.
+I couldn't actually find the LED controller on the PCB, but after a lot of digging
+I was able to guess based off the I2C commands sent during boot.
+The IS31FL3194 is a 3-channel LED driver with two-dimensional auto breathing.
+Basically, the LED patterns live on-device and are configuring using I2C instead
+of on the main processor.
+I implemented the bulk of the features, which allows for some cool lighting
+effects like an RGB breath.
 
+This was my first complex MQTT project. I built a system that integrates cleanly with Home Assistant.
 
-## Publishing
-After spending so much time perfecting this project, I realized at some point I just needed
-to release it and get some feedback.
+## Release & Community Response
 
-I made two Reddit posts, one on
-[r/rust](https://www.reddit.com/r/rust/comments/1n8hu4p/opensleep_rust_firmware_for_the_eight_sleep_pod_3/)
-and one on
-[r/eightsleep](https://www.reddit.com/r/EightSleep/comments/1n8ppn8/opensleep_complete_firmware_for_the_eight_sleep/).
+After months of development, I decided to release the project and get feedback. I posted on [r/rust](https://www.reddit.com/r/rust/comments/1n8hu4p/opensleep_rust_firmware_for_the_eight_sleep_pod_3/) and [r/eightsleep](https://www.reddit.com/r/EightSleep/comments/1n8ppn8/opensleep_complete_firmware_for_the_eight_sleep/).
 
-It was pretty successful! I got 373 upvotes in total and 81 stars on [GitHub](https://github.com/liamsnow/opensleep).
-People seemed to really like the project which was a great feeling after spending so much time on it.
+The response was encouraging: 373 combined upvotes and 112 GitHub stars. People are actively using it, which validated the effort.
 
-### Mistakes
-It was my first time publishing a programming project on Reddit and really finishing something in GitHub and
-I certainly made some mistakes, notably:
- - Went way to deep into technical detail in the post (should have kept it in GitHub)
- - I didn't clearly explain context: What is an Eight Sleep? Why would someone use this project? What is Frozen? ...
+### Lessons Learned
 
-After some helpful comments I went through a ton of versions revising both of my posts and the
-GitHub README. I think now its in a pretty understandable state, but it's a great lesson for me to learn.
+This was my first time publishing a significant project on Reddit and GitHub. I made several mistakes:
+
+- Went too deep into technical details in Reddit posts (should have kept that in GitHub)
+- Didn't clearly explain context: What is Eight Sleep? Why would someone use this? What is Frozen?
+
+After helpful feedback, I revised both posts and the GitHub README multiple times. The documentation is now much clearer, but it taught me the importance of assuming no prior knowledge when introducing projects.
 
 # Outcome
-I am super happy that I decided to do this project and publish it. It taught be a lot about how
-to publish programming projects and how to implement binary protocols in Rust.
+
+This project taught me how to reverse-engineer binary protocols in Rust and how to publish open source projects effectively. The fact that others are using opensleep makes the six months of development worthwhile.
