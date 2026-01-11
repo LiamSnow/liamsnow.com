@@ -12,6 +12,8 @@ pub struct PostCollection {
     pub posts: HashMap<String, Post>,
     pub index: Markup,
     pub rss: String,
+    base_dir: String,
+    name: String,
 }
 
 pub struct Post {
@@ -37,9 +39,9 @@ pub struct PostMeta {
 /// all the pages (index + individual pages)
 impl PostCollection {
     /// returns a new PostCollection + posts marked for homepage
-    pub fn new(base_dir: &str, collection: String) -> (Self, Vec<(String, PostMeta)>) {
-        let collection_lower = collection.to_lowercase();
-        let posts = Self::process_dir(base_dir, &collection);
+    pub fn new(base_dir: &str, name: String) -> (Self, Vec<(String, PostMeta)>) {
+        let collection_lower = name.to_lowercase();
+        let posts = Self::process_dir(base_dir, &name);
 
         let mut posts_sorted: Vec<(String, PostMeta)> = posts
             .iter()
@@ -50,8 +52,8 @@ impl PostCollection {
         let index = template::apply(
             base_dir,
             &format!("/{collection_lower}"),
-            &format!("Liam Snow's {collection}"),
-            &format!("Liam Snow's {collection}. Programming, systems, backend, Rust and more."),
+            &format!("Liam Snow's {name}"),
+            &format!("Liam Snow's {name}. Programming, systems, backend, Rust and more."),
             "index",
             html! {},
             html! {
@@ -70,16 +72,26 @@ impl PostCollection {
             None,
         );
 
-        let rss = Self::generate_rss(&posts, &collection, &posts_sorted);
+        let rss = Self::generate_rss(&posts, &name, &posts_sorted);
 
         let homepage_posts: Vec<(String, PostMeta)> = posts_sorted
             .into_iter()
             .filter(|(_, meta)| meta.homepage)
             .collect();
 
-        (PostCollection { posts, index, rss }, homepage_posts)
+        (
+            PostCollection {
+                posts,
+                index,
+                rss,
+                base_dir: base_dir.to_string(),
+                name,
+            },
+            homepage_posts,
+        )
     }
 
+    #[cfg(not(feature = "dev"))]
     pub fn get_post(&self, params: HashMap<String, String>) -> Markup {
         let id_option = params.get("id");
         if id_option.is_none() {
@@ -94,6 +106,28 @@ impl PostCollection {
         let post = post_option.unwrap();
 
         post.html.clone()
+    }
+
+    #[cfg(feature = "dev")]
+    pub fn get_post(&self, params: HashMap<String, String>) -> Markup {
+        let id_option = params.get("id");
+        if id_option.is_none() {
+            return html! { "Must provide post ID!" };
+        }
+        let id = id_option.unwrap();
+
+        let path = PathBuf::from(format!(
+            "{}/{}/{}.md",
+            self.base_dir,
+            self.name.to_lowercase(),
+            id
+        ));
+
+        if !path.exists() {
+            return html! { "Post does not exist!" };
+        }
+
+        Post::from_file(&self.base_dir, &self.name, id, &path).html
     }
 
     fn process_dir(base_dir: &str, collection: &str) -> HashMap<String, Post> {
