@@ -1,11 +1,11 @@
 ---
-title: Igloo's Providers
+title: Making Igloo's provider system
 desc: How Igloo securely runs and communicates with extensions
 date: 2025-09-20
 homepage: true
 ---
 
-[Project Page](../projects/igloo)
+If you don't know what Igloo is please check out the [Project Page](../projects/igloo).
 
 For this article I will refer to the following:
  - _Provider_: Provides integration to smart home platforms like ESPHome, Apple HomeKit, MQTT, etc.

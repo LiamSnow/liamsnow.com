@@ -1,13 +1,17 @@
 ---
-title: First Igloo Prototype
-desc: Smart home platforms are hard
+title: The first Igloo prototype
+desc: 
 date: 2025-03-14
 homepage: true
 ---
 
-[Project Page](../projects/igloo)
+If you don't know what Igloo is please check out the [Project Page](../projects/igloo).
 
-I spent six months building an Igloo prototype. Smart home platforms are significantly harder than I anticipated, but the prototype taught me what doesn't work and why.
+Initially I set out with a very different goal for Igloo.
+I wanted a smart home platform for power users that was reliable and fast.
+I knew this would be a big project, but it turned out to be much bigger than I thought.
+
+Overall, I would call this version a failure. However, it was a great learning experience.
 
 # What I Built
 
@@ -35,19 +39,23 @@ The CLI protocol was elegant for scripting, and the configuration-as-code approa
 
 ## Scale and Complexity
 
-This was my first substantial Tokio project. Managing providers, devices, entities, channels, concurrent tasks, dashboards, frontend, authentication, API, and scripting simultaneously was more complex than I anticipated. Implementing the [ESPHome provider](../projects/esphomebridge-rs) alone was very complicated.
+This was my first substantial Tokio project. Managing providers, devices, entities, channels, concurrent tasks, dashboards, frontend, authentication, API, and scripting simultaneously was more complex than I anticipated.
 
-## Configuration Conflicts with Intuition
+Making providers is harder than I thought. The [ESPHome provider](../projects/esphomebridge-rs) alone took a lot of time, especially because it was completely undocumented.
 
-The NixOS-inspired approach directly conflicted with my goal of building an intuitive platform. Users had to:
+## Configuration File is a Pain
+
+The NixOS-inspired configuration file seemed like a good approach,
+but was tedious and had little benefits. Users had to:
 - Generate password hashes manually with `igloo hash PASSWD`
 - Edit a Ron file for all configuration changes
 - Restart the system to add or remove devices
 - Understand the configuration file structure before using the system
 
-This approach might work for power users, but it creates a steep learning curve for everyone else.
-In either case, it requires users reading a ton of documentation to set up their smart home.
-If the goal is intuitive, configuration must happen through the UI, not a file.
+While I do think this system improves upon Home Assistant's YAML system,
+I think the configuration file is always going to be a pain point.
+It requires users to spend a significant amount of time browsing documentation
+just to get Igloo working.
 
 ## Architectural Problems
 

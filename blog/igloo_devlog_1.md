@@ -1,22 +1,32 @@
 ---
-title: Igloo's Device Model
-desc: An ECS model for the smart home world 
+title: Bringing ECS to smart homes
+desc: Igloo's device model
 date: 2025-08-27
 homepage: true
 ---
 
-[Project Page](../projects/igloo)
+If you don't know what Igloo is please check out the [Project Page](../projects/igloo).
+
+There are a lot of ways to represent devices and their state in smart homes.
+Through my research and experimentation, I landed on using the ECS model, which
+I think is a great system for Igloo.
+
+Before diving into it, I want to walk you through how I came to this conclusion.
 
 # Objectives
+First, I outlined my objectives:
  1. **Backwards-compatible**: New versions of Igloo must be able to work with old Extensions
  2. **Structured but Flexible**: We need to have clearly defined types to create a cohesive system. I don't want a situation where ESPHome has one light type and HomeKit has another, meaning we need different dashboard elements and Penguin nodes for each. At the same time, I want to have the flexibility to support both:
      1. New types of devices that aren't yet built into Igloo
      2. Extensions to existing types - maybe a new provider has a Fan with 10 different modes, but Igloo only has 8
- 3. **Intuitive**: Understandable for the average contributor
+ 3. **Intuitive**: Understandable for the average __contributor__
  4. **Cross-language**: While Rust will have primary support, having support for at least Python is essential.
  5. **Composable**: We need a way to group things with similar functionality. For example, maybe I want to control the color of everything that can be colored (Light Bulbs, LED strips, etc.)
 
 # How Home Assistant Does It
+Devices contain many entities. For example, my Athom light bulb contains a RGBCT_Light entity,
+a safe mode (switch) entity, etc.
+
 At the time of writing this, [Home Assistant has 47 hard-coded models](https://developers.home-assistant.io/docs/core/entity/light/)
 for each type of entity (light, lawn mower, media player, etc.).
 This makes a lot of sense. You get a strict structure for how to represent things,

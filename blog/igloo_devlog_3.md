@@ -1,11 +1,13 @@
 ---
-title: Igloo's Device Tree
-desc: Generational indices, component storage, and more
+title: A device tree for Igloo
+desc: How Igloo efficiently stores and handles devices, entities, and components
 date: 2025-09-30
 homepage: true
 ---
 
-[Project Page](../projects/igloo)
+If you don't know what Igloo is please check out the [Project Page](../projects/igloo).
+
+[GitHub Link](https://github.com/LiamSnow/igloo/tree/main/server/src/tree)
 
 # What
 Igloo's device tree needs to represent:
@@ -30,7 +32,7 @@ This creates a problem. If a script references device index 5, that device gets 
 
 Each device gets a generation assigned to it. Every reference (ID) to that device contains both the index and the generation. When a device at index 5, generation 0 (`5:0`) is deleted and a new device takes that slot, it gets generation 1. When the script tries to access `5:0`, it throws a stale reference error because the current generation is 1.
 
-This system provides fast lookups (>6x faster), compact persistent storage, and memory safety.
+This system provides fast lookups (**>6x faster**), compact persistent storage, and memory safety.
 
 # Modeling Entities
 Since entities can only have one of each component type and entities contain a subset of all components, we can add significant optimizations.

@@ -27,10 +27,10 @@ I am building Igloo.
 
 # Goals
  1. **Intuitive**: The majority of people should be able to figure out how to navigate around Igloo's website and use existing dashboards without the need to watch tutorials. Creating dashboards, scripts, and setting up Igloo will most likely require tutorials, but they should not need to be extremely long or complicated.
- 2. **Reliable**: The system must be able to run, untouched, and not crash itself. Furthermore, we should never have massive breaking updates that requires users to go around fixing scripts and configurations.
- 3. **Fast**: Commands, API-requests, and the dashboard should all feel snappy and fast. I'm not going to put any exact numbers to it now. 
+ 2. **Robust & Reliable**: The system must be able to run, untouched, and not crash itself. Furthermore, we should never have massive breaking updates that requires users to go around fixing scripts and configurations.
+ 3. **Fast**: Commands, API-requests, and the dashboard should all feel snappy and fast. 
  4. **Secure**: It must be safe to expose to the public internet without any risks of RCE, unauthorized access, or leaked secrets.
- 5. **Run "Anywhere"**: It must be able to run a small smart home on a Raspberry Pi 3 at a decent speed.
+ 5. **Run "Anywhere"**: It must be able to run a small smart home on a Raspberry Pi 3.
 
 # Development
 
