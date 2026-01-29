@@ -1,0 +1,42 @@
+@use 'main' as *;
+@use 'mixins' as *;
+
+#content {
+  a {
+    text-align: center;
+    width: 100%;
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin-top: 3px;
+  }
+
+  >a {
+    font-size: 18px;
+    background: linear-gradient(to left, #33ccff, #33ffcc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+#posts {
+  @include flex-center(row, center, stretch);
+  padding: 2rem 1rem;
+  flex-wrap: wrap;
+
+  .post {
+    @include card();
+    padding: 1rem;
+    margin: 1rem;
+    text-decoration: none;
+    max-width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 0 80px 40px black,
+      inset 0 0 20px 40px black;
+
+    &:link {
+      color: white;
+    }
+  }
+}

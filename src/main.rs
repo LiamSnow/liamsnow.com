@@ -2,45 +2,48 @@ use anyhow::{Context, Result};
 use axum::{
     Router,
     extract::State,
-    http::{HeaderName, HeaderValue, StatusCode, Uri, header},
-    response::Html,
-    routing::{get, get_service},
+    http::{StatusCode, Uri, header},
+    response::IntoResponse,
+    routing::get,
 };
 use clap::Parser;
+use either::Either;
+use mime_guess::{Mime, mime};
+use rustc_hash::{FxBuildHasher, FxHashMap};
 use serde::Deserialize;
 use std::{collections::HashMap, fs, path::PathBuf, sync::Arc};
 use tokio::net::TcpListener;
-use tower_http::{
-    compression::CompressionLayer,
-    services::{ServeDir, ServeFile},
-    set_header::SetResponseHeaderLayer,
-};
-use typst_as_lib::TypstEngine;
+use tower_http::compression::CompressionLayer;
 
 mod sitemap;
+mod typst;
 
+const ROUTES_FILE: &str = "routes.toml";
 const CONTENT_DIR: &str = "./content";
-const STATIC_DIR: &str = "./static";
 
 #[derive(Deserialize)]
 struct Config {
-    routes: Vec<Route>,
+    routes: Vec<ConfigRoute>,
 }
 
 #[derive(Deserialize)]
-struct Route {
+struct ConfigRoute {
     path: String,
     file: Option<String>,
-    dir: Option<String>,
+    /// nest directory using another routes.toml file
+    nest_dir: Option<String>,
+    /// nest all files in directory
+    auto_nest_dir: Option<String>,
 }
 
-struct ResolvedRoute {
-    url_path: String,
-    file_path: String,
+struct Route {
+    content: Either<String, Vec<u8>>,
+    mime: Mime,
 }
 
 struct AppState {
-    pages: HashMap<String, String>,
+    /// url path -> Route
+    routes: FxHashMap<String, Route>,
     sitemap: String,
 }
 
@@ -64,38 +67,14 @@ async fn main() -> Result<()> {
 
     println!("Generating pages...");
 
-    let routes = resolve_routes("", &PathBuf::from(CONTENT_DIR))?;
+    let routes = generate("", &PathBuf::from(CONTENT_DIR))?;
 
-    let pages = compile_routes(&routes).await?;
-    println!("Compiled {} pages:", pages.len());
-    for path in pages.keys() {
-        println!("  {}", path);
-    }
+    let sitemap = sitemap::generate(&routes);
 
-    let url_paths: Vec<String> = pages.keys().cloned().collect();
-    let sitemap = sitemap::generate(&url_paths);
-
-    let state = Arc::new(AppState { pages, sitemap });
+    let state = Arc::new(AppState { routes, sitemap });
 
     let app = Router::new()
         .route("/sitemap.xml", get(serve_sitemap))
-        .nest_service(
-            "/static",
-            Router::new()
-                .fallback_service(ServeDir::new(STATIC_DIR))
-                .layer(SetResponseHeaderLayer::if_not_present(
-                    header::CACHE_CONTROL,
-                    HeaderValue::from_static("public, max-age=31536000, immutable"),
-                )),
-        )
-        .route(
-            "/robots.txt",
-            get_service(ServeFile::new(format!("{STATIC_DIR}/robots.txt"))),
-        )
-        .route(
-            "/favicon.ico",
-            get_service(ServeFile::new(format!("{STATIC_DIR}/favicon.ico"))),
-        )
         .fallback(serve_page)
         .with_state(state)
         .layer(CompressionLayer::new());
@@ -107,90 +86,136 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-fn resolve_routes(base_path: &str, dir: &PathBuf) -> Result<Vec<ResolvedRoute>> {
-    let config_path = dir.join("routes.toml");
+fn generate(base_path: &str, dir: &PathBuf) -> Result<FxHashMap<String, Route>> {
+    let config_path = dir.join(ROUTES_FILE);
     let config_str = fs::read_to_string(&config_path)
         .with_context(|| format!("Failed to read {}", config_path.display()))?;
     let config: Config = toml::from_str(&config_str)?;
 
-    let mut resolved = Vec::new();
+    let mut routes = HashMap::with_capacity_and_hasher(config.routes.len(), FxBuildHasher);
 
     for route in config.routes {
-        let full_path = if base_path.is_empty() {
+        let path = if base_path.is_empty() {
             route.path.clone()
         } else {
             format!("{}{}", base_path, route.path)
         };
 
+        // direct file
         if let Some(file) = route.file {
             let file_path = dir.join(&file);
-            resolved.push(ResolvedRoute {
-                url_path: full_path,
-                file_path: file_path.to_string_lossy().to_string(),
-            });
-        } else if let Some(subdir) = route.dir {
+            process_file(&mut routes, &path, &file_path)?;
+        }
+
+        // nest dir using another routes.toml file
+        if let Some(subdir) = route.nest_dir {
+            let subdir_path = dir.join(&subdir);
+            let nested_routes = generate(&path, &subdir_path)?;
+            routes.extend(nested_routes);
+        }
+
+        // nest all files in dir
+        if let Some(subdir) = route.auto_nest_dir {
+            use walkdir::WalkDir;
+
             let subdir_path = dir.join(&subdir);
 
-            let nested_base = full_path
-                .split(':')
-                .next()
-                .unwrap_or(&full_path)
-                .trim_end_matches('/');
+            for entry in WalkDir::new(&subdir_path)
+                .into_iter()
+                .filter_map(|e| e.ok())
+            {
+                if !entry.file_type().is_file() {
+                    continue;
+                }
 
-            let nested_routes = resolve_routes(nested_base, &subdir_path)?;
-            resolved.extend(nested_routes);
+                let file_path = entry.path();
+                let relative = file_path.strip_prefix(&subdir_path)?;
+                let url_segment = relative
+                    .to_str()
+                    .context("Invalid UTF-8 in path")?
+                    .replace('\\', "/");
+
+                let full_path = format!("{}/{}", path.trim_end_matches('/'), url_segment);
+                process_file(&mut routes, &full_path, &file_path.to_path_buf())?;
+            }
         }
     }
 
-    Ok(resolved)
+    Ok(routes)
 }
 
-async fn compile_routes(routes: &[ResolvedRoute]) -> Result<HashMap<String, String>> {
-    let mut pages = HashMap::new();
+fn process_file(
+    routes: &mut FxHashMap<String, Route>,
+    url_path: &str,
+    file_path: &PathBuf,
+) -> Result<()> {
+    match file_path
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(str::to_ascii_lowercase)
+        .as_deref()
+    {
+        Some("typ") => {
+            println!("Compiling `{}`", file_path.to_string_lossy());
+            let content = typst::compile(file_path)?;
+            routes.insert(
+                url_path.trim_end_matches(".typ").to_string(),
+                Route {
+                    content: Either::Left(content),
+                    mime: mime::TEXT_HTML_UTF_8,
+                },
+            );
+        }
+        ext @ Some("sass") | ext @ Some("scss") | ext @ Some("css") => {
+            println!("Compiling `{}`", file_path.to_string_lossy());
+            let opts = grass::Options::default().style(grass::OutputStyle::Compressed);
+            let content = grass::from_path(file_path, &opts)?;
+            let new_path = url_path.trim_end_matches(&format!(".{}", ext.unwrap()));
+            routes.insert(
+                format!("{new_path}.css"),
+                Route {
+                    content: Either::Left(content),
+                    mime: mime::TEXT_CSS,
+                },
+            );
+        }
+        _ => {
+            println!("Linking `{}`", file_path.to_string_lossy());
+            let bytes = fs::read(file_path)?;
+            let mime = mime_guess::from_path(file_path).first_or_text_plain();
+            routes.insert(
+                url_path.to_string(),
+                Route {
+                    content: Either::Right(bytes),
+                    mime,
+                },
+            );
+        }
+    };
 
-    for route in routes {
-        let html = compile_typst(&route.file_path)?;
-        pages.insert(route.url_path.clone(), html);
+    Ok(())
+}
+
+async fn serve_page(uri: Uri, State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    match state.routes.get(uri.path()) {
+        Some(route) => match &route.content {
+            Either::Left(str) => (
+                [(header::CONTENT_TYPE, route.mime.to_string())],
+                str.clone(),
+            )
+                .into_response(),
+            Either::Right(bytes) => (
+                [(header::CONTENT_TYPE, route.mime.to_string())],
+                bytes.clone(),
+            )
+                .into_response(),
+        },
+
+        None => (StatusCode::NOT_FOUND).into_response(),
     }
-
-    Ok(pages)
 }
 
-fn compile_typst(file: &str) -> Result<String> {
-    let file_path = std::path::Path::new(file);
-    let parent_dir = file_path
-        .parent()
-        .unwrap_or(std::path::Path::new(CONTENT_DIR));
-
-    let file_contents = fs::read_to_string(file)?;
-
-    let template = TypstEngine::builder()
-        .main_file(file_contents)
-        .with_file_system_resolver(parent_dir)
-        .with_package_file_resolver()
-        .build();
-
-    let doc = template.compile().output.unwrap();
-
-    let html = typst_html::html(&doc).unwrap();
-
-    Ok(html)
-}
-
-async fn serve_page(
-    uri: Uri,
-    State(state): State<Arc<AppState>>,
-) -> Result<Html<String>, StatusCode> {
-    state
-        .pages
-        .get(uri.path())
-        .map(|html| Html(html.clone()))
-        .ok_or(StatusCode::NOT_FOUND)
-}
-
-async fn serve_sitemap(
-    State(state): State<Arc<AppState>>,
-) -> ([(HeaderName, &'static str); 1], String) {
+async fn serve_sitemap(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     (
         [(header::CONTENT_TYPE, "application/xml")],
         state.sitemap.clone(),

@@ -1,0 +1,208 @@
+@use 'main' as *;
+@use 'mixins' as *;
+
+main {
+  @include flex-center(column, flex-start, center);
+  padding: 4rem 1.5rem;
+}
+
+#content {
+  width: 100%;
+  max-width: 800px;
+  padding: 0;
+  border-radius: 20px;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a:not(.post-back),
+  ol,
+  ul,
+  li,
+  p:not(:has(img)) {
+    position: relative;
+    width: fit-content;
+
+    &::before {
+      content: "";
+      z-index: -1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: black;
+      box-shadow:
+        -5px 0 30px 5px black,
+        5px 0 30px 5px black,
+        0 -5px 30px 5px black,
+        0 5px 30px 5px black;
+    }
+  }
+
+  h1 {
+    font-size: 2em;
+    margin-top: 1.2em;
+    line-height: 1.2;
+    position: relative;
+    display: flex;
+    /* transform: translateY(0.7em); */
+    width: 100%;
+
+    &::after {
+      content: "";
+      border-top: 1px solid #222;
+      border-right: 1px solid #222;
+      height: 1.5em;
+      margin-left: 0.2em;
+      flex: 1;
+      transform: translateY(0.5em);
+      /* border-image: linear-gradient(to left, #333, #111) 1; */
+      border-radius: 5px 10px 0 0;
+    }
+  }
+
+  h2 {
+    font-size: 1.6em;
+    margin-top: 0.8em;
+    margin-bottom: 0.2em;
+    line-height: 1.2;
+    /* transform: translateY(0.5em); */
+  }
+
+  h3 {
+    margin-top: 0.6em;
+    font-size: 1.3em;
+    /* transform: translateY(0.3em); */
+  }
+
+  h4 {
+    margin-top: 0.2em;
+    font-size: 1em;
+    /* transform: translateY(0.1em); */
+  }
+
+  h5 {
+    margin-top: 0.1em;
+    font-size: 0.8em;
+  }
+
+  ol+p,
+  ul+p,
+  p+p {
+    margin-top: 1em;
+  }
+
+  ol,
+  ul {
+    margin-left: 1em;
+    list-style-position: outside;
+    padding-left: 1rem;
+  }
+
+  p,
+  a,
+  li {
+    font-size: 20px;
+  }
+
+  li::marker {
+    color: #706a63;
+  }
+
+  a {
+    text-decoration: none;
+    position: relative;
+    background: linear-gradient(to left, #ff33cc, #ab18dc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: linear-gradient(to left, #ff33ccaa, #ab18dcaa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    &[href^="http"]:not([href*="liamsnow.com"])::after {
+      content: "↗";
+      font-size: 0.8em;
+      margin-left: 0.2em;
+      display: inline-block;
+      background: linear-gradient(to left, #ff33cc, #ab18dc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      top: -0.2em;
+    }
+  }
+
+  // block code
+  pre:has(code) {
+    margin: 2rem 0;
+    border-radius: 6px;
+    border: 1px solid #555;
+    padding: 1rem;
+    background: #090909 !important;
+    overflow-x: scroll;
+    font-size: 16px;
+  }
+
+  // inline code
+  code:not(pre code) {
+    background: linear-gradient(to left, #ff33cc, #ab18dc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 19px; // idk looks closer sized
+
+    &::before,
+    &::after {
+      content: "`";
+    }
+  }
+
+  p:has(img) {
+    z-index: 50;
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid #330022;
+    z-index: 50;
+  }
+}
+
+.post-back {
+  color: #222;
+  z-index: 5;
+
+  &::before {
+    box-shadow: none;
+  }
+}
+
+.post-title {
+  font-size: 2.5em;
+  line-height: 1;
+  margin: 0 0 8px 0;
+  font-weight: 800;
+  text-shadow:
+    5px 5px 10px #33ffcc28,
+    5px -5px 10px #33ffcc28,
+    -5px 5px 10px #33ffcc28,
+    -5px -5px 10px #33ffcc28,
+  ;
+  z-index: 10;
+}
+
+.post-date {
+  margin-bottom: 1em;
+}

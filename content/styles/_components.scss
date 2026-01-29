@@ -1,0 +1,66 @@
+@use 'mixins' as *;
+
+.btn {
+  @include button();
+}
+
+.btn-primary {
+  @include button();
+}
+
+.container {
+  @include container();
+}
+
+.container-narrow {
+  @include container(800px);
+}
+
+.card {
+  @include card();
+  text-decoration: none;
+  color: inherit;
+
+  &:link,
+  &:visited {
+    color: inherit;
+  }
+}
+
+.card-compact {
+  @include card();
+}
+
+.section-header {
+  @include container();
+  @include flex-center(row, space-between, center);
+  @include uppercase-text();
+  margin-bottom: 3rem;
+  padding: 0;
+}
+
+.grid {
+  @include flex-center(row, center, stretch);
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+}
+
+.grid-item {
+  @include card();
+  margin: -0.5px;
+  max-width: 280px;
+
+  h3 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  .date {
+    margin-bottom: 0;
+  }
+}

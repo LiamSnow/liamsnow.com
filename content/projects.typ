@@ -1,20 +1,20 @@
 #import "shared/template.typ": template, link
 #show: template.with(
-  title: "Liam Snow's Blog",
-  desc: "Liam Snow's Blog. Programming, systems, backend, Rust and more.",
+  title: "Liam Snow's Projects",
+  desc: "Liam Snow's Projects. Programming, systems, backend, Rust and more.",
   styles: ("index",),
-  path: "/blog"
+  path: "/projects"
 )
 
-#link("RSS", "/blog/rss.xml")
+#link("RSS", "/projects/rss.xml")
 
-#let posts = toml("blog/routes.toml").routes
+#let posts = toml("projects/routes.toml").routes
 
 #html.div(id: "posts")[
   #for post in posts [
     #html.a(
       class: "post" + if post.at("highlight", default: false) { " highlight" } else { "" },
-      href: "/blog" + post.path
+      href: "/projects" + post.path
     )[
       #html.h2(class: "title")[#post.title]
       #html.p(class: "desc")[#post.desc]

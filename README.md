@@ -11,9 +11,6 @@ Expressive & fast personal website made in Rust with Typst.
  - Pre-generates all pages
  - Sitemap and RSS feed generation
  - SCSS using [grass](https://crates.io/crates/grass)
- - Font subsetting using [fontcull](https://github.com/bearcove/fontcull)
- - Minification:
-   - CSS via [lightningcss](https://lightningcss.dev/)
-   - JavaScript via [OXC](https://oxc.rs/)
 
 [See More](https://liamsnow.com/projects/liamsnow_com)
+

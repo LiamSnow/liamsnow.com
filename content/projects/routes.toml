@@ -1,0 +1,6 @@
+[[routes]]
+path = "/test"
+file = "test.typ"
+title = "Test Post"
+date = "2025-01-01"
+desc = "DESC"

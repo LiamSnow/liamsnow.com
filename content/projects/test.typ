@@ -4,7 +4,7 @@
   title: metadata.title,
   desc: metadata.desc,
   styles: ("post",),
-  path: "/blog/test"
+  path: "/projects/test"
 )
 
 = Test Post

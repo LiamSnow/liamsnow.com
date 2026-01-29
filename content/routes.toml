@@ -5,7 +5,23 @@ file = "home.typ"
 [[routes]]
 path = "/blog"
 file = "blog.typ"
+nest_dir = "blog"
 
 [[routes]]
-path = "/blog/:slug"
-dir = "blog"
+path = "/projects"
+file = "blog.typ"
+nest_dir = "projects"
+
+[[routes]]
+path = "/robots.txt"
+file = "robots.txt"
+
+[[routes]]
+path = "/styles"
+auto_nest_dir = "styles"
+
+# placed last so fontcull static analysis works :)
+[[routes]]
+path = "/fonts"
+auto_nest_dir = "fonts"
+
