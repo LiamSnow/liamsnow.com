@@ -1,6 +1,47 @@
 [[routes]]
-path = "/test"
-file = "test.typ"
-title = "Test Post"
-date = "2025-01-01"
-desc = "DESC"
+path = "/igloo_oneshot_query"
+file = "igloo/oneshot_query.typ"
+title = "Pushing Igloo's query engine to the limit"
+desc = "How Igloo is able to reach 1 million queries per second"
+date = "2025-11-24"
+homepage = true
+
+[[routes]]
+path = "/igloo_penguin"
+file = "igloo/penguin.typ"
+title = "Making a blazing fast node-based editor"
+desc = "How I made Igloo Penguin in Rust WASM"
+date = "2025-10-05"
+homepage = true
+
+[[routes]]
+path = "/igloo_device_tree"
+file = "igloo/device_tree.typ"
+title = "A device tree for Igloo"
+desc = "How Igloo efficiently stores and handles devices, entities, and components"
+date = "2025-09-30"
+homepage = true
+
+[[routes]]
+path = "/igloo_providers"
+file = "igloo/providers.typ"
+title = "Making Igloo's provider system"
+desc = "How Igloo securely runs and communicates with extensions"
+date = "2025-09-20"
+homepage = true
+
+[[routes]]
+path = "/igloo_ecs"
+file = "igloo/ecs.typ"
+title = "Bringing ECS to smart homes"
+desc = "Igloo's device model"
+date = "2025-08-27"
+homepage = true
+
+[[routes]]
+path = "/igloo_prototype"
+file = "igloo/prototype.typ"
+title = "The first Igloo prototype"
+desc = ""
+date = "2025-03-14"
+homepage = true

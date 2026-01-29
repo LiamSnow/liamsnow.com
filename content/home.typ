@@ -1,9 +1,9 @@
 #import "shared/template.typ": template, link-new-tab, link-new-tab-highlight
 #show: template.with(
-  title: "Home",
+  title: "Liam's Website",
   desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more.",
   styles: ("home",),
-  jsonld: read("ld.json"),
+  jsonld: read("shared/ld.json"),
   path: "/"
 )
 
@@ -22,16 +22,14 @@ Rust, Golang, C, C++, Python, Java, C\#, TypeScript, JavaScript, and others.
       #html.span[■]
     ]
     #html.div(class: "grid")[
-      #for item in items [
-        #html.a(
-          class: if item.at("highlight", default: false) { "highlight" } else { "" },
-          href: "/" + lower(name) + item.path
-        )[
-          #html.h3[#item.title]
-          #html.p(class: "desc")[#item.desc]
-          #html.p(class: "date")[#item.date]
-        ]
-      ]
+      #items.map(item => html.a(
+        class: if item.at("highlight", default: false) { "highlight" } else { "" },
+        href: "/" + lower(name) + item.path
+      )[
+        #html.h3[#item.title]
+        #html.p(class: "desc")[#item.desc]
+        #html.p(class: "date")[#item.date]
+      ]).join()
     ]
   ]
 }

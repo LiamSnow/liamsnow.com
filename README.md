@@ -9,7 +9,7 @@ Expressive & fast personal website made in Rust with Typst.
 ## Features
  - All content written in Typst
  - Pre-generates all pages
- - Sitemap and RSS feed generation
+ - Sitemap generation
  - SCSS using [grass](https://crates.io/crates/grass)
 
 [See More](https://liamsnow.com/projects/liamsnow_com)

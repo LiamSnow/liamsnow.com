@@ -107,3 +107,29 @@
     ]
   ]
 }
+
+#let post(
+  body,
+  base: none,
+  routes: none,
+  filename: none,
+) = {
+  let metadata = routes.routes.find(p => p.file == filename)
+
+  let header = [
+    #html.a(class: "post-back", href: "/" + base)[← #base]
+    #html.div(class: "post-title")[#metadata.title]
+    #html.p(class: "post-date")[#metadata.date]
+  ]
+  
+  template(
+    [
+      #header
+      #body
+    ],
+    title: metadata.title,
+    desc: metadata.desc,
+    styles: ("post",),
+    path: "/" + base + metadata.path
+  )
+}

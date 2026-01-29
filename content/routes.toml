@@ -9,7 +9,7 @@ nest_dir = "blog"
 
 [[routes]]
 path = "/projects"
-file = "blog.typ"
+file = "projects.typ"
 nest_dir = "projects"
 
 [[routes]]

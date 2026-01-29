@@ -21,12 +21,12 @@ mod typst;
 const ROUTES_FILE: &str = "routes.toml";
 const CONTENT_DIR: &str = "./content";
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct Config {
     routes: Vec<ConfigRoute>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct ConfigRoute {
     path: String,
     file: Option<String>,
