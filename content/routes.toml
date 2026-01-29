@@ -1,0 +1,11 @@
+[[routes]]
+path = "/"
+file = "home.typ"
+
+[[routes]]
+path = "/blog"
+file = "blog.typ"
+
+[[routes]]
+path = "/blog/:slug"
+dir = "blog"

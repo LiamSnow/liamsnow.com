@@ -1,16 +1,19 @@
 # liamsnow.com
 
+Expressive & fast personal website made in Rust with Typst.
+
 ![PageSpeed Insights 100/100 Performance 100/100 Accessibility 100/100 Best Practices 100/100 SEO](https://liamsnow.com/static/images/liamsnow_com_pagespeed.png)
 ![](https://liamsnow.com/static/images/liamsnow_com_gt.png)
 
-Fast personal website made in Rust with Axum.
 
 ## Features
+ - All content written in Typst
  - Pre-generates all pages
- - Blog posts and projects generated from markdown files using [comrak](https://crates.io/crates/comrak) and [syntect](https://crates.io/crates/syntect) syntax highlighting
- - Minifies and inlines CSS & JS
  - Sitemap and RSS feed generation
- - Sass compiler (using [grass](https://crates.io/crates/grass)) + file watching feature with `-F dev`
- - Clean HTML using [maud](https://crates.io/crates/maud) macros
+ - SCSS using [grass](https://crates.io/crates/grass)
+ - Font subsetting using [fontcull](https://github.com/bearcove/fontcull)
+ - Minification:
+   - CSS via [lightningcss](https://lightningcss.dev/)
+   - JavaScript via [OXC](https://oxc.rs/)
 
 [See More](https://liamsnow.com/projects/liamsnow_com)
