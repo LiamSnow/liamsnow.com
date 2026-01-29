@@ -1,8 +1,9 @@
-use crate::CONTENT_DIR;
-use anyhow::{Result, bail};
-use std::{path::PathBuf, process::Command};
+use crate::routes::CONTENT_DIR;
+use anyhow::{Context, Result, bail};
+use std::path::PathBuf;
+use tokio::process::Command;
 
-pub fn compile(source_path: &PathBuf) -> Result<String> {
+pub async fn compile(source_path: &PathBuf) -> Result<String> {
     let out = Command::new("typst")
         .arg("compile")
         .arg(source_path)
@@ -13,12 +14,12 @@ pub fn compile(source_path: &PathBuf) -> Result<String> {
         .arg("--root")
         .arg(CONTENT_DIR)
         .arg("-")
-        .output()?;
+        .output()
+        .await?;
 
     if out.stdout.is_empty() {
-        println!("{}", String::from_utf8_lossy(&out.stderr));
-        bail!("Failed to compile {}", source_path.to_string_lossy());
+        bail!("{}", String::from_utf8_lossy(&out.stderr));
     }
 
-    Ok(String::from_utf8_lossy(&out.stdout).to_string())
+    String::from_utf8(out.stdout).context("typst output was not valid UTF-8")
 }

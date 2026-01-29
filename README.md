@@ -7,10 +7,12 @@ Expressive & fast personal website made in Rust with Typst.
 
 
 ## Features
- - All content written in Typst
- - Pre-generates all pages
+ - All content and layout written in Typst
+   - metadata queries integrations (see [home.typ](content/home.typ))
+ - Watcher mode for development
+ - Parallel compilation (achieves 250ms startup time)
  - Sitemap generation
- - SCSS using [grass](https://crates.io/crates/grass)
+ - SCSS & SASS support
 
 [See More](https://liamsnow.com/projects/liamsnow_com)
 
