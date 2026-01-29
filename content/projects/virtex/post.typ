@@ -1,8 +1,8 @@
-#import "../shared/template.typ": post
+#import "../../shared/template.typ": post
 #show: post.with(
     base: "projects",
-    routes: toml("routes.toml"),
-    filename: "virtex.typ"
+    routes: toml("../routes.toml"),
+    filename: "virtex/post.typ"
 )
 
 During COVID-19, I designed an FPGA-based vision camera for FIRST Robotics Competition to address latency issues in existing solutions like LimeLight. LimeLight had 50-100ms latency, which required control algorithms to compensate for outdated position data. For example, a turret tracking a target needs to account for where the target was 50ms ago, not where it is now.

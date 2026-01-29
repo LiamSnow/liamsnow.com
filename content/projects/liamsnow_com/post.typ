@@ -1,8 +1,8 @@
-#import "../shared/template.typ": post
+#import "../../shared/template.typ": post
 #show: post.with(
     base: "projects",
-    routes: toml("routes.toml"),
-    filename: "liamsnow_com.typ"
+    routes: toml("../routes.toml"),
+    filename: "liamsnow_com/post.typ"
 )
 
 #link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
@@ -26,8 +26,8 @@ These goals are interconnected. Small page sizes reduce load times, which improv
 
 = Results
 
-#image("liamsnow_com_pagespeed.png")
-#image("liamsnow_com_gt.png")
+#image("pagespeed.png")
+#image("gt.png")
 
 The site achieves excellent PageSpeed scores and consistently fast load times. More importantly, the architecture makes adding new content straightforward: write Markdown, push to GitHub, and the site rebuilds automatically via git-ops on my NixOS homelab.
 

@@ -20,7 +20,6 @@ file = "robots.txt"
 path = "/styles"
 auto_nest_dir = "styles"
 
-# placed last so fontcull static analysis works :)
 [[routes]]
 path = "/fonts"
 auto_nest_dir = "fonts"
