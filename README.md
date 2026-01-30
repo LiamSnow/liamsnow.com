@@ -17,3 +17,13 @@ Expressive & fast personal website made in Rust with Typst.
 
 [See More](https://liamsnow.com/projects/liamsnow_com)
 
+## TODO
+ 1. Remove `routes.toml` and use NextJS like routing
+ 2. Page metadata (title, etc) placed in metadata
+ 3. Place article metadata in separate metadata
+ 4. Allow pages (in metadata) to request to query other pages (ex. blog.typ needs to grab all blogs)
+ 5. Allow nested blogs and projects
+ 6. Make zettelkasten like system
+    - we want projects/igloo to have cards for each blog maybe?
+
+
