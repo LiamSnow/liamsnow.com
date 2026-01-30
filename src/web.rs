@@ -1,13 +1,13 @@
 use anyhow::Result;
 use arc_swap::ArcSwap;
-use axum::{
-    Router,
-    body::Bytes,
-    extract::State,
-    http::{HeaderMap, HeaderValue, StatusCode, Uri, header},
-    response::{IntoResponse, Response},
-    routing::get,
-};
+use bytes::Bytes;
+use http::{HeaderValue, Request, Response, StatusCode, header};
+use http_body_util::Full;
+use hyper::body::Incoming;
+use hyper::server::conn::http1;
+use hyper::service::service_fn;
+use hyper_util::rt::TokioIo;
+use std::convert::Infallible;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 
@@ -16,74 +16,69 @@ use crate::compiler::Route;
 
 pub async fn run(state: Arc<ArcSwap<AppState>>, address: &str, port: u16) -> Result<()> {
     let host = format!("{address}:{port}");
-
-    let app = Router::new()
-        .route("/sitemap.xml", get(serve_sitemap))
-        .fallback(serve_page)
-        .with_state(state);
-
-    let listener = TcpListener::bind(&host).await.unwrap();
+    let listener = TcpListener::bind(&host).await?;
     println!("Hosting at {host}!");
-    axum::serve(listener, app.into_make_service()).await?;
 
-    Ok(())
+    loop {
+        let (stream, _) = listener.accept().await?;
+        let state = state.clone();
+
+        tokio::spawn(async move {
+            let _ = http1::Builder::new()
+                .serve_connection(
+                    TokioIo::new(stream),
+                    service_fn(move |req| handle(req, state.clone())),
+                )
+                .await;
+        });
+    }
 }
 
-fn accepts_brotli(headers: &HeaderMap) -> bool {
+async fn handle(
+    req: Request<Incoming>,
+    state: Arc<ArcSwap<AppState>>,
+) -> Result<Response<Full<Bytes>>, Infallible> {
+    let state = state.load();
+    let use_br = accepts_brotli(req.headers());
+
+    let route = match req.uri().path() {
+        "/sitemap.xml" => Some(&state.sitemap),
+        path => state.routes.get(path),
+    };
+
+    let response = match route {
+        Some(route) => build_response(route, use_br),
+        None => Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(Full::new(Bytes::new()))
+            .unwrap(),
+    };
+
+    Ok(response)
+}
+
+fn accepts_brotli(headers: &http::HeaderMap) -> bool {
     headers
         .get(header::ACCEPT_ENCODING)
         .and_then(|v| v.to_str().ok())
         .is_some_and(|s| s.contains("br"))
 }
 
-fn serve_route(route: &Route, use_br: bool) -> (HeaderValue, Option<HeaderValue>, Bytes) {
-    if use_br {
+fn build_response(route: &Route, use_br: bool) -> Response<Full<Bytes>> {
+    let mut builder = Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, route.content_type.clone());
+
+    let body = if use_br {
         if let Some(br) = &route.content_br {
-            return (
-                route.content_type.clone(),
-                Some(HeaderValue::from_static("br")),
-                br.clone(),
-            );
+            builder = builder.header(header::CONTENT_ENCODING, HeaderValue::from_static("br"));
+            br.clone()
+        } else {
+            route.content_identity.clone()
         }
-    }
-    (route.content_type.clone(), None, route.content_identity.clone())
-}
-
-fn build_response(content_type: HeaderValue, encoding: Option<HeaderValue>, body: Bytes) -> Response {
-    if let Some(enc) = encoding {
-        (
-            [
-                (header::CONTENT_TYPE, content_type),
-                (header::CONTENT_ENCODING, enc),
-            ],
-            body,
-        )
-            .into_response()
     } else {
-        ([(header::CONTENT_TYPE, content_type)], body).into_response()
-    }
-}
+        route.content_identity.clone()
+    };
 
-async fn serve_page(
-    uri: Uri,
-    headers: HeaderMap,
-    State(state): State<Arc<ArcSwap<AppState>>>,
-) -> Response {
-    let state = state.load();
-    match state.routes.get(uri.path()) {
-        Some(route) => {
-            let (ct, enc, body) = serve_route(route, accepts_brotli(&headers));
-            build_response(ct, enc, body)
-        }
-        None => StatusCode::NOT_FOUND.into_response(),
-    }
-}
-
-async fn serve_sitemap(
-    headers: HeaderMap,
-    State(state): State<Arc<ArcSwap<AppState>>>,
-) -> Response {
-    let state = state.load();
-    let (ct, enc, body) = serve_route(&state.sitemap, accepts_brotli(&headers));
-    build_response(ct, enc, body)
+    builder.body(Full::new(body)).unwrap()
 }

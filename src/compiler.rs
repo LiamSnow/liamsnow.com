@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
-use axum::{body::Bytes, http::HeaderValue};
 use brotli::{BrotliCompress, enc::BrotliEncoderParams};
+use bytes::Bytes;
+use http::HeaderValue;
 use mime_guess::mime;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use std::{collections::HashMap, fs};
