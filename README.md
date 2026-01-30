@@ -10,7 +10,8 @@ Expressive & fast personal website made in Rust with Typst.
  - All content and layout written in Typst
    - metadata queries integrations (see [home.typ](content/home.typ))
  - Watcher mode for development
- - Parallel compilation (achieves 250ms startup time)
+ - Parallel compilation
+ - Pre-compressed responses
  - Sitemap generation
  - SCSS & SASS support
 

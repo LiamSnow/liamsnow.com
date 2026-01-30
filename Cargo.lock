@@ -679,6 +679,7 @@ dependencies = [
  "anyhow",
  "arc-swap",
  "axum",
+ "brotli",
  "clap",
  "grass",
  "mime_guess",

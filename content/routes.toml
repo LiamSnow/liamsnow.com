@@ -1,6 +1,6 @@
 [[routes]]
 path = "/"
-file = "home.typ"
+file = "index.typ"
 
 [[routes]]
 path = "/blog"

@@ -1,8 +1,6 @@
 use anyhow::{Context, Result};
-use axum::{
-    body::Bytes,
-    http::{HeaderName, HeaderValue, header},
-};
+use axum::{body::Bytes, http::HeaderValue};
+use brotli::{BrotliCompress, enc::BrotliEncoderParams};
 use mime_guess::mime;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use std::{collections::HashMap, fs};
@@ -12,24 +10,46 @@ use crate::routes::FileTask;
 use crate::typst;
 
 pub struct Route {
-    pub content: Bytes,
-    pub headers: [(HeaderName, HeaderValue); 1],
+    pub content_br: Option<Bytes>,
+    pub content_identity: Bytes,
+    pub content_type: HeaderValue,
 }
 
 impl Route {
     pub fn from_bytes(content: Vec<u8>, mime: impl ToString) -> Self {
         Self {
-            content: Bytes::from(content),
-            headers: [(header::CONTENT_TYPE, HeaderValue::from_str(&mime.to_string()).unwrap())],
+            content_br: Some(compress_brotli(&content)),
+            content_identity: Bytes::from(content),
+            content_type: HeaderValue::from_str(&mime.to_string()).unwrap(),
+        }
+    }
+
+    pub fn from_bytes_precompressed(content: Vec<u8>, mime: impl ToString) -> Self {
+        Self {
+            content_br: None,
+            content_identity: Bytes::from(content),
+            content_type: HeaderValue::from_str(&mime.to_string()).unwrap(),
         }
     }
 
     pub fn from_string(content: String, mime: impl ToString) -> Self {
+        let bytes = content.into_bytes();
         Self {
-            content: Bytes::from(content),
-            headers: [(header::CONTENT_TYPE, HeaderValue::from_str(&mime.to_string()).unwrap())],
+            content_br: Some(compress_brotli(&bytes)),
+            content_identity: Bytes::from(bytes),
+            content_type: HeaderValue::from_str(&mime.to_string()).unwrap(),
         }
     }
+}
+
+fn compress_brotli(input: &[u8]) -> Bytes {
+    let mut output = Vec::new();
+    let params = BrotliEncoderParams {
+        quality: 11,
+        ..Default::default()
+    };
+    BrotliCompress(&mut &input[..], &mut output, &params).unwrap();
+    Bytes::from(output)
 }
 
 pub async fn compile(tasks: Vec<FileTask>) -> FxHashMap<String, Route> {
@@ -57,7 +77,8 @@ async fn process_file(task: FileTask) -> Option<(String, Route)> {
     let result = match ext.as_deref() {
         Some("typ") => process_typst(&task).await,
         Some("sass") | Some("scss") | Some("css") => process_css(&task),
-        _ => process_static(&task),
+        Some("js" | "txt" | "md" | "csv") => process_static(&task, true),
+        _ => process_static(&task, false),
     };
 
     match result {
@@ -86,8 +107,13 @@ fn process_css(task: &FileTask) -> Result<(String, Route)> {
     Ok((url_path, Route::from_string(content, mime::TEXT_CSS)))
 }
 
-fn process_static(task: &FileTask) -> Result<(String, Route)> {
+fn process_static(task: &FileTask, compress: bool) -> Result<(String, Route)> {
     let bytes = fs::read(&task.file_path).context("failed to read file")?;
     let mime = mime_guess::from_path(&task.file_path).first_or_text_plain();
-    Ok((task.url_path.clone(), Route::from_bytes(bytes, mime)))
+    let route = if compress {
+        Route::from_bytes(bytes, mime)
+    } else {
+        Route::from_bytes_precompressed(bytes, mime)
+    };
+    Ok((task.url_path.clone(), route))
 }

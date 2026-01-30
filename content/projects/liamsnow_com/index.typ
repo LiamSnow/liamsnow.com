@@ -2,7 +2,7 @@
 #show: post.with(
     base: "projects",
     routes: toml("../routes.toml"),
-    filename: "liamsnow_com/post.typ"
+    filename: "liamsnow_com/index.typ"
 )
 
 #link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]

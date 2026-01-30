@@ -1,6 +1,5 @@
 use anyhow::Result;
 use arc_swap::ArcSwap;
-use axum::body::Bytes;
 use clap::Parser;
 use rustc_hash::FxHashMap;
 use std::{path::PathBuf, sync::Arc};
@@ -14,7 +13,7 @@ mod web;
 
 pub struct AppState {
     pub routes: FxHashMap<String, compiler::Route>,
-    pub sitemap: Bytes,
+    pub sitemap: compiler::Route,
 }
 
 #[derive(Parser, Debug)]
@@ -37,7 +36,6 @@ struct Args {
 async fn main() -> Result<()> {
     let args = Args::parse();
 
-    println!("Generating pages...");
     let state = Arc::new(ArcSwap::from_pointee(build_state().await?));
 
     if args.watch {
@@ -49,8 +47,11 @@ async fn main() -> Result<()> {
 
 pub async fn build_state() -> Result<AppState> {
     // let start = Instant::now();
+    println!("Indexing routes..");
     let tasks = routes::load("", &PathBuf::from(routes::CONTENT_DIR))?;
+    println!("Compiling routes..");
     let routes = compiler::compile(tasks).await;
+    println!("Building sitemap..");
     let sitemap = sitemap::generate(&routes);
     // println!("startup time = {:?}", Instant::now() - start);
     Ok(AppState { routes, sitemap })

@@ -1,4 +1,4 @@
-use axum::body::Bytes;
+use mime_guess::mime;
 use rustc_hash::FxHashMap;
 use std::fmt::Write;
 
@@ -6,7 +6,7 @@ use crate::compiler::Route;
 
 const BASE_URL: &str = "https://liamsnow.com";
 
-pub fn generate(routes: &FxHashMap<String, Route>) -> Bytes {
+pub fn generate(routes: &FxHashMap<String, Route>) -> Route {
     let mut xml = String::with_capacity(2048);
     xml.push_str(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
     xml.push('\n');
@@ -30,5 +30,5 @@ pub fn generate(routes: &FxHashMap<String, Route>) -> Bytes {
     }
 
     xml.push_str("</urlset>");
-    Bytes::from(xml)
+    Route::from_string(xml, mime::TEXT_XML)
 }

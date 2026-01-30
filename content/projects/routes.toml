@@ -1,6 +1,7 @@
 [[routes]]
 path = "/opensleep"
-file = "opensleep/post.typ"
+file = "opensleep/index.typ"
+auto_nest_dir = "opensleep"
 title = "opensleep 113★"
 desc = "Open source firmware for the Eight Sleep Pod 3"
 date = "2025-09-04"
@@ -17,7 +18,7 @@ homepage = true
 
 [[routes]]
 path = "/liamsnow_com"
-file = "liamsnow_com/post.typ"
+file = "liamsnow_com/index.typ"
 title = "liamsnow.com"
 desc = "Fast personal website made in Rust with Axum"
 date = "2025-07-04"
@@ -41,7 +42,8 @@ homepage = true
 
 [[routes]]
 path = "/virtex"
-file = "virtex/post.typ"
+file = "virtex/index.typ"
+auto_nest_dir = "virtex"
 title = "virtex"
 desc = "815fps FPGA-based IR machine vision camera"
 date = "2022-05-27"

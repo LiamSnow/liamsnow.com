@@ -2,7 +2,7 @@
 #show: post.with(
     base: "projects",
     routes: toml("../routes.toml"),
-    filename: "virtex/post.typ"
+    filename: "virtex/index.typ"
 )
 
 During COVID-19, I designed an FPGA-based vision camera for FIRST Robotics Competition to address latency issues in existing solutions like LimeLight. LimeLight had 50-100ms latency, which required control algorithms to compensate for outdated position data. For example, a turret tracking a target needs to account for where the target was 50ms ago, not where it is now.
@@ -26,14 +26,14 @@ I successfully demonstrated 815fps tracking, but FIRST Robotics Competition swit
  - #link("https://github.com/34-Engineering/Virtex-App")[Virtex App]: Angular + Electron desktop application for configuration and camera stream viewing
 
 = Images
-#image("virtex2_on.jpeg")
+#html.img(src: "virtex/virtex2_on.jpeg")
 
-#image("virtex2_desk.jpeg")
+#html.img(src: "virtex/virtex2_desk.jpeg")
 
 == PCB
 
 Eight-layer PCB integrating FTDI USB chip, Artix-7 FPGA, and Onsemi image sensor:
 
-#image("virtex_main_pcb_back.jpeg")
+#html.img(src: "virtex/virtex_main_pcb_back.jpeg")
 
-#image("virtex_main_pcb_front.jpeg")
+#html.img(src: "virtex/virtex_main_pcb_front.jpeg")

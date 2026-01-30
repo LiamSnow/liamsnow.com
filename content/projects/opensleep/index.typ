@@ -2,7 +2,7 @@
 #show: post.with(
     base: "projects",
     routes: toml("../routes.toml"),
-    filename: "opensleep/post.typ"
+    filename: "opensleep/index.typ"
 )
 
 #link("https://github.com/liamsnow/opensleep")[GitHub Repo]
@@ -38,7 +38,7 @@ data immediately. Instead, it only receives batched updates.
 
 Version 2 took approximately six months to complete and represents a complete reimplementation. Instead of pretending to be one Eight Sleep service (the DAC) and interacting with the others, it replaces all Eight Sleep services entirely:
 
-#image("comparison.svg")
+#html.img(src: "opensleep/comparison.svg")
 
 (Note that in this diagram ninesleep is equivalent to opensleep V1)
 
