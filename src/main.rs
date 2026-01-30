@@ -30,11 +30,17 @@ struct Args {
     /// Watch content directory for changes and rebuild
     #[arg(short, long)]
     watch: bool,
+
+    /// Path to the typst binary
+    #[arg(short, long, default_value = "typst")]
+    typst: String,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
+
+    typst::set_binary_path(&args.typst);
 
     let state = Arc::new(ArcSwap::from_pointee(build_state().await?));
 
