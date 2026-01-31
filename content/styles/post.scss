@@ -6,6 +6,33 @@ main {
   padding: 4rem 1.5rem;
 }
 
+.post-back {
+  color: #222;
+  z-index: 5;
+
+  &::before {
+    box-shadow: none;
+  }
+}
+
+.post-title {
+  font-size: 2.5em;
+  line-height: 1;
+  margin: 0 0 8px 0;
+  font-weight: 800;
+  text-shadow:
+    5px 5px 10px #33ffcc28,
+    5px -5px 10px #33ffcc28,
+    -5px 5px 10px #33ffcc28,
+    -5px -5px 10px #33ffcc28,
+  ;
+  z-index: 10;
+}
+
+.post-date {
+  margin-bottom: 1em;
+}
+
 #content {
   width: 100%;
   max-width: 800px;
@@ -18,7 +45,7 @@ main {
   h4,
   h5,
   h6,
-  a:not(.post-back),
+  a:not(.post-back):not(.post),
   ol,
   ul,
   li,
@@ -113,7 +140,7 @@ main {
     color: #706a63;
   }
 
-  a {
+  a:not(.post) {
     text-decoration: none;
     position: relative;
     background: linear-gradient(to left, #ff33cc, #ab18dc);
@@ -180,29 +207,44 @@ main {
   }
 }
 
-.post-back {
-  color: #222;
-  z-index: 5;
 
-  &::before {
-    box-shadow: none;
+#posts {
+  @include flex-center(row, center, stretch);
+  padding: 1rem 0.5rem;
+  flex-wrap: wrap;
+
+  >.post {
+    @include card();
+    box-shadow: inset 0 0 20px 40px black;
+    padding: 1rem;
+    max-width: 250px;
+    text-decoration: none;
+    color: inherit;
+    margin: -0.5px;
+    cursor: pointer;
+    border-radius: 3px;
+
+    &.highlight {
+      z-index: 20;
+      border-color: #ab18dc;
+    }
+
+    &.highlight:hover * {
+      color: #b957da;
+    }
+
+    .title {
+      font-weight: bold;
+    }
+
+    .desc {
+      font-size: 0.85em;
+    }
+
+    .date {
+      margin-bottom: 0;
+      font-size: 0.85em;
+      color: #999;
+    }
   }
-}
-
-.post-title {
-  font-size: 2.5em;
-  line-height: 1;
-  margin: 0 0 8px 0;
-  font-weight: 800;
-  text-shadow:
-    5px 5px 10px #33ffcc28,
-    5px -5px 10px #33ffcc28,
-    -5px 5px 10px #33ffcc28,
-    -5px -5px 10px #33ffcc28,
-  ;
-  z-index: 10;
-}
-
-.post-date {
-  margin-bottom: 1em;
 }

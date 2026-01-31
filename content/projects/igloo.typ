@@ -1,11 +1,13 @@
 #metadata((
   title: "igloo",
   desc: "A secure, fast, & intuitive smart home platform",
-  date: "2025-05-06",
+  date: "Started 2025-01-01",
   homepage: true
 )) <page>
 
-#import "/_shared/template.typ": post
+#metadata("blog/igloo/") <query>
+
+#import "/_shared/template.typ": post, query
 #show: post
 
 #link("https://github.com/liamsnow/igloo")[GitHub Repo]
@@ -35,6 +37,17 @@ I am building Igloo.
  + *Secure*: It must be safe to expose to the public internet without any risks of RCE, unauthorized access, or leaked secrets.
  + *Run "Anywhere"*: It must be able to run a small smart home on a Raspberry Pi 3.
 
-= Development
+= Updates/Blog
 
-More to come! See my #link("../blog")[Blog] for development updates.
+#let posts = query.at(0, default: ()).sorted(key: p => p.at("date", default: "")).rev()
+
+#html.div(id: "posts")[
+  #posts.map(post => html.a(
+    class: "post" + if post.at("highlight", default: false) { " highlight" } else { "" },
+    href: post.url
+  )[
+    #html.div(class: "title")[#post.title]
+    #html.div(class: "desc")[#post.at("desc", default: "")]
+    #html.div(class: "date")[#post.at("date", default: "")]
+  ]).join()
+]
