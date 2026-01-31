@@ -1,5 +1,5 @@
 #metadata((
-  title: "opensleep 113★",
+  title: "opensleep 120★",
   desc: "Open source firmware for the Eight Sleep Pod 3",
   date: "2025-09-04",
   homepage: true,
