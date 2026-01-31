@@ -23,24 +23,32 @@ pub struct AppState {
 #[command(name = "liamsnow-com")]
 struct Args {
     /// Hostname or IP address to bind to
-    #[arg(short, long, default_value = "127.0.0.1")]
+    #[arg(short, long, env = "ADDRESS", default_value = "127.0.0.1")]
     address: String,
 
     /// Port number (1-65535)
-    #[arg(short, long, default_value_t = 3232)]
+    #[arg(short, long, env = "PORT", default_value_t = 3232)]
     port: u16,
 
     /// Watch content directory for changes and rebuild
-    #[arg(short, long)]
+    #[arg(short, long, env = "WATCH")]
     watch: bool,
 
     /// Path to the typst binary
-    #[arg(short, long, default_value = "typst")]
+    #[arg(short, long, env = "TYPST", default_value = "typst")]
     typst: String,
 
     /// Path to file containing GitHub webhook secret
-    #[arg(long)]
+    #[arg(long, env = "GITHUB_SECRET_PATH")]
     github_secret_path: Option<String>,
+
+    /// Path to the cargo binary
+    #[arg(short, long, env = "CARGO", default_value = "cargo")]
+    cargo: String,
+
+    /// Path to the git binary
+    #[arg(short, long, env = "GIT", default_value = "git")]
+    git: String,
 }
 
 #[tokio::main]
@@ -49,6 +57,8 @@ async fn main() -> Result<()> {
     let args = Args::parse();
 
     typst::set_binary_path(&args.typst);
+    update::set_cargo_path(&args.cargo);
+    update::set_git_path(&args.git);
 
     if let Some(ref path) = args.github_secret_path {
         update::init_secret(path)?;

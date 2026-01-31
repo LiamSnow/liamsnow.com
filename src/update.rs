@@ -11,6 +11,16 @@ use tokio::process::Command;
 type HmacSha256 = Hmac<Sha256>;
 
 static WEBHOOK_SECRET: OnceLock<String> = OnceLock::new();
+static CARGO_PATH: OnceLock<String> = OnceLock::new();
+static GIT_PATH: OnceLock<String> = OnceLock::new();
+
+pub fn set_cargo_path(path: &str) {
+    CARGO_PATH.set(path.to_string()).ok();
+}
+
+pub fn set_git_path(path: &str) {
+    GIT_PATH.set(path.to_string()).ok();
+}
 
 pub fn init_secret(path: &str) -> Result<()> {
     let secret = fs::read_to_string(path).map(|s| s.trim().to_string())?;
@@ -99,7 +109,8 @@ async fn execute() -> Result<()> {
     println!("Starting self-update...");
 
     println!("  Running git pull...");
-    let output = Command::new("git").arg("pull").output().await?;
+    let git = GIT_PATH.get().map(|s| s.as_str()).unwrap_or("git");
+    let output = Command::new(git).arg("pull").output().await?;
 
     if !output.status.success() {
         bail!(
@@ -110,7 +121,8 @@ async fn execute() -> Result<()> {
     println!("  git pull succeeded");
 
     println!("  Running cargo build --release...");
-    let output = Command::new("cargo")
+    let cargo = CARGO_PATH.get().map(|s| s.as_str()).unwrap_or("cargo");
+    let output = Command::new(cargo)
         .args(["build", "--release"])
         .output()
         .await?;
