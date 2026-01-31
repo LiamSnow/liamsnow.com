@@ -10,7 +10,7 @@
 
 #link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
 
-*NOTE*: This is currently out of date and based off the first version. I will be updating this soonThis is currently out of date and based off the first version. I will be updating this soon.
+*NOTE*: This is currently out of date and based off the first version. I will be updating this soon.
 
 = Why Build This?
 
