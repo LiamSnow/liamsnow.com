@@ -15,6 +15,9 @@ use crate::AppState;
 use crate::compiler::Route;
 use crate::update;
 
+const SITEMAP_PATH: &str = "/sitemap.xml";
+const UPDATE_PATH: &str = "/_update";
+
 pub async fn run(state: Arc<ArcSwap<AppState>>, address: &str, port: u16) -> Result<()> {
     let host = format!("{address}:{port}");
     let listener = TcpListener::bind(&host).await?;
@@ -39,7 +42,7 @@ async fn handle(
     req: Request<Incoming>,
     state: Arc<ArcSwap<AppState>>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
-    if req.method() == Method::POST && req.uri().path() == "/_update/" {
+    if req.method() == Method::POST && req.uri().path() == UPDATE_PATH {
         return Ok(update::handle(req).await);
     }
 
@@ -47,7 +50,7 @@ async fn handle(
     let use_br = accepts_brotli(req.headers());
 
     let route = match req.uri().path() {
-        "/sitemap.xml" => Some(&state.sitemap),
+        SITEMAP_PATH => Some(&state.sitemap),
         path => state.routes.get(path),
     };
 
