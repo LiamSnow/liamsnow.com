@@ -1,7 +1,7 @@
 #metadata((
   title: "liamsnow.com",
-  desc: "Fast personal website made in Rust with Axum",
-  date: "2025-07-04",
+  desc: "Fast personal website made with Rust & Typst, hosted on Helios illumos.",
+  date: "2026-01-31",
   homepage: true
 )) <page>
 
@@ -10,106 +10,128 @@
 
 #link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
 
-*NOTE*: This is currently out of date and based off the first version. I will be updating this soon
+liamsnow.com is fast website written in Rust
+that has all content and layout written in #link("https://typst.app")[Typst].
+There is no HTML, only Typst and SCSS.
 
 = Why Build This?
 
-I wanted full control over my personal website and to not be limited by existing static site generators (SSGs).
-While, I'm sure existing SSGs would have worked fine, making it myself both gave me more freedom and the opportunity to make another Rust project.
+While many SSGs would work:
+ + I am very particular with what I want
+ + I want bleeding edge performance
+ + It needs to run on illumos
+ + I want to write everything in Typst
 
-= Goals
+= Why Typst?
+For about a year in college I wrote all my notes in Obsidian.
+After so much frustration with Obsidian being slow,
+having to pay for syncing to mobile, and it being exceptionally hard
+to write extensions (at the time), I decided I needed something else.
 
-When starting this project, I set strict performance targets:
+I started just writing my notes in Markdown, using
+#link("https://pandoc.org/")[pandoc] to compile it.
+I made a Neovim extension to automatically open up a browser preview of this.
+I experimented with writing all my notes in LaTeX, but it was just too
+tedious and time consuming.
 
-- *Static site generation*: Pre-render all content at startup, serve instantly on each request
-- *Small page size*: Target minimal transfer size for fast loading and reduced bounce rates
-- *High PageSpeed scores*: Optimize for Google's Core Web Vitals, which directly impact SEO rankings
-- *Markup-based content*: Write blogs and project pages in markup language
-- *Aesthetic but Readable*: It must look good while still being easy to read and navigate
+Eventually I discovered Typst. It was the best of both worlds,
+the power of LaTeX (and more) with the ease of Markdown.
+It completely transformed my note taking experience.
 
-These goals are interconnected. Small page sizes reduce load times, which improves user experience and helps with search engine rankings. Fast initial loads prevent visitors from bouncing before the page even renders. The site currently weighs 13.39kB uncompressed (4.68kB compressed), which helps achieve these objectives.
+When I was making the #link("liamsnow_com/v1")[original version]
+of my website, Typst HTML export was just not ready, so
+I set it up to use Markdown.
+
+I used this for about half a year, but, I just always had this
+feeling that I had to do this in Typst.
+It would give me so much more power and make writing easier.
+Typst HTML export was in better state, but still not ready.
+It doesn't have multi-page export and
+#link("https://github.com/typst/typst/pull/7783")[randomly breaks].
+However, I persevered through and was able to get it all working.
+
+= Indexer
+== Discovery
+All content in written in a `content/` folder.
+At the start of the program, it will walk through
+content and index it. Mapping:
+ - `index.typ` -> `liamsnow.com/`,
+ - `projects/igloo.typ` -> `liamsnow.com/projects/igloo`
+ - `styles/home.scss` -> `liamsnow.com/styles/home.css` (will be compiled)
+ - etc.
+All other files keep their extensions. Files prefixed with `_` are ignored.
+
+== Metadata
+Each `.typ` file will have metadata tag at the top of the file
+to describe the title and other useful information:
+
+```typst
+#metadata((title: "..", ..)) <page>
+```
+
+After discovery, we spawn up a bunch of tokio tasks
+to grab this metadata from each page in parallel
+(using `typst query ..`).
+
+== Queries
+Some pages, like `/`, `/blog`, etc. need to get information
+about other pages. Ex. `/blog` needs a list of all blogs.
+
+I have introduced a simple query system, where `.typ` can have
+the following at the top of their file:
+
+```typst
+#metadata("blog/") <query>
+```
+
+Which will then return a response (via `sys.inputs`)
+of the metadata of all pages in `blog/`. 
+This metadata also includes the mapped url from discovery
+so it can link to those pages.
+
+= Compiler
+After indexing, we spawn up a bunch of tokio tasks to process
+each file in parallel. This will do a few things:
+ + Compile `.typ` files
+ + Compile `.scss`, `.sass`, `.css` files using #link("https://crates.io/crates/grass")[grass] (which also compacts them)
+ + Pre-compress everything using #link("https://en.wikipedia.org/wiki/Brotli")[Brotli]
+
+= Watcher
+Having a hot reload/watcher system really helps with writing posts.
+So I set up a pretty simple system for this:
+ + Inject some code into the website which will connect to a websocket. When it recieves a message, refresh the page.
+ + Watch for any file modifications in `content/` (create, remove, modify)
+   + Upon change, rebuild, then notify websockets
+
+I couldn't use `typst watch` for a few reasons:
+ + Typst doesn't know about our depencies from our custom query system
+ + We need to compile things besides just Typst files
+
+= Self Updating / Gitops
+It would be really annoying if I had to SSH into my server, login
+to the zone, git pull, recompile, and restart the service for every
+change to my website. So, I created a pretty simple self updating system.
+
+I setup a GitHub webhook which POSTs to `liamsnow.com/_update`.
+Upon recieving this it will:
+ + Verify the sig/secret
+ + Git pull
+ + Recompile
+ + Stop the service (#link("https://en.wikipedia.org/wiki/Service_Management_Facility")[SMF] will restart it)
+
+
+= Prefetch on Hover
+I've always loved how fast and snappy #link("https://www.mcmaster.com/")[McMaster-Carr]
+is. So I decided to bring over one of their best features - prefetching pages on hover.
+It prefetches pages when you hover over them, so that when you actually
+do navigate there, its already cached.
 
 = Results
 
-#image("pagespeed.png")
-#image("gt.png")
+I'm super happy with the results. Its fast but also
+has a great experience to use. I get to write posts
+in Typst, with hot reloading, and gitops.
 
-The site achieves excellent PageSpeed scores and consistently fast load times. More importantly, the architecture makes adding new content straightforward: write Markdown, push to GitHub, and the site rebuilds automatically via git-ops on my NixOS homelab.
+#html.img(src: "liamsnow_com/pagespeed.png")
+#html.img(src: "liamsnow_com/gt.png")
 
-= Development
-
-== Choosing a Templating Engine
-
-I evaluated several Rust templating options before settling on my approach.
-I tried
-#link("https://crates.io/crates/minijinja")[minijinja] and #link("https://crates.io/crates/handlebars")[handlebars-rust]
-first which both are solid libraries. However, I ultimately chose Maud for two reasons: type safety and reducing the number of files in the project.
-
-Maud lets you write HTML directly in Rust, which means the compiler catches errors that would slip through other templating systems. Instead of maintaining separate template files, everything stays in Rust.
-
-Here's an example of a Maud component:
-
-```rust
-fn header(path: &str) -> Markup {
-    html! {
-        header {
-            .container {
-                .left {
-                    (link("IV", &get_base_url(path)))
-                }
-                .nav.desktop {
-                    (link("BLOG", "/blog"))
-                    (link("PROJECTS", "/projects"))
-                }
-                .nav.mobile {
-                    button { "MENU" }
-                }
-            }
-        }
-    }
-}
-```
-
-I built a template system in `src/template.rs` that takes page metadata and content, wrapping them in complete HTML pages. This approach makes it easy to create reusable components.
-
-== Markup
-=== Typst
-
-Initially, I wanted to use Typst for rendering content. Typst is a massive improvement over Markdown, and I use it extensively for personal notes. I spent considerable time trying to make Typst's HTML generation work for this site.
-
-Unfortunately, Typst's HTML support is still early-stage. It lacks equation rendering, syntax highlighting, and other features necessary for my website. There's an #link("https://github.com/typst/typst/issues/721")[active GitHub issue] tracking HTML generation progress. I hope to revisit this once HTML generation matures.
-
-=== Markdown
-
-With Typst not viable, I went with Markdown. I chose #link("https://crates.io/crates/comrak")[comrak]
-because it's the same Markdown flavor as GitHub and has extensive plugin support. The syntect plugin handles syntax highlighting, which was essential for my website.
-
-== SCSS
-
-I originally wrote all styling in plain CSS, but nested rules quickly became cumbersome. I set up
-#link("https://crates.io/crates/grass")[grass], a Rust SCSS compiler, which simplified the styling workflow.
-For development, I created a script in `src/scss.rs` that watches `.scss` files in `static/` and regenerates CSS when files are changed.
-
-Each page has its own SCSS file that imports the main stylesheet. This structure allows me to compile one file per page and inline it easily using `OutputStyle::Compressed`.
-
-== Inlining Everything
-
-One controversial optimization I made was inlining all CSS and JavaScript. This trades away caching benefits for faster first-page loads.
-
-This works because my assets are tiny. The entire site weighs 13.39kB uncompressed (4.68kB compressed). For most visitors, the usage pattern is either landing on the homepage and maybe reading one blog post, or arriving via a direct link to a specific post. In these cases, inlining delivers content faster than making separate requests for tiny CSS and JS files.
-
-The tradeoff is that heavy navigation around the site doesn't benefit from caching. But that's not the typical use case for a personal website, and I optimized for the common path.
-
-For JavaScript, I used #link("https://crates.io/crates/minify-js")[minify-js] to compress the code further before inlining.
-
-== Prefetch on Hover
-
-One feature I'm particularly happy with is prefetching pages when users hover over links. I borrowed this idea from #link("https://www.mcmaster.com/")[McMaster-Carr], which has excellent UX partly because of this technique.
-
-The implementation is straightforward: when you hover over an internal link for more than 100ms, the browser prefetches that page in the background. By the time you click, the page is likely already cached. This makes navigation feel instantaneous.
-
-The 100ms delay prevents prefetching when users accidentally hover over links while scrolling. The script also tracks which URLs have been prefetched to avoid redundant requests. Combined with the small page sizes, this makes the site feel snappy.
-
-== Deployment
-
-The site deploys automatically to my NixOS homelab using git-ops. When I push changes to GitHub, a webhook triggers a rebuild and deployment.
