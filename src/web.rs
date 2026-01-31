@@ -1,7 +1,7 @@
 use anyhow::Result;
 use arc_swap::ArcSwap;
 use bytes::Bytes;
-use http::{HeaderValue, Request, Response, StatusCode, header};
+use http::{HeaderValue, Method, Request, Response, StatusCode, header};
 use http_body_util::Full;
 use hyper::body::Incoming;
 use hyper::server::conn::http1;
@@ -13,6 +13,7 @@ use tokio::net::TcpListener;
 
 use crate::AppState;
 use crate::compiler::Route;
+use crate::update;
 
 pub async fn run(state: Arc<ArcSwap<AppState>>, address: &str, port: u16) -> Result<()> {
     let host = format!("{address}:{port}");
@@ -38,6 +39,10 @@ async fn handle(
     req: Request<Incoming>,
     state: Arc<ArcSwap<AppState>>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
+    if req.method() == Method::POST && req.uri().path() == "/_update/" {
+        return Ok(update::handle(req).await);
+    }
+
     let state = state.load();
     let use_br = accepts_brotli(req.headers());
 

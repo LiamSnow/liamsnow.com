@@ -8,6 +8,7 @@ mod compiler;
 mod indexer;
 mod sitemap;
 mod typst;
+mod update;
 mod watcher;
 mod web;
 
@@ -36,6 +37,10 @@ struct Args {
     /// Path to the typst binary
     #[arg(short, long, default_value = "typst")]
     typst: String,
+
+    /// Path to file containing GitHub webhook secret
+    #[arg(long)]
+    github_secret_path: Option<String>,
 }
 
 #[tokio::main]
@@ -44,6 +49,11 @@ async fn main() -> Result<()> {
     let args = Args::parse();
 
     typst::set_binary_path(&args.typst);
+
+    if let Some(ref path) = args.github_secret_path {
+        update::init_secret(path)?;
+        println!("GitHub webhook update enabled");
+    }
 
     println!("Indexing...");
     let index = indexer::index().await?;
