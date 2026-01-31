@@ -1,5 +1,6 @@
 use crate::CONTENT_DIR;
 use crate::indexer::{PageMeta, PageMetaWithUrl};
+use crate::watcher::WATCH_ADDR;
 use anyhow::{Context, Result, bail};
 use serde_json::Value;
 use std::path::PathBuf;
@@ -121,5 +122,20 @@ pub async fn compile(
         bail!("{}", String::from_utf8_lossy(&out.stderr));
     }
 
-    String::from_utf8(out.stdout).context("typst output was not valid UTF-8")
+    let mut html = String::from_utf8(out.stdout).context("typst output was not valid UTF-8")?;
+
+    if let Some(addr) = WATCH_ADDR.get().unwrap() {
+        html = html.replacen("</head>", &format!(r#"
+            <script>
+                (function() {{                                                                              
+                    const ws = new WebSocket(`ws://{addr}`);                              
+                    ws.onmessage = () => location.reload();                                                  
+                    ws.onclose = () => setTimeout(() => location.reload(), 1000);                            
+                }})();
+            </script>
+            </head>
+            "#), 1);
+    }
+
+    Ok(html)
 }

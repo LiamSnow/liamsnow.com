@@ -34,6 +34,14 @@ struct Args {
     #[arg(short, long, env = "WATCH")]
     watch: bool,
 
+    /// Watch websocket port number (1-65535)
+    #[arg(short, long, env = "WATCH_PORT", default_value_t = 3233)]
+    watch_port: u16,
+
+    /// Watch websocket hostname or IP address to bind to
+    #[arg(short, long, env = "WATCH_ADDRESS", default_value = "127.0.0.1")]
+    watch_address: String,
+
     /// Path to the typst binary
     #[arg(short, long, env = "TYPST", default_value = "typst")]
     typst: String,
@@ -59,6 +67,7 @@ async fn main() -> Result<()> {
     typst::set_binary_path(&args.typst);
     update::set_cargo_path(&args.cargo);
     update::set_git_path(&args.git);
+    watcher::set_watch_addr(&args);
 
     if let Some(ref path) = args.github_secret_path {
         update::init_secret(path)?;
@@ -76,8 +85,10 @@ async fn main() -> Result<()> {
 
     let state = Arc::new(ArcSwap::from_pointee(AppState { routes, sitemap }));
 
-    if args.watch {
-        watcher::spawn(state.clone());
+    if let Some(addr) = watcher::WATCH_ADDR.get().unwrap() {
+        if let Err(e) = watcher::spawn(state.clone(), addr).await {
+            eprintln!("Watcher error: {e}");
+        }
     }
 
     println!("Startup time = {:?}", Instant::now() - start);

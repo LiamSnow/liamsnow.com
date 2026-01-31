@@ -1,20 +1,91 @@
 use anyhow::Result;
 use arc_swap::ArcSwap;
+use bytes::Bytes;
+use futures::{SinkExt, StreamExt};
 use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher, event::ModifyKind};
-use std::{path::PathBuf, sync::Arc};
+use std::{
+    net::SocketAddr,
+    path::PathBuf,
+    sync::{Arc, OnceLock},
+};
+use tokio::{
+    net::{TcpListener, TcpStream},
+    sync::{broadcast, mpsc},
+};
+use tokio_tungstenite::tungstenite::Message;
 
-use crate::{AppState, CONTENT_DIR, compiler, indexer, sitemap};
+use crate::{AppState, Args, CONTENT_DIR, compiler, indexer, sitemap};
 
-pub fn spawn(state: Arc<ArcSwap<AppState>>) {
+pub static WATCH_ADDR: OnceLock<Option<String>> = OnceLock::new();
+
+pub fn set_watch_addr(args: &Args) {
+    let watch_addr = match args.watch {
+        true => Some(format!("{}:{}", args.watch_address, args.watch_port)),
+        false => None,
+    };
+
+    WATCH_ADDR.set(watch_addr).ok();
+}
+
+pub async fn spawn(state: Arc<ArcSwap<AppState>>, addr: &str) -> Result<()> {
+    let listener = TcpListener::bind(&addr).await?;
+
+    let (on_rebuild_tx, on_rebuild_rx) = broadcast::channel(1);
+
+    // accept ws connections
     tokio::spawn(async move {
-        if let Err(e) = watch(state).await {
+        while let Ok((stream, addr)) = listener.accept().await {
+            tokio::spawn(conn_handler(on_rebuild_rx.resubscribe(), stream, addr));
+        }
+    });
+
+    // watch fs and rebuild
+    tokio::spawn(async move {
+        if let Err(e) = watch(state, on_rebuild_tx).await {
             eprintln!("Watcher error: {e}");
         }
     });
+
+    Ok(())
 }
 
-async fn watch(state: Arc<ArcSwap<AppState>>) -> Result<()> {
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<()>(1);
+async fn conn_handler(
+    mut on_rebuild: broadcast::Receiver<()>,
+    raw_stream: TcpStream,
+    addr: SocketAddr,
+) {
+    println!("New websocket connection @ {addr}");
+    let mut stream = tokio_tungstenite::accept_async(raw_stream)
+        .await
+        .expect("Error during the websocket handshake occurred");
+    println!("Websocket connected @ {addr}");
+
+    loop {
+        tokio::select! {
+            _ = on_rebuild.recv() => {
+                if let Err(e) = stream.send(Message::Binary(Bytes::new())).await {
+                    eprintln!("Error sending to websocket @ {addr}: {e}");
+                    break;
+                }
+            }
+            res = stream.next() => {
+                match res {
+                    None => break,
+                    Some(Result::Err(e)) => {
+                        eprintln!("Error from websocket @ {addr}: {e}");
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    println!("Websocket disconnected @ {addr}");
+}
+
+/// Watch `content/` and trigger rebuilds
+async fn watch(state: Arc<ArcSwap<AppState>>, ws_tx: broadcast::Sender<()>) -> Result<()> {
+    let (tx, mut rx) = mpsc::channel::<()>(1);
 
     let mut watcher = RecommendedWatcher::new(
         move |res: Result<notify::Event, notify::Error>| {
@@ -45,6 +116,9 @@ async fn watch(state: Arc<ArcSwap<AppState>>) -> Result<()> {
             Ok(new_state) => {
                 state.store(Arc::new(new_state));
                 println!("Rebuild complete.");
+                if let Ok(n) = ws_tx.send(()) {
+                    println!("Notified {n} websockets");
+                }
             }
             Err(e) => eprintln!("Rebuild failed: {e}"),
         }
