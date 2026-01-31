@@ -1,11 +1,14 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "blog",
-    routes: toml("../routes.toml"),
-    filename: "igloo/ecs.typ"
-)
+#metadata((
+  title: "Bringing ECS to smart homes",
+  desc: "Igloo's device model",
+  date: "2025-08-27",
+  homepage: true
+)) <page>
 
-If you don't know what Igloo is please check out the #link("../projects/igloo")[Project Page].
+#import "/_shared/template.typ": post
+#show: post
+
+If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 There are a lot of ways to represent devices and their state in smart homes.
 Through my research and experimentation, I landed on using the ECS model, which

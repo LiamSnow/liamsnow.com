@@ -1,9 +1,12 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "projects",
-    routes: toml("../routes.toml"),
-    filename: "liamsnow_com/index.typ"
-)
+#metadata((
+  title: "liamsnow.com",
+  desc: "Fast personal website made in Rust with Axum",
+  date: "2025-07-04",
+  homepage: true
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 #link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
 

@@ -1,9 +1,13 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "projects",
-    routes: toml("../routes.toml"),
-    filename: "opensleep/index.typ"
-)
+#metadata((
+  title: "opensleep 113★",
+  desc: "Open source firmware for the Eight Sleep Pod 3",
+  date: "2025-09-04",
+  homepage: true,
+  highlight: true
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 #link("https://github.com/liamsnow/opensleep")[GitHub Repo]
 

@@ -1,9 +1,12 @@
-#import "../shared/template.typ": post
-#show: post.with(
-    base: "projects",
-    routes: toml("routes.toml"),
-    filename: "igloo.typ"
-)
+#metadata((
+  title: "igloo",
+  desc: "A secure, fast, & intuitive smart home platform",
+  date: "2025-05-06",
+  homepage: true
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 #link("https://github.com/liamsnow/igloo")[GitHub Repo]
 

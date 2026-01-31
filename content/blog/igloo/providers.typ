@@ -1,11 +1,14 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "blog",
-    routes: toml("../routes.toml"),
-    filename: "igloo/providers.typ"
-)
+#metadata((
+  title: "Making Igloo's provider system",
+  desc: "How Igloo securely runs and communicates with extensions",
+  date: "2025-09-20",
+  homepage: true
+)) <page>
 
-If you don't know what Igloo is please check out the #link("../projects/igloo")[Project Page].
+#import "/_shared/template.typ": post
+#show: post
+
+If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 For this article I will refer to the following:
  - _Provider_: Provides integration to smart home platforms like ESPHome, Apple HomeKit, MQTT, etc.

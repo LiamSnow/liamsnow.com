@@ -1,3 +1,7 @@
+#let path = sys.inputs.at("path", default: "/")
+#let page = json.decode(sys.inputs.at("page", default: "{}"))
+#let query = json.decode(sys.inputs.at("query", default: "[]"))
+
 #let link(text, href) = {
   html.a(href: href)[#text]
 }
@@ -10,7 +14,7 @@
   html.a(target: "_blank", class: "highlight", href: href)[#text]
 }
 
-#let header(path) = {
+#let header() = {
   html.header[
     #html.div(class: "container")[
       #html.div(class: "left")[
@@ -44,12 +48,11 @@
 
 #let template(
   body,
-  title: str,
-  desc: str,
-  styles: array,
+  styles: (),
   jsonld: none,
-  path: str
 ) = {
+  let title = page.at("title", default: "Liam Snow")
+  let desc = page.at("desc", default: "")
   let canonical-url = "https://liamsnow.com" + path
 
   html.html(lang: "en")[
@@ -80,10 +83,8 @@
       #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceMono-Bold.woff2", ("as"): "font", type: "font/ttf", crossorigin: "anonymous"))
       #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/otf", crossorigin: "anonymous"))
 
-      #if styles != none {
-        for style in styles {
-          html.link(rel: "stylesheet", href: "/styles/" + style + ".css")
-        }
+      #for style in styles {
+        html.link(rel: "stylesheet", href: "/styles/" + style + ".css")
       }
 
       #html.script(type: "application/ld+json")[#read("schema.json")]
@@ -95,7 +96,7 @@
       #html.script(type: "text/javascript")[#read("preload.js")]
     ]
     #html.body[
-      #header(path)
+      #header()
 
       #html.main[
         #html.div(id: "content")[
@@ -108,28 +109,25 @@
   ]
 }
 
-#let post(
-  body,
-  base: none,
-  routes: none,
-  filename: none,
-) = {
-  let metadata = routes.routes.find(p => p.file == filename)
+#let post(body) = {
+  // derive base from path (ex., /blog/igloo/ecs → blog)
+  let parts = path.split("/").filter(p => p != "")
+  let base = if parts.len() > 0 { parts.at(0) } else { "" }
 
-  let header = [
+  let title = page.at("title", default: "")
+  let date = page.at("date", default: "")
+
+  let post-header = [
     #html.a(class: "post-back", href: "/" + base)[← #base]
-    #html.div(class: "post-title")[#metadata.title]
-    #html.p(class: "post-date")[#metadata.date]
+    #html.div(class: "post-title")[#title]
+    #html.p(class: "post-date")[#date]
   ]
-  
+
   template(
     [
-      #header
+      #post-header
       #body
     ],
-    title: metadata.title,
-    desc: metadata.desc,
     styles: ("post",),
-    path: "/" + base + metadata.path
   )
 }

@@ -1,10 +1,14 @@
-#import "shared/template.typ": template, link-new-tab, link-new-tab-highlight
-#show: template.with(
+#metadata((
   title: "Liam's Website",
-  desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more.",
+  desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more."
+)) <page>
+
+#metadata(("projects/", "blog/")) <query>
+
+#import "/_shared/template.typ": template, link-new-tab, link-new-tab-highlight, query
+#show: template.with(
   styles: ("home",),
-  jsonld: read("shared/ld.json"),
-  path: "/"
+  jsonld: read("_shared/ld.json"),
 )
 
 #let about-me = [
@@ -24,11 +28,11 @@ Rust, Golang, C, C++, Python, Java, C\#, TypeScript, JavaScript, and others.
     #html.div(class: "grid")[
       #items.map(item => html.a(
         class: if item.at("highlight", default: false) { "highlight" } else { "" },
-        href: "/" + lower(name) + item.path
+        href: item.url
       )[
         #html.h3[#item.title]
-        #html.p(class: "desc")[#item.desc]
-        #html.p(class: "date")[#item.date]
+        #html.p(class: "desc")[#item.at("desc", default: "")]
+        #html.p(class: "date")[#item.at("date", default: "")]
       ]).join()
     ]
   ]
@@ -50,14 +54,9 @@ Rust, Golang, C, C++, Python, Java, C\#, TypeScript, JavaScript, and others.
   ]
 ]
 
-#let projects = toml("projects/routes.toml").routes.filter(item => item.at("homepage", default: false))
-#let blogs = toml("blog/routes.toml").routes.filter(item => item.at("homepage", default: false))
-
+#let projects = query.at(0, default: ()).filter(item => item.at("homepage", default: false)).sorted(key: item => item.at("date", default: "")).rev()
+#let blogs = query.at(1, default: ()).filter(item => item.at("homepage", default: false)).sorted(key: item => item.at("date", default: "")).rev()
 #html.div(id: "sections")[
   #make-section("PROJECTS", projects)
   #make-section("BLOG", blogs)
 ]
-
-
-
-

@@ -3,7 +3,7 @@ use arc_swap::ArcSwap;
 use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher, event::ModifyKind};
 use std::{path::PathBuf, sync::Arc};
 
-use crate::{AppState, build_state, routes};
+use crate::{AppState, CONTENT_DIR, compiler, indexer, sitemap};
 
 pub fn spawn(state: Arc<ArcSwap<AppState>>) {
     tokio::spawn(async move {
@@ -31,17 +31,17 @@ async fn watch(state: Arc<ArcSwap<AppState>>) -> Result<()> {
     )?;
 
     watcher.watch(
-        PathBuf::from(routes::CONTENT_DIR).as_path(),
+        PathBuf::from(CONTENT_DIR).as_path(),
         RecursiveMode::Recursive,
     )?;
 
-    println!("Watching {} for changes...", routes::CONTENT_DIR);
+    println!("Watching {} for changes...", CONTENT_DIR);
 
     while rx.recv().await.is_some() {
         while rx.try_recv().is_ok() {}
 
         println!("Change detected, rebuilding...");
-        match build_state().await {
+        match rebuild().await {
             Ok(new_state) => {
                 state.store(Arc::new(new_state));
                 println!("Rebuild complete.");
@@ -53,4 +53,11 @@ async fn watch(state: Arc<ArcSwap<AppState>>) -> Result<()> {
     }
 
     Ok(())
+}
+
+async fn rebuild() -> Result<AppState> {
+    let index = indexer::index().await?;
+    let routes = compiler::compile(index).await;
+    let sitemap = sitemap::generate(&routes);
+    Ok(AppState { routes, sitemap })
 }

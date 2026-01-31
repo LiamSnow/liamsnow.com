@@ -1,11 +1,14 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "blog",
-    routes: toml("../routes.toml"),
-    filename: "igloo/penguin.typ"
-)
+#metadata((
+  title: "Making a blazing fast node-based editor",
+  desc: "How I made Igloo Penguin in Rust WASM",
+  date: "2025-10-05",
+  homepage: true
+)) <page>
 
-If you don't know what Igloo is please check out the #link("../projects/igloo")[Project Page].
+#import "/_shared/template.typ": post
+#show: post
+
+If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 This is not the best write up about Penguin, so I'd highly recommend
 you browse the

@@ -1,22 +1,22 @@
-#import "shared/template.typ": template, link
-#show: template.with(
+#metadata((
   title: "Liam's Blog",
-  desc: "Liam Snow's Blog. Programming, systems, backend, Rust and more.",
-  styles: ("index",),
-  path: "/blog"
-)
+  desc: "Liam Snow's Blog. Programming, systems, backend, Rust and more."
+)) <page>
 
-// #link("RSS", "/blog/rss.xml")
+#metadata("blog/") <query>
 
-#let posts = toml("blog/routes.toml").routes
+#import "/_shared/template.typ": template, link, query
+#show: template.with(styles: ("index",))
+
+#let posts = query.at(0, default: ()).sorted(key: p => p.at("date", default: "")).rev()
 
 #html.div(id: "posts")[
   #posts.map(post => html.a(
     class: "post" + if post.at("highlight", default: false) { " highlight" } else { "" },
-    href: "/blog" + post.path
+    href: post.url
   )[
     #html.h2(class: "title")[#post.title]
-    #html.p(class: "desc")[#post.desc]
-    #html.p(class: "date")[#post.date]
+    #html.p(class: "desc")[#post.at("desc", default: "")]
+    #html.p(class: "date")[#post.at("date", default: "")]
   ]).join()
 ]

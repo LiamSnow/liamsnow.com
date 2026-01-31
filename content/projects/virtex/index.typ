@@ -1,9 +1,12 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "projects",
-    routes: toml("../routes.toml"),
-    filename: "virtex/index.typ"
-)
+#metadata((
+  title: "virtex",
+  desc: "815fps FPGA-based IR machine vision camera",
+  date: "2022-05-27",
+  homepage: false
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 During COVID-19, I designed an FPGA-based vision camera for FIRST Robotics Competition to address latency issues in existing solutions like LimeLight. LimeLight had 50-100ms latency, which required control algorithms to compensate for outdated position data. For example, a turret tracking a target needs to account for where the target was 50ms ago, not where it is now.
 

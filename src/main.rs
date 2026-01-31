@@ -2,14 +2,16 @@ use anyhow::Result;
 use arc_swap::ArcSwap;
 use clap::Parser;
 use rustc_hash::FxHashMap;
-use std::{path::PathBuf, sync::Arc, time::Instant};
+use std::{sync::Arc, time::Instant};
 
 mod compiler;
-mod routes;
+mod indexer;
 mod sitemap;
 mod typst;
 mod watcher;
 mod web;
+
+pub const CONTENT_DIR: &str = "./content";
 
 pub struct AppState {
     pub routes: FxHashMap<String, compiler::Route>,
@@ -38,27 +40,27 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let start = Instant::now();
     let args = Args::parse();
 
     typst::set_binary_path(&args.typst);
 
-    let state = Arc::new(ArcSwap::from_pointee(build_state().await?));
+    println!("Indexing...");
+    let index = indexer::index().await?;
+
+    println!("Compiling...");
+    let routes = compiler::compile(index).await;
+
+    println!("Building sitemap...");
+    let sitemap = sitemap::generate(&routes);
+
+    let state = Arc::new(ArcSwap::from_pointee(AppState { routes, sitemap }));
 
     if args.watch {
         watcher::spawn(state.clone());
     }
 
-    web::run(state, &args.address, args.port).await
-}
-
-pub async fn build_state() -> Result<AppState> {
-    let start = Instant::now();
-    println!("Indexing routes..");
-    let tasks = routes::load("", &PathBuf::from(routes::CONTENT_DIR))?;
-    println!("Compiling routes..");
-    let routes = compiler::compile(tasks).await;
-    println!("Building sitemap..");
-    let sitemap = sitemap::generate(&routes);
     println!("Startup time = {:?}", Instant::now() - start);
-    Ok(AppState { routes, sitemap })
+
+    web::run(state, &args.address, args.port).await
 }

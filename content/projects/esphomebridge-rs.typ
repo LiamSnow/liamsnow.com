@@ -1,9 +1,12 @@
-#import "../shared/template.typ": post
-#show: post.with(
-    base: "projects",
-    routes: toml("routes.toml"),
-    filename: "esphomebridge-rs.typ"
-)
+#metadata((
+  title: "esphomebridge-rs",
+  desc: "ESPHome client API written in Rust",
+  date: "2025-01-15",
+  homepage: true
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 #link("https://github.com/liamsnow/esphomebridge-rs")[GitHub Repo]
 

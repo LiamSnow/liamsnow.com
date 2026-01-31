@@ -1,11 +1,14 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "blog",
-    routes: toml("../routes.toml"),
-    filename: "igloo/prototype.typ"
-)
+#metadata((
+  title: "The first Igloo prototype",
+  desc: "",
+  date: "2025-03-14",
+  homepage: true
+)) <page>
 
-If you don't know what Igloo is please check out the #link("../projects/igloo")[Project Page].
+#import "/_shared/template.typ": post
+#show: post
+
+If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 Initially I set out with a very different goal for Igloo.
 I wanted a smart home platform for power users that was reliable and fast.

@@ -1,9 +1,12 @@
-#import "../shared/template.typ": post
-#show: post.with(
-    base: "projects",
-    routes: toml("routes.toml"),
-    filename: "ical-rs.typ"
-)
+#metadata((
+  title: "ical-rs",
+  desc: "A flexible and typed iCalendar (RFC 5545) library ",
+  date: "2024-11-10",
+  homepage: true
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 *NOTE:* This is one of my earlier Rust projects. I'm planning a rewrite that uses code generation in `build.rs` instead of macros for more comprehensive type coverage and better ergonomics.
 

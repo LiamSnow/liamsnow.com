@@ -1,11 +1,14 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "blog",
-    routes: toml("../routes.toml"),
-    filename: "igloo/device_tree.typ"
-)
+#metadata((
+  title: "A device tree for Igloo",
+  desc: "How Igloo efficiently stores and handles devices, entities, and components",
+  date: "2025-09-30",
+  homepage: true
+)) <page>
 
-If you don't know what Igloo is please check out the #link("../projects/igloo")[Project Page].
+#import "/_shared/template.typ": post
+#show: post
+
+If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 #link("https://github.com/LiamSnow/igloo/tree/main/server/src/tree")[GitHub Link]
 

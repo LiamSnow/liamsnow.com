@@ -1,12 +1,15 @@
-#import "../../shared/template.typ": post
-#show: post.with(
-    base: "blog",
-    routes: toml("../routes.toml"),
-    filename: "igloo/oneshot_query.typ"
-)
+#metadata((
+  title: "Pushing Igloo's query engine to the limit",
+  desc: "How Igloo is able to reach 1 million queries per second",
+  date: "2025-11-24",
+  homepage: true
+)) <page>
+
+#import "/_shared/template.typ": post
+#show: post
 
 This article assumes you are familiar with both Igloo's ECS system and device tree. If you are not I would recommend you to check out my past blog posts on these.
-If you don't know what Igloo is please check out the #link("../projects/igloo")[Project Page].
+If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 The query engine is giant project and I cannot cover all of it here.
 I would recommend you to check out the code which is linked throughout this article.
