@@ -11,12 +11,13 @@
   jsonld: read("_shared/ld.json"),
 )
 
-#let about-me = [
-I'm a Computer Science MS and Electrical & Computer Engineering BS student at
+#let about-me = [I'm a Computer Science MS and Electrical & Computer Engineering BS student at
 Worcester Polytechnic Institute with a passion for systems programming and backend
 development.
 I enjoy learning in all areas of CS and have experience in many languages:
 Rust, Golang, C, C++, Python, Java, C\#, TypeScript, JavaScript, and others.
+
+*#underline[Nothing] on this website is written by AI* 
 ]
 
 #let make-section(name, items) = {
