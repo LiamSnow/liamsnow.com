@@ -14,31 +14,47 @@ pub struct Route {
     pub content_br: Option<Bytes>,
     pub content_identity: Bytes,
     pub content_type: HeaderValue,
+    pub cache_control: Option<HeaderValue>,
 }
 
 impl Route {
-    pub fn from_bytes(content: Vec<u8>, mime: impl ToString) -> Self {
+    pub fn from_bytes(
+        content: Vec<u8>,
+        mime: impl ToString,
+        cache_control: Option<HeaderValue>,
+    ) -> Self {
         Self {
             content_br: Some(compress_brotli(&content)),
             content_identity: Bytes::from(content),
             content_type: HeaderValue::from_str(&mime.to_string()).unwrap(),
+            cache_control,
         }
     }
 
-    pub fn from_bytes_precompressed(content: Vec<u8>, mime: impl ToString) -> Self {
+    pub fn from_bytes_precompressed(
+        content: Vec<u8>,
+        mime: impl ToString,
+        cache_control: Option<HeaderValue>,
+    ) -> Self {
         Self {
             content_br: None,
             content_identity: Bytes::from(content),
             content_type: HeaderValue::from_str(&mime.to_string()).unwrap(),
+            cache_control,
         }
     }
 
-    pub fn from_string(content: String, mime: impl ToString) -> Self {
+    pub fn from_string(
+        content: String,
+        mime: impl ToString,
+        cache_control: Option<HeaderValue>,
+    ) -> Self {
         let bytes = content.into_bytes();
         Self {
             content_br: Some(compress_brotli(&bytes)),
             content_identity: Bytes::from(bytes),
             content_type: HeaderValue::from_str(&mime.to_string()).unwrap(),
+            cache_control,
         }
     }
 }
@@ -73,7 +89,10 @@ pub async fn compile(index: Index) -> FxHashMap<String, Route> {
             let result = typst::compile(&task.file_path, &task.url, meta, &query_results).await;
 
             match result {
-                Ok(content) => Some((task.url, Route::from_string(content, mime::TEXT_HTML_UTF_8))),
+                Ok(content) => Some((
+                    task.url,
+                    Route::from_string(content, mime::TEXT_HTML_UTF_8, None),
+                )),
                 Err(e) => {
                     eprintln!("{}: {e}", task.file_path.display());
                     None
@@ -124,17 +143,21 @@ fn process_css(task: &FileTask) -> Result<(String, Route)> {
         grass::from_path(&task.file_path, &opts).context("failed to compile css/scss/sass")?;
     Ok((
         task.url.clone(),
-        Route::from_string(content, mime::TEXT_CSS),
+        Route::from_string(content, mime::TEXT_CSS, None),
     ))
 }
 
 fn process_static(task: &FileTask, compress: bool) -> Result<(String, Route)> {
     let bytes = fs::read(&task.file_path).context("failed to read file")?;
     let mime = mime_guess::from_path(&task.file_path).first_or_text_plain();
+
+    let cache_control = (mime.type_() == "font")
+        .then(|| HeaderValue::from_static("public, max-age=31536000, immutable"));
+
     let route = if compress {
-        Route::from_bytes(bytes, mime)
+        Route::from_bytes(bytes, mime, cache_control)
     } else {
-        Route::from_bytes_precompressed(bytes, mime)
+        Route::from_bytes_precompressed(bytes, mime, cache_control)
     };
     Ok((task.url.clone(), route))
 }

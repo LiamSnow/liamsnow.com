@@ -77,6 +77,10 @@ fn build_response(route: &Route, use_br: bool) -> Response<Full<Bytes>> {
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, route.content_type.clone());
 
+    if let Some(cc) = &route.cache_control {
+        builder = builder.header(header::CACHE_CONTROL, cc.clone());
+    }
+
     let body = if use_br {
         if let Some(br) = &route.content_br {
             builder = builder.header(header::CONTENT_ENCODING, HeaderValue::from_static("br"));

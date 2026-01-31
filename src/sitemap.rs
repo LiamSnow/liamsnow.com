@@ -30,5 +30,5 @@ pub fn generate(routes: &FxHashMap<String, Route>) -> Route {
     }
 
     xml.push_str("</urlset>");
-    Route::from_string(xml, mime::TEXT_XML)
+    Route::from_string(xml, mime::TEXT_XML, None)
 }
