@@ -84,6 +84,10 @@
       #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/otf", crossorigin: "anonymous"))
 
       #for style in styles {
+        html.elem("link", attrs: (rel: "preload", href: "/styles/" + style + ".css", ("as"): "style"))
+      }
+
+      #for style in styles {
         html.link(rel: "stylesheet", href: "/styles/" + style + ".css")
       }
 
