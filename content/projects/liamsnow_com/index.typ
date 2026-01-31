@@ -10,6 +10,8 @@
 
 #link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
 
+*NOTE*: This is currently out of date and based off the first version. I will be updating this soonThis is currently out of date and based off the first version. I will be updating this soon.
+
 = Why Build This?
 
 I wanted full control over my personal website and to not be limited by existing static site generators (SSGs).
