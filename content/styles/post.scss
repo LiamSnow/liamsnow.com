@@ -39,7 +39,6 @@ main {
   padding: 0;
   border-radius: 20px;
 
-  h1,
   h2,
   h3,
   h4,
@@ -70,7 +69,7 @@ main {
     }
   }
 
-  h1 {
+  h2 {
     font-size: 2em;
     margin-top: 1.2em;
     line-height: 1.2;
@@ -92,7 +91,7 @@ main {
     }
   }
 
-  h2 {
+  h3 {
     font-size: 1.6em;
     margin-top: 0.8em;
     margin-bottom: 0.2em;
@@ -100,19 +99,19 @@ main {
     /* transform: translateY(0.5em); */
   }
 
-  h3 {
+  h4 {
     margin-top: 0.6em;
     font-size: 1.3em;
     /* transform: translateY(0.3em); */
   }
 
-  h4 {
+  h5 {
     margin-top: 0.2em;
     font-size: 1em;
     /* transform: translateY(0.1em); */
   }
 
-  h5 {
+  h6 {
     margin-top: 0.1em;
     font-size: 0.8em;
   }
