@@ -7,17 +7,27 @@
 
 #import "/_shared/template.typ": template, link-new-tab, link-new-tab-highlight, query
 #show: template.with(
-  styles: ("home",),
+  styles: ("index",),
   jsonld: read("_shared/ld.json"),
 )
 
-#let about-me = [I'm a Computer Science MS and Electrical & Computer Engineering BS student at
-Worcester Polytechnic Institute with a passion for systems programming and backend
-development.
-I enjoy learning in all areas of CS and have experience in many languages:
-Rust, Golang, C, C++, Python, Java, C\#, TypeScript, JavaScript, and others.
+#html.div(id: "hero")[
+  #html.h1[LIAM#box(html.elem("wbr"))SNOW]
 
-*#underline[Nothing] on this website is written by AI* 
+  #block[
+    = About me
+
+    Hi, I'm William (Liam) Snow IV
+    - CS MS & ECE BS @ Worcester Polytechnic Institute
+    - Rust 🦀, systems, & backend
+
+    *#underline[Nothing] on this website is written by AI* 
+
+    #link-new-tab("EMAIL", "mailto:mail@liamsnow.com")
+    #link-new-tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/")
+    #link-new-tab("GITHUB", "https://github.com/liamsnow")
+    #link-new-tab-highlight("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf")
+  ]
 ]
 
 #let make-section(name, items) = {
@@ -26,34 +36,18 @@ Rust, Golang, C, C++, Python, Java, C\#, TypeScript, JavaScript, and others.
       #html.span[#name]
       #html.span[■]
     ]
-    #html.div(class: "grid")[
+    #html.div(class: "posts")[
       #items.map(item => html.a(
         class: if item.at("highlight", default: false) { "highlight" } else { "" },
         href: item.url
       )[
-        #html.h3[#item.title]
+        == #item.title
         #html.p(class: "desc")[#item.at("desc", default: "")]
         #html.p(class: "date")[#item.at("date", default: "")]
       ]).join()
     ]
   ]
 }
-
-#html.div(id: "hero")[
-  #html.h1[LIAM#box(html.elem("wbr"))SNOW]
-
-  #html.div(class: "content")[
-    #html.div(class: "left")[]
-    #html.div(class: "right")[
-      #html.h2[About me]
-      #html.p[#about-me]
-      #link-new-tab("EMAIL", "mailto:mail@liamsnow.com")
-      #link-new-tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/")
-      #link-new-tab("GITHUB", "https://github.com/liamsnow")
-      #link-new-tab-highlight("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf")
-    ]
-  ]
-]
 
 #let projects = query.at(0, default: ()).filter(item => item.at("homepage", default: false)).sorted(key: item => item.at("date", default: "")).rev()
 #let blogs = query.at(1, default: ()).filter(item => item.at("homepage", default: false)).sorted(key: item => item.at("date", default: "")).rev()

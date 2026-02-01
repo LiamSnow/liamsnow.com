@@ -40,7 +40,7 @@
       #html.p(class: "right")[
         © 2025 William Snow IV
         #linebreak()
-        #link-new-tab("Made with Rust 🦀", "https://github.com/liamsnow/liamsnow.com")
+        #link-new-tab("Source Code", "https://github.com/liamsnow/liamsnow.com")
       ]
     ]
   ]
@@ -97,7 +97,9 @@
         html.script(type: "application/ld+json")[#jsonld]
       }
 
-      #html.script(type: "text/javascript")[#read("preload.js")]
+      #html.script(type: "text/javascript")[
+        #read("preload.js")
+      ]
     ]
     #html.body[
       #header()

@@ -41,7 +41,7 @@ I am building Igloo.
 
 #let posts = query.at(0, default: ()).sorted(key: p => p.at("date", default: "")).rev()
 
-#html.div(id: "posts")[
+#html.div(class: "posts")[
   #posts.map(post => html.a(
     class: "post" + if post.at("highlight", default: false) { " highlight" } else { "" },
     href: post.url

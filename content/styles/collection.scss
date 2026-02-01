@@ -1,0 +1,14 @@
+@use 'main' as *;
+@use 'mixins' as *;
+
+.posts {
+  padding: 2rem 1rem;
+
+  >a {
+    padding: 1.5rem;
+    margin: 1rem;
+    max-width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 0 80px 40px black, inset 0 0 20px 40px black;
+  }
+}
