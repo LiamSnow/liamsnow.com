@@ -8,6 +8,8 @@
 #import "/_shared/template.typ": post
 #show: post
 
+#image("penguin.png")
+
 If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
 This is not the best write up about Penguin, so I'd highly recommend
@@ -230,7 +232,6 @@ Now, in the dirty tracking system:
 = Results
 I'm super happy with the final solution.
 It's performance while still being easy to read, follow, and add new features to.
-
 
 #image("penguin.png")
 
