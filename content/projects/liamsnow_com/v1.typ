@@ -110,6 +110,7 @@ When you hover over an internal link for more than 100ms, the browser prefetches
 
 The 100ms delay prevents prefetching when users accidentally hover over links while scrolling. The script also tracks which URLs have been prefetched to avoid redundant requests. Combined with the small page sizes, this makes the site feel snappy.
 
-== Deployment
+== Continuous Deployment
 
-The site deploys automatically to my NixOS homelab using git-ops. When I push changes to GitHub, a webhook triggers a rebuild and deployment.
+The site has continuous deployment on my NixOS homelab.
+When I push changes to GitHub, a webhook triggers a rebuild and deployment.

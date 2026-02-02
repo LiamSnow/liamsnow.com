@@ -96,24 +96,24 @@ each file in parallel. This will do a few things:
  + Compile `.scss`, `.sass`, `.css` files using #link("https://crates.io/crates/grass")[grass] (which also compacts them)
  + Pre-compress everything using #link("https://en.wikipedia.org/wiki/Brotli")[Brotli]
 
-= Watcher
-Having a hot reload/watcher system really helps with writing posts.
+= Hot Reloading
+Having a hot reload system really helps with writing posts.
 So I set up a pretty simple system for this:
  + Inject some code into the website which will connect to a websocket. When it recieves a message, refresh the page.
  + Watch for any file modifications in `content/` (create, remove, modify)
    + Upon change, rebuild, then notify websockets
 
 I couldn't use `typst watch` for a few reasons:
- + Typst doesn't know about our depencies from our custom query system
+ + Typst doesn't know about our dependencies from our custom query system
  + We need to compile things besides just Typst files
 
-= Self Updating / Gitops
+= Continuous Deployment
 It would be really annoying if I had to SSH into my server, login
 to the zone, git pull, recompile, and restart the service for every
-change to my website. So, I created a pretty simple self updating system.
+change to my website. So, I created a pretty simple CD system.
 
-I setup a GitHub webhook which POSTs to `liamsnow.com/_update`.
-Upon recieving this it will:
+I set up a GitHub webhook which POSTs to `liamsnow.com/_update`.
+Upon receiving this it will:
  + Verify the sig/secret
  + Git pull
  + Recompile
@@ -130,7 +130,7 @@ do navigate there, its already cached.
 
 I'm super happy with the results. Its fast but also
 has a great experience to use. I get to write posts
-in Typst, with hot reloading, and gitops.
+in Typst, with hot reloading, and continuous deployment.
 
 #html.img(src: "liamsnow_com/pagespeed.png")
 #html.img(src: "liamsnow_com/gt.png")
