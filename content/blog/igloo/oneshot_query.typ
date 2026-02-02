@@ -8,11 +8,12 @@
 #import "/_shared/template.typ": post
 #show: post
 
-This article assumes you are familiar with both Igloo's ECS system and device tree. If you are not I would recommend you to check out my past blog posts on these.
+This article assumes you are familiar with both
+Igloo's #link("ecs")[ECS] system and #link("device_tree")[device tree].
 If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
 
-The query engine is giant project and I cannot cover all of it here.
-I would recommend you to check out the code which is linked throughout this article.
+The query engine is a massive project and I cannot cover all of it here.
+To avoid making this article unnecessarily long, I will walk through only how one-shot get value aggregated component queries work (ex. get average brightness of lights in the kitchen).
 
 = What
 Create a system to get data from the device tree.
@@ -47,10 +48,10 @@ If you want to do just about anything in Igloo, it involves the device tree, and
 Making the query engine faster, makes everything faster.
 It makes scripts execute faster, the UI snappier, and can actually reduce resource utilage.
 
-A super important point of this too, is that I am trying to reach 1 million queries per second on my desktop computer (i9-10900k, 10G networking, 4GHz RAM) in my (currently simple) smart home. When I go to put this on a Raspberry Pi 3, it will be substantially slower.
+Furthermore, I am trying to reach 1 million queries per second on my desktop computer (i9-10900k, 10G networking, 4GHz RAM) in my (currently simple) smart home. When I go to put this on a Raspberry Pi 3, it will be substantially slower.
 
 = The Model
-#link("https://github.com/LiamSnow/igloo/blob/main/interface/src/query/model.rs")[The query model]
+#link("https://github.com/LiamSnow/igloo/blob/main/interface/src/query/model")[The query model]
 lives inside igloo interface, a shared crate. It allows for 5 targets of queries:
 Extension, Group, Device, Entity, and Component.
 
@@ -77,7 +78,6 @@ It handles deduplication, reordering queries to evaluate cheap operations first,
 and flattening.
 
 = Evaluating One-Shot Queries
-To avoid making this article unnecessarily long, I will walk through only how one-shot get value aggregated component queries work (ex. get average value of lights in the kitchen).
 
 We need to:
  + iterate over devices that match the filters

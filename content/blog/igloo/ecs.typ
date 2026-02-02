@@ -5,7 +5,7 @@
   homepage: true
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "/_shared/template.typ": post, link-new-tab
 #show: post
 
 If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
@@ -92,9 +92,11 @@ This is a representation of an Athom RGBCT ESPHome Light Bulb in Igloo's ECS mod
 ```
 
 == Implementation
-To implement this ECS model I decided to go with `build.rs` code generation
-in a shared crate called `igloo-interface`. This interface crate will
-be used by both the core system, frontend, extensions, and scripts.
+To implement this ECS model I decided to go with a
+#link-new-tab("build script", "https://doc.rust-lang.org/cargo/reference/build-scripts.html")
+for code generation in a shared crate called `igloo-interface`.
+This interface crate will be used by both the core system, frontend,
+extensions, and scripts.
 
 Code generation allows us to easily generate Rust and Python code from a TOML file.
 In `igloo-interface` we have a file called `components.toml`:
