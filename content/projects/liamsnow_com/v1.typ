@@ -31,8 +31,8 @@ These goals are interconnected. Small page sizes reduce load times, which improv
 
 = Results
 
-#html.img(src: "liamsnow_com/pagespeed.png")
-#html.img(src: "liamsnow_com/gt.png")
+#html.img(src: "pagespeed.png")
+#html.img(src: "gt.png")
 
 The site achieves excellent PageSpeed scores and consistently fast load times. More importantly, the architecture makes adding new content straightforward: write Markdown, push to GitHub, and the site rebuilds automatically via git-ops on my NixOS homelab.
 
