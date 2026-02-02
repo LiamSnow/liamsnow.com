@@ -63,7 +63,7 @@ With opensleep V2, you can use your Pod 3 with complete privacy and create Home 
 
 Version 1 interfaces with frankenfirmware (a C++ binary), which communicates via USART to two STM32 microcontrollers: "Sensor" (manages bed sensors) and "Frozen" (manages temperature control and water systems).
 
-Completing Version 2 meant reverse-engineering the custom USART protocol for Sensor and Frozen. I tried several approaches before building a harness for frankenfirmware using #link("https://github.com/JakWai01/lurk")[lurk], a modern Rust alternative to strace for monitoring system calls. This harness, which I called Fiona (a modified version of opensleep V1), let me send commands to frankenfirmware and observe its responses. Over several months of incremental improvements, I decoded most of the protocol.
+Completing Version 2 meant reverse-engineering the custom USART protocol for Sensor and Frozen. I tried several approaches before building a harness for frankenfirmware using #link("https://github.com/JakWai01/lurk")[lurk] (looking back I really should have used ptrace directly). This harness, which I called Fiona (Shameless reference) was a modified version of opensleep V1 which let me send commands to frankenfirmware and observe its responses. Over several months of incremental improvements, I decoded most of the protocol.
 
 The protocol follows this structure:
 ```
