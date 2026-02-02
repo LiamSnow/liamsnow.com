@@ -17,11 +17,16 @@
   #block[
     = About me
 
-    Hi, I'm William (Liam) Snow IV
-    - CS MS & ECE BS @ Worcester Polytechnic Institute
-    - Rust 🦀, systems, & backend
+    #block[
+      Hi, I'm William (Liam) Snow IV
+      - CS MS & ECE BS @ Worcester Polytechnic Institute
+      - Rust 🦀, systems, & backend
+    ]
 
     *#underline[Nothing] on this website is written by AI* 
+
+    I am always open to feedback.
+    The best way to give me feedback is currently via email.
 
     #link-new-tab("EMAIL", "mailto:mail@liamsnow.com")
     #link-new-tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/")

@@ -25,27 +25,31 @@ header {
     max-width: 800px;
     margin: 0 auto;
     padding: 0 2rem;
-  }
 
-  h2 {
-    font-size: 1.7rem;
-    margin-bottom: 1rem;
-  }
+    h2 {
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+    }
 
-  p,
-  li {
-    font-size: 1.2rem;
-  }
+    >* {
+      margin-bottom: 1rem;
+    }
 
-  ol,
-  ul {
-    list-style-position: inside;
-    margin-bottom: 1rem;
-  }
+    p,
+    li {
+      font-size: 1.2rem;
+    }
 
-  a {
-    @include button();
-    margin: 1.2rem 0 0 0.5rem;
+    ol,
+    ul {
+      list-style-position: inside;
+      margin-bottom: 1rem;
+    }
+
+    a {
+      @include button();
+      margin: 1.2rem 0 0 0.5rem;
+    }
   }
 }
 
