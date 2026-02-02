@@ -44,7 +44,7 @@ The CLI protocol was elegant for scripting, and the configuration-as-code approa
 
 This was my first substantial Tokio project. Managing providers, devices, entities, channels, concurrent tasks, dashboards, frontend, authentication, API, and scripting simultaneously was more complex than I anticipated.
 
-Making providers is harder than I thought. The #link("../projects/esphomebridge-rs")[ESPHome provider] alone took a lot of time, especially because it was completely undocumented.
+Making providers is harder than I thought. The #link("../../projects/esphomebridge-rs")[ESPHome provider] alone took a lot of time, especially because it was completely undocumented.
 
 == Configuration File is a Pain
 
