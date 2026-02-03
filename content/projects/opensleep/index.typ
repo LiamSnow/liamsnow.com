@@ -16,7 +16,7 @@ This project is for educational and research purposes only. It is for personal, 
 
 = Background
 
-The Eight Sleep Pod 3 is a smart mattress cover that uses water circulation to control temperature (ranging from 55°F to 110°F). Temperature regulation during sleep has been shown to improve sleep quality, increasing deep sleep by up to 14 minutes and REM sleep by up to 9 minutes. The Pod also tracks sleep metrics like heart rate, HRV, and sleep stages.
+The Eight Sleep Pod 3 is a smart mattress cover that uses water circulation to control temperature (ranging from 55°F to 110°F). Eight Sleep claims that temperature regulation during sleep has been shown to improve sleep quality, increasing deep sleep by up to 14 minutes and REM sleep by up to 9 minutes. The Pod also tracks sleep metrics like heart rate, HRV, and sleep stages.
 
 However, Eight Sleep's closed-source firmware has many privacy concerns.
 By default, raw sleep tracking data is streamed directly to Eight Sleep's
