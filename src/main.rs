@@ -35,11 +35,11 @@ struct Args {
     watch: bool,
 
     /// Watch websocket port number (1-65535)
-    #[arg(short, long, env = "WATCH_PORT", default_value_t = 3233)]
+    #[arg(long, env = "WATCH_PORT", default_value_t = 3233)]
     watch_port: u16,
 
     /// Watch websocket hostname or IP address to bind to
-    #[arg(short, long, env = "WATCH_ADDRESS", default_value = "127.0.0.1")]
+    #[arg(long, env = "WATCH_ADDRESS", default_value = "127.0.0.1")]
     watch_address: String,
 
     /// Path to the typst binary
