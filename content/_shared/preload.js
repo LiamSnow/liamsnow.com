@@ -1,9 +1,16 @@
-(function() {
-  'use strict';
-
+window.addEventListener('load', () => {
+  const links = document.querySelectorAll('a[href]');
   const prefetched = new Set();
-
   let hoverTimer = null;
+
+  links.forEach(link => {
+    const href = link.getAttribute('href');
+
+    if (href && isLocalUrl(href)) {
+      link.addEventListener('mouseenter', handleMouseEnter);
+      link.addEventListener('mouseleave', handleMouseLeave);
+    }
+  });
 
   function isLocalUrl(url) {
     if (url.startsWith('/')) {
@@ -35,7 +42,6 @@
     link.href = url;
     document.head.appendChild(link);
 
-    // mark prefetched
     prefetched.add(url);
   }
 
@@ -51,7 +57,6 @@
       clearTimeout(hoverTimer);
     }
 
-    // delay prefetch by 100ms
     hoverTimer = setTimeout(() => {
       prefetchUrl(href);
     }, 100);
@@ -63,29 +68,4 @@
       hoverTimer = null;
     }
   }
-
-  function initPreload() {
-    const links = document.querySelectorAll('a[href]');
-
-    links.forEach(link => {
-      const href = link.getAttribute('href');
-
-      // only add listeners to local links
-      if (href && isLocalUrl(href)) {
-        link.addEventListener('mouseenter', handleMouseEnter);
-        link.addEventListener('mouseleave', handleMouseLeave);
-      }
-    });
-  }
-
-  // init when ready
-  function init() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initPreload);
-      return;
-    }
-    initPreload();
-  }
-
-  init();
-})();
+});

@@ -1,4 +1,4 @@
-window.onload = () => {
+window.addEventListener('load', () => {
   const HOUR = 60 * 60;
   const DAY = HOUR * 24;
   
@@ -48,4 +48,4 @@ window.onload = () => {
     el.textContent = getRelativeTime(raw);
     el.title = fullDate;
   });
-};
+});

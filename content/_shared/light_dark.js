@@ -1,4 +1,4 @@
-window.onload = () => {
+window.addEventListener('load', () => {
   var button = document.querySelector('.light-dark');
   if (!button) {
     console.error("Could not find light-dark button!");
@@ -48,4 +48,4 @@ window.onload = () => {
       setTheme(next);
     }
   });
-};
+});
