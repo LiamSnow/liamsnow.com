@@ -70,22 +70,27 @@ header {
     font-size: 2rem;
     letter-spacing: -3px;
     position: relative;
+    transition: color 0.2s ease;
 
     &::after {
       content: "";
       position: absolute;
       border-top: 2px solid white;
       border-bottom: 2px solid white;
+      border-radius: 2px;
       top: 7px;
       left: -2px;
       right: -6px;
       bottom: 6px;
     }
-  }
 
-  img {
-    height: 40px;
-    width: auto;
+    &:hover {
+      color: $yellow-500;
+
+      &::after {
+        border-color: $yellow-500;
+      }
+    }
   }
 
   .nav {
@@ -103,10 +108,19 @@ header {
     button img {
       filter: invert(1);
       width: 26px;
+
+      &:hover {
+        filter: $green-600-filter;
+      }
     }
 
     a {
       margin-left: 1.5rem;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $link-hover-color;
+      }
     }
   }
 
@@ -116,12 +130,7 @@ header {
     letter-spacing: 0.05em;
     text-decoration: none;
     color: white;
-    transition: opacity 0.2s ease;
     font-weight: 600;
-
-    &:hover {
-      opacity: 0.7;
-    }
   }
 }
 
