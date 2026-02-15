@@ -82,6 +82,10 @@ main {
             filter: $stats-icon-filter;
           }
 
+          p>img {
+            transform: translateY(3px);
+          }
+
           :nth-child(2) {
             font-weight: bold;
           }
