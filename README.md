@@ -18,6 +18,6 @@ hosted on [Helios](https://github.com/oxidecomputer/helios)
 
 [See More](https://liamsnow.com/projects/liamsnow_com)
 
-![PageSpeed Insights 100/100 Performance 100/100 Accessibility 100/100 Best Practices 100/100 SEO](https://liamsnow.com/static/images/liamsnow_com_pagespeed.png)
-![](https://liamsnow.com/static/images/liamsnow_com_gt.png)
+![PageSpeed Insights 100/100 Performance 100/100 Accessibility 100/100 Best Practices 100/100 SEO](https://liamsnow.com/projects/liamsnow_com/pagespeed.png)
+![](https://liamsnow.com/projects/liamsnow_com/gt.png)
 
