@@ -77,6 +77,10 @@ main {
           align-items: center;
           gap: 4px;
 
+          * {
+            white-space: nowrap;
+          }
+
           img {
             width: 22px;
             filter: $stats-icon-filter;

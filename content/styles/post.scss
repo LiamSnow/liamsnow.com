@@ -83,6 +83,7 @@ main {
   #post-stats {
     margin: 0.5rem 0 0 1rem;
     list-style-type: none;
+    color: $alt-color-alt;
 
     >li {
       * {
@@ -91,10 +92,6 @@ main {
 
       strong {
         margin-right: 2px;
-      }
-
-      p {
-        color: $alt-color-alt;
       }
 
       img {

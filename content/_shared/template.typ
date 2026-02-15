@@ -136,17 +136,10 @@
         html.script(type: "application/ld+json")[#jsonld]
       }
 
-      #html.script(type: "text/javascript")[
-        #read("preload.js")
-      ]
-
-      #html.script(type: "text/javascript")[
-        #read("light_dark.js")
-      ]
-
-      #html.script(type: "text/javascript")[
-        #read("header.js")
-      ]
+      #html.script(type: "text/javascript")[#read("preload.js")]
+      #html.script(type: "text/javascript")[#read("light_dark.js")]
+      #html.script(type: "text/javascript")[#read("header.js")]
+      #html.script(type: "text/javascript")[#read("date.js")]
     ]
     #html.body[
       #header()
@@ -183,12 +176,16 @@
           #html.li[
             #image("/icons/written.svg")
             *Written:*
-            #page.at("written", default: "")
+            #html.p(class: "date")[
+              #page.at("written", default: "") 
+            ]
           ]
           #html.li[
             #image("/icons/updated.svg")
             *Updated:*
-            #page.at("updated", default: "")
+            #html.p(class: "date")[
+              #page.at("updated", default: "") 
+            ]
           ]
         ]
 

@@ -26,12 +26,16 @@
         #html.div[
           #image("icons/written.svg")
           #html.p[Written:]
-          #html.p[#post.at("written", default: "")]
+          #html.p(class: "date")[
+            #post.at("written", default: "")
+          ]
         ]
         #html.div[
           #image("icons/updated.svg")
           #html.p[Updated:]
-          #html.p[#post.at("updated", default: "")]
+          #html.p(class: "date")[
+            #post.at("updated", default: "")
+          ]
         ]
       ]
     ]
