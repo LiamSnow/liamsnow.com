@@ -7,16 +7,19 @@ use std::{
     net::SocketAddr,
     path::PathBuf,
     sync::{Arc, OnceLock},
+    time::Duration,
 };
 use tokio::{
     net::{TcpListener, TcpStream},
     sync::{broadcast, mpsc},
+    time::sleep,
 };
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::{AppState, Args, CONTENT_DIR, compiler, indexer, sitemap};
 
 pub static WATCH_ADDR: OnceLock<Option<String>> = OnceLock::new();
+const DEBOUNCE_MS: u64 = 100;
 
 pub fn set_watch_addr(args: &Args) {
     let watch_addr = match args.watch {
@@ -109,6 +112,8 @@ async fn watch(state: Arc<ArcSwap<AppState>>, ws_tx: broadcast::Sender<()>) -> R
     println!("Watching {} for changes...", CONTENT_DIR);
 
     while rx.recv().await.is_some() {
+        // lil debounce
+        sleep(Duration::from_millis(DEBOUNCE_MS)).await;
         while rx.try_recv().is_ok() {}
 
         println!("Change detected, rebuilding...");
