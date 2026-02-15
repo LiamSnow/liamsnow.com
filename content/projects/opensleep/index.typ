@@ -1,15 +1,17 @@
 #metadata((
-  title: "opensleep 120★",
+  title: "opensleep",
   desc: "Open source firmware for the Eight Sleep Pod 3",
-  date: "2025-09-04",
+  written: "2025-09-04",
+  updated: "2026-02-02",
+  links: (
+    ("GitHub", "https://github.com/liamsnow/opensleep"),
+  ),
   homepage: true,
   highlight: true
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
-
-#link("https://github.com/liamsnow/opensleep")[GitHub Repo]
 
 = Disclaimer
 This project is for educational and research purposes only. It is for personal, non-commercial use and is not affiliated with, endorsed by, or sponsored by Eight Sleep. The Eight Sleep name and Pod are trademarks of Eight Sleep, Inc.
@@ -113,7 +115,7 @@ This was my first complex MQTT project. I built a system that integrates cleanly
 
 After months of development, I decided to release the project and get feedback. I posted on #link("https://www.reddit.com/r/rust/comments/1n8hu4p/opensleep_rust_firmware_for_the_eight_sleep_pod_3/")[r/rust] and #link("https://www.reddit.com/r/EightSleep/comments/1n8ppn8/opensleep_complete_firmware_for_the_eight_sleep/")[r/eightsleep].
 
-The response was encouraging: 373 combined upvotes and 112 GitHub stars. People are actively using it, which validated the effort.
+The response was encouraging: 373 combined upvotes and 122 GitHub stars. People are actively using it, which validated the effort.
 
 === Lessons Learned
 

@@ -1,14 +1,20 @@
 #metadata((
   title: "A device tree for Igloo",
   desc: "How Igloo efficiently stores and handles devices, entities, and components",
-  date: "2025-09-30",
+  written: "2025-09-30",
+  updated: "2025-09-30",
+  links: (
+    ("Project Page", "/projects/igloo"),
+    ("Homepage", "https://igloo.rs"),
+    ("GitHub", "https://github.com/liamsnow/igloo"),
+  ),
   homepage: true
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
 
-If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
+If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
 
 #link("https://github.com/LiamSnow/igloo/tree/main/server/src/tree")[GitHub Link]
 

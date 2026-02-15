@@ -1,38 +1,6 @@
 @font-face {
-  font-family: 'Space Mono';
-  src: url('/fonts/SpaceMono-Regular.woff2') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Space Mono';
-  src: url('/fonts/SpaceMono-Bold.woff2') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Space Mono';
-  src: url('/fonts/SpaceMono-Italic.woff2') format('truetype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Space Mono';
-  src: url('/fonts/SpaceMono-BoldItalic.woff2') format('truetype');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Space Grotesk';
-  src: url('/fonts/SpaceGrotesk-Light.woff2') format('truetype');
+  src: url('/fonts/SpaceGrotesk-Light.woff2') format('woff2');
   font-weight: 200;
   font-style: normal;
   font-display: swap;
@@ -40,7 +8,7 @@
 
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('/fonts/SpaceGrotesk-Regular.woff2') format('truetype');
+  src: url('/fonts/SpaceGrotesk-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -48,7 +16,7 @@
 
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('/fonts/SpaceGrotesk-Bold.woff2') format('truetype');
+  src: url('/fonts/SpaceGrotesk-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -56,8 +24,24 @@
 
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('/fonts/SpaceGrotesk-Medium.woff2') format('truetype');
+  src: url('/fonts/SpaceGrotesk-Medium.woff2') format('woff2');
   font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DIN Next Slab Black';
+  src: url('/fonts/DINNextSlabBlack.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ioskeley Mono';
+  src: url('/fonts/IoskeleyMono-Regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }

@@ -1,14 +1,20 @@
 #metadata((
   title: "The first Igloo prototype",
   desc: "",
-  date: "2025-03-14",
+  written: "2025-03-14",
+  updated: "2025-03-14",
+  links: (
+    ("Project Page", "/projects/igloo"),
+    ("Homepage", "https://igloo.rs"),
+    ("GitHub", "https://github.com/liamsnow/igloo"),
+  ),
   homepage: true
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
 
-If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
+If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
 
 Initially I set out with a very different goal for Igloo.
 I wanted a smart home platform for power users that was reliable and fast.
@@ -44,7 +50,7 @@ The CLI protocol was elegant for scripting, and the configuration-as-code approa
 
 This was my first substantial Tokio project. Managing providers, devices, entities, channels, concurrent tasks, dashboards, frontend, authentication, API, and scripting simultaneously was more complex than I anticipated.
 
-Making providers is harder than I thought. The #link("../../projects/esphomebridge-rs")[ESPHome provider] alone took a lot of time, especially because it was completely undocumented.
+Making providers is harder than I thought. The #link("/projects/esphomebridge-rs")[ESPHome provider] alone took a lot of time, especially because it was completely undocumented.
 
 == Configuration File is a Pain
 

@@ -1,7 +1,13 @@
 #metadata((
   title: "Pushing Igloo's query engine to the limit",
   desc: "How Igloo is able to reach 1 million queries per second",
-  date: "2025-11-24",
+  written: "2025-11-24",
+  updated: "2025-11-24",
+  links: (
+    ("Project Page", "/projects/igloo"),
+    ("Homepage", "https://igloo.rs"),
+    ("GitHub", "https://github.com/liamsnow/igloo"),
+  ),
   homepage: true
 )) <page>
 
@@ -10,7 +16,7 @@
 
 This article assumes you are familiar with both
 Igloo's #link("ecs")[ECS] system and #link("device_tree")[device tree].
-If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
+If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
 
 The query engine is a massive project and I cannot cover all of it here.
 To avoid making this article unnecessarily long, I will walk through only how one-shot get value aggregated component queries work (ex. get average brightness of lights in the kitchen).

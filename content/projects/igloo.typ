@@ -1,7 +1,12 @@
 #metadata((
   title: "igloo",
   desc: "A secure, fast, & intuitive smart home platform",
-  date: "Started 2025-01-01",
+  written: "2025-01-01",
+  updated: "2026-02-01",
+  links: (
+    ("Homepage", "https://igloo.rs"),
+    ("GitHub", "https://github.com/liamsnow/igloo"),
+  ),
   homepage: true
 )) <page>
 
@@ -9,10 +14,6 @@
 
 #import "/_shared/template.typ": post, query
 #show: post
-
-#link("https://github.com/liamsnow/igloo")[GitHub Repo]
-
-#link("https://igloo.rs")[Website]
 
 = Background
 
@@ -39,15 +40,14 @@ I am building Igloo.
 
 = Updates/Blog
 
-#let posts = query.at(0, default: ()).sorted(key: p => p.at("date", default: "")).rev()
+#let posts = {
+  query.at(0, default: ())
+    .sorted(key: p => p.at("updated", default: "")).rev()
+}
 
 #html.div(class: "posts")[
-  #posts.map(post => html.a(
-    class: "post" + if post.at("highlight", default: false) { " highlight" } else { "" },
-    href: post.url
-  )[
+  #posts.map(post => html.a(href: post.url, class: "post")[
     #html.div(class: "title")[#post.title]
     #html.div(class: "desc")[#post.at("desc", default: "")]
-    #html.div(class: "date")[#post.at("date", default: "")]
   ]).join()
 ]

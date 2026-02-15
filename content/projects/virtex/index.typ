@@ -1,7 +1,11 @@
 #metadata((
   title: "virtex",
   desc: "815fps FPGA-based IR machine vision camera",
-  date: "2022-05-27",
+  written: "2022-05-27",
+  updated: "2022-05-28",
+  links: (
+    ("GitHub", "https://github.com/34-Engineering"),
+  ),
   homepage: false
 )) <page>
 

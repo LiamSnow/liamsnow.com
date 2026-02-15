@@ -1,24 +1,25 @@
 @use 'main' as *;
 @use 'mixins' as *;
+@use 'variables' as *;
 
-header {
-  /* border-bottom: none !important; */
+header:not(.scroll) {
+  box-shadow: none;
 }
 
 #hero {
-  padding: 0 0 4rem 0;
+  padding: 0 0 2rem 0;
   margin: 0;
-  border-bottom: 1px solid #666;
-  box-shadow: 0 25px 25px 10px black;
+  background-color: $header-bg;
+  color: $header-color;
+  box-shadow: 0 1px 5px $header-bg;
 
   >h1 {
-    font-family: 'Space Mono';
+    font-family: $font-fancy;
     font-weight: 700;
     text-align: center;
-    margin: 1rem 1rem 1rem 1rem;
+    margin: 0 1rem 1rem 1rem;
     line-height: 1;
-    text-shadow: 3px 2px #33ffcc, -3px -2px #ab18dc;
-    font-size: min(35vw, 200px);
+    font-size: min(35vw, 165px);
   }
 
   >div {
@@ -27,8 +28,9 @@ header {
     padding: 0 2rem;
 
     h2 {
-      font-size: 1.7rem;
-      margin-bottom: 1rem;
+      font-family: $font-fancy;
+      font-size: 1.9rem;
+      margin-bottom: 0.3rem;
     }
 
     >* {
@@ -46,9 +48,26 @@ header {
       margin-bottom: 1rem;
     }
 
+    .social {
+      margin-top: 1.5rem;
+    }
+
+    p {
+      display: inline-block;
+    }
+
+    // ferris
+    li img {
+      display: inline-block;
+      transform: translateY(3px);
+    }
+
     a {
-      @include button();
-      margin: 1.2rem 0 0 0.5rem;
+      color: $link-color;
+
+      &:hover {
+        color: $link-hover-color;
+      }
     }
   }
 }
@@ -64,50 +83,118 @@ header {
     width: 100%;
     z-index: 20;
 
-    &:not(:last-child) {
-      box-shadow: 0 25px 25px 10px black;
-    }
-
     &:not(:first-child) {
-      border-top: 1px solid #666;
+      border-top: 5px solid $grey-border;
     }
 
     >.header {
-      max-width: 1200px;
-      margin: 0 auto;
       padding: 0;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-size: 1.8rem;
       margin-bottom: 3rem;
       font-weight: 600;
+      font-family: $font-fancy;
+
+      a {
+        text-decoration: none;
+        color: $main-color;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $link-hover-color;
+        }
+      }
     }
-  }
-
-  h3 {
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-  }
-
-  p {
-    margin-bottom: 1rem;
   }
 }
 
 .posts {
-  flex-direction: row;
-  padding: 0;
-  margin: 0;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 1rem;
 
-  >a {
-    box-shadow: inset 0 0 20px 40px black;
-    padding: 2rem;
+  >li {
+    background: $alt-bg;
+    color: $alt-color-alt;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem 0.9rem 1rem;
     max-width: 280px;
-    margin: -0.5px;
-    border-radius: 3px;
+    box-shadow: 0 1px 3px $main-shadow-color;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .info {
+      a {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: $alt-color;
+        margin: 0;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $link-hover-color;
+        }
+      }
+    }
+
+    &.highlight {
+      z-index: 20;
+      box-shadow: 0 0 3px $yellow-500;
+      border: 1px solid $yellow-500;
+    }
+
+    >.quick-links {
+      margin-top: auto;
+      width: 100%;
+
+      &:has(*) {
+        margin-top: 1rem;
+      }
+
+      a {
+        text-decoration: none;
+        color: $link-color;
+        transition: color 0.2s ease;
+        font-size: 90%;
+        margin-right: 1rem;
+
+        &:hover {
+          color: $link-hover-color;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  #sections {
+    padding: 0 1rem;
+
+    >section {
+      padding: 0.5rem 0 1.3rem 0;
+
+      >.header {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .posts {
+    flex-direction: column;
+
+    >li {
+      width: 100%;
+      max-width: 100%;
+    }
+
   }
 }

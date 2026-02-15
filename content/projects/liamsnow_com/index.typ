@@ -1,14 +1,17 @@
 #metadata((
   title: "liamsnow.com",
   desc: "Fast personal website made with Rust & Typst, hosted on Helios illumos.",
-  date: "2026-01-31",
+  written: "2026-01-31",
+  updated: "2026-02-02",
+  links: (
+    ("Homepage", "https://liamsnow.com"),
+    ("GitHub", "https://github.com/liamsnow/liamsnow.com"),    
+  ),
   homepage: true
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
-
-#link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
 
 liamsnow.com is fast website written in Rust
 that has all content and layout written in #link("https://typst.app")[Typst].

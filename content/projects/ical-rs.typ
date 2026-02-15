@@ -1,7 +1,11 @@
 #metadata((
   title: "ical-rs",
   desc: "A flexible and typed iCalendar (RFC 5545) library ",
-  date: "2024-11-10",
+  written: "2024-11-10",
+  updated: "2024-11-10",
+  links: (
+    ("GitHub", "https://github.com/liamsnow/ical-rs"),
+  ),
   homepage: true
 )) <page>
 

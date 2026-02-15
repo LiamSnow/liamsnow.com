@@ -21,8 +21,45 @@
         #link("IV", "/")
       ]
       #html.nav(class: "nav")[
+        #html.button(class: "light-dark")[
+          #html.span(class: "moon", style: "display: none")[
+            #image("../icons/moon.svg")
+          ]
+          #html.span(class: "sun", style: "display: none")[
+            #image("../icons/sun.svg")
+          ]
+        ]
         #link("BLOG", "/blog")
         #link("PROJECTS", "/projects")
+      ]
+    ]
+  ]
+}
+
+#let social() = {
+  html.div(class: "social")[
+    #html.div[
+      #html.a(target: "_blank", href: "mailto:mail@liamsnow.com")[
+        #image("../icons/email.svg")
+        Email
+      ]
+    ]
+    #html.div[
+      #html.a(target: "_blank", href: "https://www.linkedin.com/in/william-snow-iv-140438169/")[
+        #image("../icons/linkedin.svg")
+        LinkedIn
+      ]
+    ]
+    #html.div[
+      #html.a(target: "_blank", href: "https://github.com/liamsnow")[
+        #image("../icons/github.svg")
+        GitHub
+      ]
+    ]
+    #html.div[
+      #html.a(target: "_blank", href: "https://github.com/LiamSnow/resume/blob/main/resume.pdf")[
+        #image("../icons/resume.svg")
+        Resume
       ]
     ]
   ]
@@ -32,15 +69,17 @@
   html.footer[
     #html.div(class: "container")[
       #html.div(class: "left")[
-        #link-new-tab("EMAIL", "mailto:mail@liamsnow.com")
-        #link-new-tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/")
-        #link-new-tab("GITHUB", "https://github.com/liamsnow")
-        #link-new-tab-highlight("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf")
+        #social()
       ]
-      #html.p(class: "right")[
+      #html.div(class: "right")[
         © 2025 William Snow IV
         #linebreak()
-        #link-new-tab("Source Code", "https://github.com/liamsnow/liamsnow.com")
+        #html.div[
+          #html.a(target: "_blank", href: "https://github.com/liamsnow/liamsnow.com")[
+            #image("../icons/code.svg")
+            Source Code
+          ]
+        ]
       ]
     ]
   ]
@@ -79,9 +118,9 @@
       #html.link(rel: "alternate", type: "application/rss+xml", title: "Liam Snow's Blog", href: "/blog/rss.xml")
       #html.link(rel: "alternate", type: "application/rss+xml", title: "Liam Snow's Projects", href: "/projects/rss.xml")
 
-      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceMono-Regular.woff2", ("as"): "font", type: "font/ttf", crossorigin: "anonymous"))
-      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceMono-Bold.woff2", ("as"): "font", type: "font/ttf", crossorigin: "anonymous"))
-      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/otf", crossorigin: "anonymous"))
+      #html.elem("link", attrs: (rel: "preload", href: "/fonts/DINNextSlabBlack.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Bold.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
 
       #for style in styles {
         html.elem("link", attrs: (rel: "preload", href: "/styles/" + style + ".css", ("as"): "style"))
@@ -99,6 +138,14 @@
 
       #html.script(type: "text/javascript")[
         #read("preload.js")
+      ]
+
+      #html.script(type: "text/javascript")[
+        #read("light_dark.js")
+      ]
+
+      #html.script(type: "text/javascript")[
+        #read("header.js")
       ]
     ]
     #html.body[
@@ -120,19 +167,40 @@
   let parts = path.split("/").filter(p => p != "")
   let base = if parts.len() > 0 { parts.at(0) } else { "" }
 
-  let title = page.at("title", default: "")
-  let date = page.at("date", default: "")
-
-  let post-header = [
-    #html.a(class: "post-back", href: "/" + base)[← #base]
-    #html.div(class: "post-title")[#title]
-    #html.p(class: "post-date")[#date]
-  ]
-
   template(
     [
-      #post-header
-      #body
+      #html.div(id: "post-header")[
+        // #html.a(class: "post-back", href: "/" + base)[
+        //   ← #base
+        // ]
+
+        #html.div(id: "post-info")[
+          = #page.at("title", default: "")
+          #page.at("desc", default: "")
+        ]
+
+        #html.ul(id: "post-stats")[
+          #html.li[
+            #image("/icons/written.svg")
+            *Written:*
+            #page.at("written", default: "")
+          ]
+          #html.li[
+            #image("/icons/updated.svg")
+            *Updated:*
+            #page.at("updated", default: "")
+          ]
+        ]
+
+        #html.div(id: "post-quick-links")[
+          #for item in page.at("links", default: ()) {
+            link-new-tab(item.at(0), item.at(1))
+          }
+        ]
+      ]
+      #html.div(id: "post-body")[
+        #body
+      ]
     ],
     styles: ("post",),
   )

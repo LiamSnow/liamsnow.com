@@ -1,7 +1,13 @@
 #metadata((
   title: "Making a blazing fast node-based editor",
   desc: "How I made Igloo Penguin in Rust WASM",
-  date: "2025-10-05",
+  written: "2025-10-05",
+  updated: "2025-10-05",
+  links: (
+    ("Project Page", "/projects/igloo"),
+    ("Homepage", "https://igloo.rs"),
+    ("GitHub", "https://github.com/liamsnow/igloo"),
+  ),
   homepage: true
 )) <page>
 
@@ -10,7 +16,7 @@
 
 #image("penguin.png")
 
-If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
+If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
 
 This is not the best write up about Penguin, so I'd highly recommend
 you browse the

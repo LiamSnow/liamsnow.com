@@ -1,14 +1,20 @@
 #metadata((
   title: "Making Igloo's provider system",
   desc: "How Igloo securely runs and communicates with extensions",
-  date: "2025-09-20",
+  written: "2025-09-20",
+  updated: "2025-09-20",
+  links: (
+    ("Project Page", "/projects/igloo"),
+    ("Homepage", "https://igloo.rs"),
+    ("GitHub", "https://github.com/liamsnow/igloo"),
+  ),
   homepage: true
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
 
-If you don't know what Igloo is please check out the #link("../../projects/igloo")[Project Page].
+If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
 
 For this article I will refer to the following:
  - _Provider_: Provides integration to smart home platforms like ESPHome, Apple HomeKit, MQTT, etc.

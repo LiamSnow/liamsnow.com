@@ -1,7 +1,8 @@
 #metadata((
   title: "My self-hosting journey",
   desc: "Docker, Kubernetes, NixOS, Helios Illumos",
-  date: "2026-02-01",
+  written: "2026-02-01",
+  updated: "2026-02-01",
   homepage: true
 )) <page>
 

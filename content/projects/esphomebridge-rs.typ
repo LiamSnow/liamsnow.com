@@ -1,14 +1,16 @@
 #metadata((
   title: "esphomebridge-rs",
   desc: "ESPHome client API written in Rust",
-  date: "2025-01-15",
+  written: "2025-01-15",
+  updated: "2025-01-15",
+  links: (
+    ("GitHub", "https://github.com/liamsnow/esphomebridge-rs"),
+  ),
   homepage: true
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
-
-#link("https://github.com/liamsnow/esphomebridge-rs")[GitHub Repo]
 
 *NOTE*: This is one of my earlier Rust projects and has since been rewritten for #link("https://github.com/LiamSnow/igloo/tree/main/esphome")[Igloo V2]. The new version is cleaner and faster, but I wanted to keep this post up.
 

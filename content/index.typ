@@ -5,14 +5,14 @@
 
 #metadata(("projects/", "blog/")) <query>
 
-#import "/_shared/template.typ": template, link-new-tab, link-new-tab-highlight, query
+#import "/_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social
 #show: template.with(
   styles: ("index",),
   jsonld: read("_shared/ld.json"),
 )
 
 #html.div(id: "hero")[
-  #html.h1[LIAM#box(html.elem("wbr"))SNOW]
+  #html.h1[liam#box(html.elem("wbr"))snow]
 
   #block[
     = About me
@@ -20,43 +20,49 @@
     #block[
       Hi, I'm William (Liam) Snow IV
       - CS MS & ECE BS @ Worcester Polytechnic Institute
-      - Rust 🦀, systems, & backend
+      - Rust #image("icons/cuddlyferris.svg", width: 18pt), systems, backend, & more
     ]
 
     *#underline[Nothing] on this website is written by AI* 
 
-    I am always open to feedback.
-    The best way to give me feedback is currently via email.
+    Please give feedback/critiques via #link-new-tab("email", "mailto:mail@liamsnow.com")!
 
-    #link-new-tab("EMAIL", "mailto:mail@liamsnow.com")
-    #link-new-tab("LINKEDIN", "https://www.linkedin.com/in/william-snow-iv-140438169/")
-    #link-new-tab("GITHUB", "https://github.com/liamsnow")
-    #link-new-tab-highlight("RESUME", "https://github.com/LiamSnow/resume/blob/main/resume.pdf")
+    #social()
   ]
 ]
 
-#let make-section(name, items) = {
+#let make-section(name, href, items) = {
   html.section[
     #html.div(class: "header")[
-      #html.span[#name]
-      #html.span[■]
+      #link(name, href)
     ]
-    #html.div(class: "posts")[
-      #items.map(item => html.a(
+    #html.ol(class: "posts")[
+      #items.map(item => html.li(
         class: if item.at("highlight", default: false) { "highlight" } else { "" },
-        href: item.url
       )[
-        == #item.title
-        #html.p(class: "desc")[#item.at("desc", default: "")]
-        #html.p(class: "date")[#item.at("date", default: "")]
+        #html.div(class: "info")[
+          #link(item.title, item.url)
+          #html.p(class: "desc")[#item.at("desc", default: "")]
+        ]
+        #html.div(class: "quick-links")[
+          #for item in item.at("links", default: ()) {
+            link-new-tab(item.at(0), item.at(1))
+          }
+        ]
       ]).join()
     ]
   ]
 }
 
-#let projects = query.at(0, default: ()).filter(item => item.at("homepage", default: false)).sorted(key: item => item.at("date", default: "")).rev()
-#let blogs = query.at(1, default: ()).filter(item => item.at("homepage", default: false)).sorted(key: item => item.at("date", default: "")).rev()
+#let projects = {
+  query.at(0, default: ()).filter(item => item.at("homepage", default: false))
+    .sorted(key: item => item.at("updated", default: "")).rev()
+}
+#let blogs = {
+  query.at(1, default: ()).filter(item => item.at("homepage", default: false))
+    .sorted(key: item => item.at("updated", default: "")).rev()
+}
 #html.div(id: "sections")[
-  #make-section("PROJECTS", projects)
-  #make-section("BLOG", blogs)
+  #make-section("Projects", "projects", projects)
+  #make-section("Blog", "blog", blogs)
 ]

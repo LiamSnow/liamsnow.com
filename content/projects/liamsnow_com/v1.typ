@@ -1,16 +1,21 @@
 #metadata((
   title: "liamsnow.com v1",
   desc: "Fast personal website made in Rust with Axum",
-  date: "2025-07-04",
+  written: "2025-07-04",
+  updated: "2025-12-01",
+  links: (
+    ("Homepage", "https://liamsnow.com"),
+    ("GitHub", "https://github.com/LiamSnow/liamsnow.com/tree/3e98824a6d714c76dc7f765232b6a97c9991739e"),    
+  ),
   homepage: false
 )) <page>
 
 #import "/_shared/template.typ": post
 #show: post
 
-#link("https://github.com/liamsnow/liamsnow.com")[GitHub Repo]
-
-= #link("../liamsnow_com")[See the V2]
+#link("../liamsnow_com")[
+    *See the V2*
+]
 
 = Why Build This?
 
