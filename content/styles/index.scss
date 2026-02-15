@@ -166,6 +166,7 @@ header:not(.scroll) {
         transition: color 0.2s ease;
         font-size: 90%;
         margin-right: 1rem;
+        white-space: nowrap;
 
         &:hover {
           color: $link-hover-color;

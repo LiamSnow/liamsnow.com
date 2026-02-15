@@ -225,7 +225,13 @@ footer {
       margin-right: 10px;
     }
 
-    a {
+    a,
+    p {
+      color: $yellow-500 !important;
+      font-size: 0.875rem !important;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       padding: 0;
       margin: 0;
       text-decoration: none;
@@ -235,11 +241,6 @@ footer {
       display: inline-block;
       padding: 0;
       margin: 0;
-      color: $yellow-500;
-      font-size: 0.875rem !important;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
     }
   }
 }
