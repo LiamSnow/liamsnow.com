@@ -83,7 +83,6 @@ main {
 
           img {
             width: 22px;
-            filter: $stats-icon-filter;
           }
 
           p>img {
@@ -92,6 +91,12 @@ main {
 
           :nth-child(2) {
             font-weight: bold;
+          }
+        }
+
+        >div:not(.lang) {
+          img {
+            filter: $stats-icon-filter;
           }
         }
       }

@@ -1,5 +1,5 @@
 #metadata((
-  title: "HomeLab / Self Hosting",
+  title: "HomeLab",
   desc: "Docker, Kubernetes, NixOS, Helios Illumos",
   started: "2024-04-11",
   ended: "Now",

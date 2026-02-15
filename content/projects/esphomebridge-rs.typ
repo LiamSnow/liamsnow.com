@@ -3,6 +3,7 @@
   desc: "ESPHome client API written in Rust",
   started: "2025-01-15",
   ended: "2025-02-24",
+  lang: "Rust",
   links: (
     ("GitHub", "https://github.com/liamsnow/esphomebridge-rs"),
   ),

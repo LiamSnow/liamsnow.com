@@ -3,6 +3,7 @@
   desc: "A flexible and typed iCalendar (RFC 5545) library ",
   started: "2024-08-04",
   ended: "2024-12-11",
+  lang: "Rust",
   links: (
     ("GitHub", "https://github.com/liamsnow/ical-rs"),
   ),

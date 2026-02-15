@@ -155,9 +155,23 @@
   ]
 }
 
+#let lang-icon(lang) = {
+  if lang == "Rust" {
+    image("/icons/cuddlyferris.svg")
+  } else if lang == "SystemVerilog" {
+    image("/icons/xor.svg") 
+  } else {
+    image("/icons/code.svg")
+  }
+}
+
+#let lang-display(lang) = {
+  lang-icon(lang)
+  html.p[Language:]
+  html.p[#lang]
+}
+
 #let post(body) = {
-
-
   template(
     [
       #html.div(id: "post-header")[
@@ -210,6 +224,12 @@
                   #ended
                 ]
               }
+            ]
+          }
+
+          #if "lang" in page {
+            html.li(class: "lang")[
+              #lang-display(page.at("lang"))
             ]
           }
         ]

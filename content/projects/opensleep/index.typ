@@ -3,6 +3,7 @@
   desc: "Open source firmware for the Eight Sleep Pod 3",
   started: "2024-11-05",
   ended: "2025-12-01",
+  lang: "Rust",
   links: (
     ("GitHub", "https://github.com/liamsnow/opensleep"),
   ),

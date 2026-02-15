@@ -3,6 +3,7 @@
   desc: "815fps FPGA-based IR machine vision camera",
   started: "2021-04-30",
   ended: "2022-05-28",
+  lang: "SystemVerilog",
   links: (
     ("GitHub", "https://github.com/34-Engineering"),
   ),

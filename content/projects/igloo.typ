@@ -3,6 +3,7 @@
   desc: "A secure, fast, & intuitive smart home platform",
   started: "2025-01-01",
   ended: "Now",
+  lang: "Rust",
   links: (
     ("Homepage", "https://igloo.rs"),
     ("GitHub", "https://github.com/liamsnow/igloo"),

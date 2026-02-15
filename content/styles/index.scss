@@ -130,8 +130,11 @@ header:not(.scroll) {
     justify-content: space-between;
 
     .info {
+      *:not(.desc) {
+        display: inline-block;
+      }
+
       a {
-        display: block;
         font-size: 1.25rem;
         font-weight: 600;
         color: $alt-color;
@@ -142,6 +145,19 @@ header:not(.scroll) {
 
         &:hover {
           color: $link-hover-color;
+        }
+      }
+
+      img {
+        width: 22px;
+        transform: translateY(1px);
+        margin-left: 2px;
+      }
+
+      >div:not(.lang) {
+        img {
+          filter: $stats-icon-filter;
+          transform: translateY(3px);
         }
       }
     }

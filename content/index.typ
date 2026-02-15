@@ -5,7 +5,7 @@
 
 #metadata(("projects/", "blog/")) <query>
 
-#import "/_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social
+#import "/_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social, lang-icon
 #show: template.with(
   styles: ("index",),
   jsonld: read("_shared/ld.json"),
@@ -42,8 +42,25 @@
       )[
         #html.div(class: "info")[
           #link(item.title, item.url)
+
+          #if "lang" in item {
+            html.div(class: "lang")[
+              #lang-icon(item.at("lang"))
+            ]
+          }
+
+          #if "ended" in item {
+            let ended = item.at("ended")
+            if ended == "Now" {
+              html.div[#image("icons/infinite.svg")]
+            } else {
+              html.div[#image("icons/done_all.svg")]
+            }
+          }
+          
           #html.p(class: "desc")[#item.at("desc", default: "")]
         ]
+
         #html.div(class: "quick-links")[
           #for item in item.at("links", default: ()) {
             link-new-tab(item.at(0), item.at(1))
@@ -56,7 +73,7 @@
 
 #let projects = {
   query.at(0, default: ()).filter(item => item.at("homepage", default: false))
-    .sorted(key: item => item.at("updated", default: "")).rev()
+    .sorted(key: item => item.at("ended", default: "")).rev()
 }
 #let blogs = {
   query.at(1, default: ()).filter(item => item.at("homepage", default: false))

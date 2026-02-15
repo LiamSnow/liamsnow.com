@@ -3,6 +3,7 @@
   desc: "Fast personal website made with Rust & Typst, hosted on Helios illumos.",
   started: "2026-01-28",
   ended: "2026-02-15",
+  lang: "Rust",
   links: (
     ("Homepage", "https://liamsnow.com"),
     ("GitHub", "https://github.com/liamsnow/liamsnow.com"),    

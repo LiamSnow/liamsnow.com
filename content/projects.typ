@@ -5,7 +5,7 @@
 
 #metadata("projects/") <query>
 
-#import "/_shared/template.typ": template, link, link-new-tab, query
+#import "/_shared/template.typ": template, link, link-new-tab, query, lang-display
 #show: template.with(styles: ("collection",))
 
 #let posts = {
@@ -43,6 +43,12 @@
             ]
           }
         ]
+
+        #if "lang" in post {
+          html.div(class: "lang")[
+            #lang-display(post.at("lang"))
+          ]
+        }
       ]
     ]
     #html.div(class: "quick-links")[
