@@ -26,6 +26,7 @@ window.addEventListener('load', () => {
 
   function setTheme(theme) {
     document.documentElement.style.colorScheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
     updateImages(theme);
   }

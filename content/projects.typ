@@ -10,7 +10,7 @@
 
 #let posts = {
   query.at(0, default: ())
-    .sorted(key: p => p.at("updated", default: "")).rev()
+    .sorted(key: p => p.at("ended", default: "")).rev()
 }
 
 #html.ol(class: "posts")[
@@ -24,18 +24,24 @@
       ]
       #html.div(class: "stats")[
         #html.div[
-          #image("icons/written.svg")
-          #html.p[Written:]
+          #image("icons/rocket_launch.svg")
+          #html.p[Started:]
           #html.p(class: "date")[
-            #post.at("written", default: "")
+            #post.at("started", default: "")
           ]
         ]
         #html.div[
-          #image("icons/updated.svg")
-          #html.p[Updated:]
-          #html.p(class: "date")[
-            #post.at("updated", default: "")
-          ]
+          #let ended = post.at("ended", default: "")
+          #if ended == "Now" {
+            image("icons/infinite.svg")
+            html.p[Ongoing]
+          } else {
+            image("icons/done_all.svg")
+            html.p[Ended:]
+            html.p(class: "date")[
+              #ended
+            ]
+          }
         ]
       ]
     ]

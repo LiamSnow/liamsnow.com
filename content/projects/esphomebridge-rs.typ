@@ -1,8 +1,8 @@
 #metadata((
   title: "esphomebridge-rs",
   desc: "ESPHome client API written in Rust",
-  written: "2025-01-15",
-  updated: "2025-01-15",
+  started: "2025-01-15",
+  ended: "2025-02-24",
   links: (
     ("GitHub", "https://github.com/liamsnow/esphomebridge-rs"),
   ),

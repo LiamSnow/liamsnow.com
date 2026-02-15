@@ -1,8 +1,8 @@
 #metadata((
   title: "virtex",
   desc: "815fps FPGA-based IR machine vision camera",
-  written: "2021-04-30",
-  updated: "2022-05-28",
+  started: "2021-04-30",
+  ended: "2022-05-28",
   links: (
     ("GitHub", "https://github.com/34-Engineering"),
   ),

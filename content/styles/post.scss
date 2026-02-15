@@ -86,19 +86,26 @@ main {
     color: $alt-color-alt;
 
     >li {
-      * {
-        display: inline-block;
-      }
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 4px;
 
-      strong {
-        margin-right: 2px;
+      * {
+        white-space: nowrap;
       }
 
       img {
         width: 22px;
-        transform: translateY(6px);
-        margin-right: 2px;
         filter: $stats-icon-filter;
+      }
+
+      p>img {
+        transform: translateY(3px);
+      }
+
+      :nth-child(2) {
+        font-weight: bold;
       }
     }
   }

@@ -1,8 +1,8 @@
 #metadata((
   title: "igloo",
   desc: "A secure, fast, & intuitive smart home platform",
-  written: "2025-01-01",
-  updated: "2026-02-01",
+  started: "2025-01-01",
+  ended: "Now",
   links: (
     ("Homepage", "https://igloo.rs"),
     ("GitHub", "https://github.com/liamsnow/igloo"),

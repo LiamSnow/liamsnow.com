@@ -1,8 +1,8 @@
 #metadata((
   title: "liamsnow.com v1",
   desc: "Fast personal website made in Rust with Axum",
-  written: "2025-07-04",
-  updated: "2025-12-01",
+  started: "2024-10-06",
+  ended: "2025-12-01",
   links: (
     ("Homepage", "https://liamsnow.com"),
     ("GitHub", "https://github.com/LiamSnow/liamsnow.com/tree/3e98824a6d714c76dc7f765232b6a97c9991739e"),    

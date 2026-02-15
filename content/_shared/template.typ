@@ -156,37 +156,62 @@
 }
 
 #let post(body) = {
-  // derive base from path (ex., /blog/igloo/ecs → blog)
-  let parts = path.split("/").filter(p => p != "")
-  let base = if parts.len() > 0 { parts.at(0) } else { "" }
+
 
   template(
     [
       #html.div(id: "post-header")[
-        // #html.a(class: "post-back", href: "/" + base)[
-        //   ← #base
-        // ]
-
         #html.div(id: "post-info")[
           = #page.at("title", default: "")
           #page.at("desc", default: "")
         ]
 
         #html.ul(id: "post-stats")[
-          #html.li[
-            #image("/icons/written.svg")
-            *Written:*
-            #html.p(class: "date")[
-              #page.at("written", default: "") 
+          #if "written" in page {
+            html.li[
+              #image("/icons/written.svg")
+              #html.p[Written:]
+              #html.p(class: "date")[
+                #page.at("written")
+              ]
             ]
-          ]
-          #html.li[
-            #image("/icons/updated.svg")
-            *Updated:*
-            #html.p(class: "date")[
-              #page.at("updated", default: "") 
+          }
+        
+          #if "updated" in page {
+            html.li[
+              #image("/icons/updated.svg")
+              #html.p[Updated:]
+              #html.p(class: "date")[
+                #page.at("updated")
+              ]
             ]
-          ]
+          }
+
+          #if "started" in page {
+            html.li[
+              #image("/icons/rocket_launch.svg")
+              #html.p[Started:]
+              #html.p(class: "date")[
+                #page.at("started")
+              ]
+            ]
+          }
+
+          #if "ended" in page {
+            html.li[
+              #let ended = page.at("ended")
+              #if ended == "Now" {
+                image("/icons/infinite.svg")
+                html.p[Ongoing]
+              } else {
+                image("/icons/done_all.svg")
+                html.p[Ended:]
+                html.p(class: "date")[
+                  #ended
+                ]
+              }
+            ]
+          }
         ]
 
         #html.div(id: "post-quick-links")[

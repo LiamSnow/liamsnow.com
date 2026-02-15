@@ -1,8 +1,8 @@
 #metadata((
   title: "liamsnow.com",
   desc: "Fast personal website made with Rust & Typst, hosted on Helios illumos.",
-  written: "2026-01-31",
-  updated: "2026-02-02",
+  started: "2026-01-28",
+  ended: "2026-02-15",
   links: (
     ("Homepage", "https://liamsnow.com"),
     ("GitHub", "https://github.com/liamsnow/liamsnow.com"),    

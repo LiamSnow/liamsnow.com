@@ -1,8 +1,8 @@
 #metadata((
   title: "opensleep",
   desc: "Open source firmware for the Eight Sleep Pod 3",
-  written: "2025-09-04",
-  updated: "2026-02-02",
+  started: "2024-11-05",
+  ended: "2025-12-01",
   links: (
     ("GitHub", "https://github.com/liamsnow/opensleep"),
   ),
