@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use brotli::{BrotliCompress, enc::BrotliEncoderParams};
 use bytes::Bytes;
 use http::HeaderValue;
@@ -139,8 +139,7 @@ fn process_file(task: FileTask) -> Option<(String, Route)> {
 
 fn process_css(task: &FileTask) -> Result<(String, Route)> {
     let opts = grass::Options::default().style(grass::OutputStyle::Compressed);
-    let content =
-        grass::from_path(&task.file_path, &opts).context("failed to compile css/scss/sass")?;
+    let content = grass::from_path(&task.file_path, &opts)?;
     Ok((
         task.url.clone(),
         Route::from_string(content, mime::TEXT_CSS, None),
