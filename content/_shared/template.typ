@@ -21,12 +21,12 @@
         #link("IV", "/")
       ]
       #html.nav(class: "nav")[
-        #html.button(class: "light-dark")[
+        #html.button(class: "light-dark", aria-label: "Toggle dark mode")[
           #html.span(class: "moon", style: "display: none")[
-            #image("../icons/moon.svg")
+            #image("../icons/moon.svg", alt: "Enable dark mode icon")
           ]
           #html.span(class: "sun", style: "display: none")[
-            #image("../icons/sun.svg")
+            #image("../icons/sun.svg", alt: "Enable light mode icon")
           ]
         ]
         #link("BLOG", "/blog")
@@ -40,25 +40,25 @@
   html.div(class: "social")[
     #html.div[
       #html.a(target: "_blank", href: "mailto:mail@liamsnow.com")[
-        #image("../icons/email.svg")
+        #image("../icons/email.svg", alt: "Email Icon")
         Email
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://www.linkedin.com/in/william-snow-iv-140438169/")[
-        #image("../icons/linkedin.svg")
+        #image("../icons/linkedin.svg", alt: "LinkedIn Icon")
         LinkedIn
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://github.com/liamsnow")[
-        #image("../icons/github.svg")
+        #image("../icons/github.svg", alt: "GitHub Icon")
         GitHub
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://github.com/LiamSnow/resume/blob/main/resume.pdf")[
-        #image("../icons/resume.svg")
+        #image("../icons/resume.svg", alt: "Resume Icon")
         Resume
       ]
     ]
@@ -76,7 +76,7 @@
         #linebreak()
         #html.div[
           #html.a(target: "_blank", href: "https://github.com/liamsnow/liamsnow.com")[
-            #image("../icons/code.svg")
+            #image("../icons/code.svg", alt: "Source Code Icon")
             Source Code
           ]
         ]
@@ -157,11 +157,11 @@
 
 #let lang-icon(lang) = {
   if lang == "Rust" {
-    image("/icons/cuddlyferris.svg")
+    image("/icons/cuddlyferris.svg", alt: "Rust Icon")
   } else if lang == "SystemVerilog" {
-    image("/icons/xor.svg") 
+    image("/icons/xor.svg", alt: "SystemVerilog Icon") 
   } else {
-    image("/icons/code.svg")
+    image("/icons/code.svg", alt: "Other Programming Language Icon")
   }
 }
 
@@ -183,7 +183,7 @@
         #html.ul(id: "post-stats")[
           #if "written" in page {
             html.li[
-              #image("/icons/written.svg")
+              #image("/icons/written.svg", alt: "Written Icon")
               #html.p[Written:]
               #html.p(class: "date")[
                 #page.at("written")
@@ -193,7 +193,7 @@
         
           #if "updated" in page {
             html.li[
-              #image("/icons/updated.svg")
+              #image("/icons/updated.svg", alt: "Updated Icon")
               #html.p[Updated:]
               #html.p(class: "date")[
                 #page.at("updated")
@@ -203,7 +203,7 @@
 
           #if "started" in page {
             html.li[
-              #image("/icons/rocket_launch.svg")
+              #image("/icons/rocket_launch.svg", alt: "Started Icon")
               #html.p[Started:]
               #html.p(class: "date")[
                 #page.at("started")
@@ -215,10 +215,10 @@
             html.li[
               #let ended = page.at("ended")
               #if ended == "Now" {
-                image("/icons/infinite.svg")
+                image("/icons/infinite.svg", alt: "Ongoing Project Icon")
                 html.p[Ongoing]
               } else {
-                image("/icons/done_all.svg")
+                image("/icons/done_all.svg", alt: "Project End Date Icon")
                 html.p[Ended:]
                 html.p(class: "date")[
                   #ended

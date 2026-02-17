@@ -24,14 +24,14 @@
       ]
       #html.div(class: "stats")[
         #html.div[
-          #image("icons/written.svg")
+          #image("icons/written.svg", alt: "Blog start date icon")
           #html.p[Written:]
           #html.p(class: "date")[
             #post.at("written", default: "")
           ]
         ]
         #html.div[
-          #image("icons/updated.svg")
+          #image("icons/updated.svg", alt: "Blog updated icon")
           #html.p[Updated:]
           #html.p(class: "date")[
             #post.at("updated", default: "")

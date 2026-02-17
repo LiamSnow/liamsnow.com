@@ -154,17 +154,17 @@ footer {
     /* } */
 
     >.right {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: white;
       text-align: right;
 
       a {
         text-decoration: none;
-        color: $link-color;
+        color: $yellow-500;
         transition: color 0.2s ease;
 
         &:hover {
-          color: $link-hover-color;
+          color: $yellow-750;
         }
       }
 
@@ -175,7 +175,7 @@ footer {
 
       img {
         width: 20px;
-        filter: $green-600-filter;
+        filter: $yellow-500-filter;
         transform: translateY(5px);
         margin-right: 10px;
       }

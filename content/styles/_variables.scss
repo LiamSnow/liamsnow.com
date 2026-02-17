@@ -21,11 +21,12 @@ $grey-1010: hsl(48, 1%, 5%);
 $green-300: hsl(150, 100%, 50%);
 $green-400: hsl(151, 100%, 47%);
 $green-500: hsl(152, 96%, 44%);
-$green-600: hsl(152, 100%, 34%);
+$green-600: hsl(152, 100%, 30%);
 // use https://htmlcolors.com/hsl-to-hex
 // then https://angel-rs.github.io/css-color-filter-generator/
 $green-600-filter: brightness(0) saturate(100%) invert(58%) sepia(61%) saturate(6450%) hue-rotate(128deg) brightness(96%) contrast(101%);
-$green-700: hsl(152, 100%, 24%);
+$green-link: hsl(151, 79%, 19%);
+$green-link2: hsl(120, 100%, 16%);
 $green-800: hsl(115, 31%, 31%);
 $green-850: hsl(115, 31%, 26%);
 $green-890: hsl(115, 31%, 23%);
@@ -46,7 +47,9 @@ $orange-900: hsl(15, 75%, 28%);
 $yellow-100: hsl(44, 100%, 90%);
 $yellow-500: hsl(44, 100%, 60%);
 $yellow-500-filter: brightness(0) saturate(100%) invert(84%) sepia(60%) saturate(2164%) hue-rotate(329deg) brightness(104%) contrast(101%);
+$yellow-600: hsl(44, 83%, 55%);
 $yellow-700: hsl(44, 67%, 50%);
+$yellow-750: hsl(44, 67%, 45%);
 $yellow-800: hsl(44, 67%, 20%);
 $yellow-900: hsl(44, 30%, 23%);
 
@@ -67,11 +70,11 @@ $alt-bg-hover: light-dark($grey-250, $grey-940);
 $alt-bg-dark: light-dark($grey-150, $grey-1000);
 $alt-bg-dark-hover: light-dark($grey-100, $grey-1010);
 $alt-color: light-dark($grey-800, $grey-100);
-$alt-color-alt: light-dark($grey-600, $grey-500);
+$alt-color-alt: light-dark($grey-700, $grey-500);
 
 $grey-border: light-dark($grey-300, $grey-700);
-$link-color: light-dark($green-600, $green-500);
-$link-hover-color: light-dark($green-800, $green-300);
+$link-color: light-dark($green-link2, $green-500);
+$link-hover-color: light-dark($green-600, $green-300);
 
 $stats-icon-color: rgb(184, 77, 148);
 $stats-icon-filter: brightness(0) saturate(100%) invert(45%) sepia(26%) saturate(1236%) hue-rotate(267deg) brightness(85%) contrast(92%);

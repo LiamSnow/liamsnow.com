@@ -64,10 +64,11 @@ header:not(.scroll) {
     }
 
     a {
-      color: $link-color;
+      color: light-dark($yellow-500, $green-500);
+      transition: color 0.2s ease;
 
       &:hover {
-        color: $link-hover-color;
+        color: light-dark($yellow-750, $green-300);
       }
     }
   }

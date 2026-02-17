@@ -24,7 +24,7 @@
       ]
       #html.div(class: "stats")[
         #html.div[
-          #image("icons/rocket_launch.svg")
+          #image("icons/rocket_launch.svg", alt: "Project start date icon")
           #html.p[Started:]
           #html.p(class: "date")[
             #post.at("started", default: "")
@@ -33,10 +33,10 @@
         #html.div[
           #let ended = post.at("ended", default: "")
           #if ended == "Now" {
-            image("icons/infinite.svg")
+            image("icons/infinite.svg", alt: "Ongoing project icon")
             html.p[Ongoing]
           } else {
-            image("icons/done_all.svg")
+            image("icons/done_all.svg", alt: "Project end date icon")
             html.p[Ended:]
             html.p(class: "date")[
               #ended
