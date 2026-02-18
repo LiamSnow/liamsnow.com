@@ -25,7 +25,7 @@
 
     *#underline[Nothing] on this website is written by AI* 
 
-    Please give feedback/critiques via #link-new-tab("email", "mailto:mail@liamsnow.com")!
+    Please give feedback/critiques by #link-new-tab("email", "mailto:mail@liamsnow.com")!
 
     #social()
   ]
