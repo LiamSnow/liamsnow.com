@@ -242,8 +242,6 @@ pub fn file_path_to_url(content_dir: &Path, file_path: &Path) -> String {
         "/".to_string()
     } else if let Some(stripped) = path_str.strip_suffix("/index") {
         format!("/{stripped}")
-    } else if path_str.ends_with("/index") {
-        format!("/{}", &path_str[..path_str.len() - 6])
     } else {
         format!("/{path_str}")
     }

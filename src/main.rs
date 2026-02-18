@@ -85,10 +85,10 @@ async fn main() -> Result<()> {
 
     let state = Arc::new(ArcSwap::from_pointee(AppState { routes, sitemap }));
 
-    if let Some(addr) = watcher::WATCH_ADDR.get().unwrap() {
-        if let Err(e) = watcher::spawn(state.clone(), addr).await {
-            eprintln!("Watcher error: {e}");
-        }
+    if let Some(addr) = watcher::WATCH_ADDR.get().unwrap()
+        && let Err(e) = watcher::spawn(state.clone(), addr).await
+    {
+        eprintln!("Watcher error: {e}");
     }
 
     println!("Startup time = {:?}", Instant::now() - start);

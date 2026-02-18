@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use brotli::{BrotliCompress, enc::BrotliEncoderParams};
 use bytes::Bytes;
 use http::HeaderValue;
