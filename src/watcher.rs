@@ -1,14 +1,9 @@
+use crate::{CONFIG, build};
 use anyhow::Result;
-use arc_swap::ArcSwap;
 use bytes::Bytes;
 use futures::{SinkExt, StreamExt};
 use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher, event::ModifyKind};
-use std::{
-    net::SocketAddr,
-    path::PathBuf,
-    sync::{Arc, OnceLock},
-    time::Duration,
-};
+use std::{net::SocketAddr, path::Path, time::Duration};
 use tokio::{
     net::{TcpListener, TcpStream},
     sync::{broadcast, mpsc},
@@ -16,21 +11,11 @@ use tokio::{
 };
 use tokio_tungstenite::tungstenite::Message;
 
-use crate::{AppState, Args, CONTENT_DIR, compiler, indexer, sitemap};
-
-pub static WATCH_ADDR: OnceLock<Option<String>> = OnceLock::new();
 const DEBOUNCE_MS: u64 = 100;
 
-pub fn set_watch_addr(args: &Args) {
-    let watch_addr = match args.watch {
-        true => Some(format!("{}:{}", args.watch_address, args.watch_port)),
-        false => None,
-    };
-
-    WATCH_ADDR.set(watch_addr).ok();
-}
-
-pub async fn spawn(state: Arc<ArcSwap<AppState>>, addr: &str) -> Result<()> {
+pub async fn spawn() -> Result<()> {
+    let cfg = CONFIG.get().unwrap();
+    let addr = format!("{}:{}", cfg.watch_address, cfg.watch_port);
     let listener = TcpListener::bind(&addr).await?;
 
     let (on_rebuild_tx, on_rebuild_rx) = broadcast::channel(1);
@@ -38,13 +23,13 @@ pub async fn spawn(state: Arc<ArcSwap<AppState>>, addr: &str) -> Result<()> {
     // accept ws connections
     tokio::spawn(async move {
         while let Ok((stream, addr)) = listener.accept().await {
-            tokio::spawn(conn_handler(on_rebuild_rx.resubscribe(), stream, addr));
+            tokio::spawn(ws_handler(on_rebuild_rx.resubscribe(), stream, addr));
         }
     });
 
     // watch fs and rebuild
     tokio::spawn(async move {
-        if let Err(e) = watch(state, on_rebuild_tx).await {
+        if let Err(e) = watch(on_rebuild_tx, &cfg.content_dir).await {
             eprintln!("Watcher error: {e}");
         }
     });
@@ -52,7 +37,7 @@ pub async fn spawn(state: Arc<ArcSwap<AppState>>, addr: &str) -> Result<()> {
     Ok(())
 }
 
-async fn conn_handler(
+async fn ws_handler(
     mut on_rebuild: broadcast::Receiver<()>,
     raw_stream: TcpStream,
     addr: SocketAddr,
@@ -87,7 +72,7 @@ async fn conn_handler(
 }
 
 /// Watch `content/` and trigger rebuilds
-async fn watch(state: Arc<ArcSwap<AppState>>, ws_tx: broadcast::Sender<()>) -> Result<()> {
+async fn watch(ws_tx: broadcast::Sender<()>, content_dir: &Path) -> Result<()> {
     let (tx, mut rx) = mpsc::channel::<()>(1);
 
     let mut watcher = RecommendedWatcher::new(
@@ -104,12 +89,9 @@ async fn watch(state: Arc<ArcSwap<AppState>>, ws_tx: broadcast::Sender<()>) -> R
         notify::Config::default(),
     )?;
 
-    watcher.watch(
-        PathBuf::from(CONTENT_DIR).as_path(),
-        RecursiveMode::Recursive,
-    )?;
+    watcher.watch(content_dir, RecursiveMode::Recursive)?;
 
-    println!("Watching {} for changes...", CONTENT_DIR);
+    println!("Watching {} for changes...", content_dir.display());
 
     while rx.recv().await.is_some() {
         // lil debounce
@@ -117,26 +99,15 @@ async fn watch(state: Arc<ArcSwap<AppState>>, ws_tx: broadcast::Sender<()>) -> R
         while rx.try_recv().is_ok() {}
 
         println!("Change detected, rebuilding...");
-        match rebuild().await {
-            Ok(new_state) => {
-                state.store(Arc::new(new_state));
-                println!("Rebuild complete.");
-                if let Ok(n) = ws_tx.send(()) {
-                    println!("Notified {n} websockets");
-                }
-            }
-            Err(e) => eprintln!("Rebuild failed: {e}"),
+
+        if let Err(e) = build().await {
+            eprintln!("Rebuild failed: {e}");
+        } else if let Ok(n) = ws_tx.send(()) {
+            println!("Notified {n} websockets");
         }
 
         while rx.try_recv().is_ok() {}
     }
 
     Ok(())
-}
-
-async fn rebuild() -> Result<AppState> {
-    let index = indexer::index().await?;
-    let routes = compiler::compile(index).await;
-    let sitemap = sitemap::generate(&routes);
-    Ok(AppState { routes, sitemap })
 }

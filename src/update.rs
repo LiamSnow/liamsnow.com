@@ -8,21 +8,13 @@ use sha2::Sha256;
 use std::{fs, sync::OnceLock};
 use tokio::process::Command;
 
+use crate::CONFIG;
+
 type HmacSha256 = Hmac<Sha256>;
 
 static WEBHOOK_SECRET: OnceLock<String> = OnceLock::new();
-static CARGO_PATH: OnceLock<String> = OnceLock::new();
-static GIT_PATH: OnceLock<String> = OnceLock::new();
 
-pub fn set_cargo_path(path: &str) {
-    CARGO_PATH.set(path.to_string()).ok();
-}
-
-pub fn set_git_path(path: &str) {
-    GIT_PATH.set(path.to_string()).ok();
-}
-
-pub fn init_secret(path: &str) -> Result<()> {
+pub fn set_secret(path: &str) -> Result<()> {
     let secret = fs::read_to_string(path).map(|s| s.trim().to_string())?;
     WEBHOOK_SECRET
         .set(secret)
@@ -30,12 +22,8 @@ pub fn init_secret(path: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn is_enabled() -> bool {
-    WEBHOOK_SECRET.get().is_some()
-}
-
 pub async fn handle(req: http::Request<Incoming>) -> Response<Full<Bytes>> {
-    if !is_enabled() {
+    if WEBHOOK_SECRET.get().is_none() {
         return Response::builder()
             .status(StatusCode::NOT_FOUND)
             .body(Full::new(Bytes::new()))
@@ -106,11 +94,11 @@ fn verify_signature(sig_header: &str, body: &[u8]) -> bool {
 }
 
 async fn execute() -> Result<()> {
+    let cfg = CONFIG.get().unwrap();
     println!("Starting self-update...");
 
     println!("  Running git pull...");
-    let git = GIT_PATH.get().map(|s| s.as_str()).unwrap_or("git");
-    let output = Command::new(git).arg("pull").output().await?;
+    let output = Command::new(&cfg.git).arg("pull").output().await?;
 
     if !output.status.success() {
         bail!(
@@ -121,8 +109,7 @@ async fn execute() -> Result<()> {
     println!("  git pull succeeded");
 
     println!("  Running cargo build --release...");
-    let cargo = CARGO_PATH.get().map(|s| s.as_str()).unwrap_or("cargo");
-    let output = Command::new(cargo)
+    let output = Command::new(&cfg.cargo)
         .args(["build", "--release"])
         .output()
         .await?;

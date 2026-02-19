@@ -14,7 +14,7 @@
 #import "/_shared/template.typ": post
 #show: post
 
-#image("penguin.png")
+#html.img(src: "penguin.png")
 
 If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
 
@@ -239,7 +239,7 @@ Now, in the dirty tracking system:
 I'm super happy with the final solution.
 It's performance while still being easy to read, follow, and add new features to.
 
-#image("penguin.png")
+#html.img(src: "penguin.png")
 
 = What's Next
 Eventually I need to work on the Penguin executor, but before that's possible,

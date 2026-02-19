@@ -1,9 +1,8 @@
 #metadata((
   title: "Liam's Website",
-  desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more."
+  desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more.",
+  query: ("/projects/", "/blog/"),
 )) <page>
-
-#metadata(("projects/", "blog/")) <query>
 
 #import "/_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social, lang-icon
 #show: template.with(

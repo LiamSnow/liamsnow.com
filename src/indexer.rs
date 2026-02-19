@@ -1,255 +1,180 @@
-use crate::{CONTENT_DIR, typst};
-use anyhow::{Result, bail};
-use rustc_hash::{FxBuildHasher, FxHashMap};
+use crate::{CONFIG, typst};
+use anyhow::{Context, Result};
+use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::collections::BTreeMap;
+use std::mem;
+use std::ops::Bound;
+use std::path::PathBuf;
+use tokio::fs;
 use tokio::task::JoinSet;
-use walkdir::WalkDir;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PageMeta {
     pub title: String,
-    #[serde(flatten)]
-    pub extra: Value,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct PageMetaWithUrl {
+    #[serde(default)]
+    pub query: Vec<String>,
+    /// injected indexer
+    #[serde(default)]
     pub url: String,
-    pub title: String,
     #[serde(flatten)]
     pub extra: Value,
 }
 
-impl PageMetaWithUrl {
-    pub fn from_meta(url: String, meta: &PageMeta) -> Self {
+pub struct Task {
+    pub path: PathBuf,
+    pub ty: TaskType,
+}
+
+pub enum TaskType {
+    Page {
+        meta: PageMeta,
+        query_result: String,
+    },
+    File,
+}
+
+impl Task {
+    fn file(path: PathBuf) -> Self {
         Self {
-            url,
-            title: meta.title.clone(),
-            extra: meta.extra.clone(),
+            path,
+            ty: TaskType::File,
         }
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct PageTask {
-    pub file_path: PathBuf,
-    pub url: String,
-    pub meta: Option<PageMeta>,
-    pub query_prefixes: Vec<String>,
-}
+/// Index all files in `content`, get metadata, & resolve queries
+pub async fn index() -> Result<BTreeMap<String, Task>> {
+    let content_dir = &CONFIG.get().unwrap().content_dir;
+    let (mut num_pages, mut num_files) = (0, 0);
+    let mut typst_tasks = JoinSet::new();
+    let mut stack = vec![fs::read_dir(content_dir).await?];
+    let mut index = BTreeMap::new();
 
-#[derive(Debug, Clone)]
-pub struct FileTask {
-    pub file_path: PathBuf,
-    pub url: String,
-}
-
-pub struct Index {
-    pub pages: Vec<PageTask>,
-    pub files: Vec<FileTask>,
-    pub resolved_queries: FxHashMap<String, Vec<Vec<PageMetaWithUrl>>>,
-}
-
-/// Index all files in `content`, resolve queries, & get metadata
-pub async fn index() -> Result<Index> {
-    let content_dir = Path::new(CONTENT_DIR);
-
-    println!("  Discovering files...");
-    let (page_tasks, file_tasks) = discover_files(content_dir)?;
-    println!(
-        "  Found {} pages, {} files",
-        page_tasks.len(),
-        file_tasks.len()
-    );
-
-    println!("  Extracting metadata...");
-    let page_tasks = extract_all_metadata(page_tasks).await?;
-
-    println!("  Building index...");
-    let page_index = build_index(&page_tasks);
-
-    println!("  Resolving queries...");
-    let resolved_queries = resolve_queries(&page_tasks, &page_index);
-
-    Ok(Index {
-        pages: page_tasks,
-        files: file_tasks,
-        resolved_queries,
-    })
-}
-
-/// Walk through `content` dir, finding all pages and files
-fn discover_files(content_dir: &Path) -> Result<(Vec<PageTask>, Vec<FileTask>)> {
-    let mut pages = Vec::new();
-    let mut files = Vec::new();
-
-    for entry in WalkDir::new(content_dir) {
-        let Ok(entry) = entry else {
+    while let Some(iter) = stack.last_mut() {
+        let Some(entry) = iter.next_entry().await? else {
+            stack.pop();
             continue;
         };
 
-        if !entry.file_type().is_file() {
+        let file_type = entry.file_type().await?;
+
+        if file_type.is_dir() {
+            stack.push(fs::read_dir(entry.path()).await?);
             continue;
         }
 
-        let path = entry.path();
-        let relative = path.strip_prefix(content_dir)?;
+        if file_type.is_file() {
+            let path = entry.path();
+            let rel = path
+                .strip_prefix(content_dir)?
+                .to_str()
+                .context("non-UTF-8 path")?;
 
-        if is_hidden_path(relative) {
-            continue;
-        }
-
-        let ext = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .map(str::to_ascii_lowercase);
-
-        match ext.as_deref() {
-            Some("typ") => {
-                let url = file_path_to_url(content_dir, path);
-                pages.push(PageTask {
-                    file_path: path.to_path_buf(),
-                    url,
-                    meta: None,
-                    query_prefixes: vec![],
-                });
+            if is_hidden(rel) {
+                continue;
             }
-            Some("scss" | "sass") => {
-                let url = format!("/{}", relative.with_extension("css").display());
-                files.push(FileTask {
-                    file_path: path.to_path_buf(),
-                    url,
-                });
-            }
-            _ => {
-                let url = format!("/{}", relative.display());
-                files.push(FileTask {
-                    file_path: path.to_path_buf(),
-                    url,
-                });
+
+            let url = make_url(rel);
+
+            if rel.ends_with(".typ") {
+                num_pages += 1;
+                typst_tasks.spawn(process_typst(path, url));
+            } else {
+                num_files += 1;
+                index.insert(url, Task::file(path));
             }
         }
     }
 
-    Ok((pages, files))
-}
+    println!("  Found {num_pages} pages, {num_files} files");
 
-/// Extract metadata from all page tasks in parallel
-async fn extract_all_metadata(mut tasks: Vec<PageTask>) -> Result<Vec<PageTask>> {
-    let mut set = JoinSet::new();
-
-    for (index, task) in tasks.iter().enumerate() {
-        let path = task.file_path.clone();
-        set.spawn(async move {
-            let meta = typst::query_page_meta(&path).await;
-            let prefixes = typst::query_prefixes(&path).await;
-            (index, meta, prefixes)
-        });
+    println!("  Extracing metadata...");
+    let mut tbe = FxHashMap::default();
+    while let Some(result) = typst_tasks.join_next().await {
+        let (url, task, query) = result??;
+        if !query.is_empty() {
+            tbe.insert(url.clone(), query);
+        }
+        index.insert(url, task);
     }
 
-    while let Some(result) = set.join_next().await {
-        let (index, meta_result, prefixes_result) = result?;
-
-        match meta_result {
-            Ok(Some(meta)) => tasks[index].meta = Some(meta),
-            Ok(None) => {
-                bail!(
-                    "{}: missing #metadata((title: ..)) <page>",
-                    tasks[index].file_path.display()
-                );
-            }
-            Err(e) => {
-                bail!("{}: {e}", tasks[index].file_path.display());
-            }
-        }
-
-        match prefixes_result {
-            Ok(prefixes) => tasks[index].query_prefixes = prefixes,
-            Err(e) => {
-                eprintln!(
-                    "{}: WARN: failed to extract queries: {e}",
-                    tasks[index].file_path.display()
-                );
-            }
-        }
-    }
-
-    Ok(tasks)
-}
-
-fn build_index(tasks: &[PageTask]) -> Vec<PageMetaWithUrl> {
-    tasks
-        .iter()
-        .filter_map(|task| {
-            task.meta
-                .as_ref()
-                .map(|meta| PageMetaWithUrl::from_meta(task.url.clone(), meta))
-        })
-        .collect()
-}
-
-fn resolve_queries(
-    tasks: &[PageTask],
-    index: &[PageMetaWithUrl],
-) -> FxHashMap<String, Vec<Vec<PageMetaWithUrl>>> {
-    let mut resolved: FxHashMap<String, Vec<Vec<PageMetaWithUrl>>> =
-        HashMap::with_hasher(FxBuildHasher);
-
-    for task in tasks {
-        if task.query_prefixes.is_empty() {
-            continue;
-        }
-
-        let results: Vec<Vec<PageMetaWithUrl>> = task
-            .query_prefixes
+    println!("  Evaluating queries...");
+    for (url, query) in tbe {
+        let outer: Vec<Vec<&PageMeta>> = query
             .iter()
-            .map(|prefix| {
-                let norm_prefix = if prefix.starts_with('/') {
-                    prefix.clone()
-                } else {
-                    format!("/{prefix}")
-                };
-
+            .map(|part| {
+                let mut end = part.clone();
+                if let Some(last) = end.as_bytes().last().copied() {
+                    end.pop();
+                    end.push((last + 1) as char);
+                }
                 index
-                    .iter()
-                    .filter(|page| page.url.starts_with(&norm_prefix) && page.url != task.url)
-                    .cloned()
+                    .range::<str, _>((
+                        Bound::Included(part.as_str()),
+                        Bound::Excluded(end.as_str()),
+                    ))
+                    .filter_map(|(_, t)| match &t.ty {
+                        TaskType::Page { meta, .. } => Some(meta),
+                        _ => None,
+                    })
                     .collect()
             })
             .collect();
 
-        resolved.insert(task.url.clone(), results);
+        let res = serde_json::to_string(&outer)?;
+        if let TaskType::Page { query_result, .. } = &mut index.get_mut(&url).unwrap().ty {
+            *query_result = res;
+        }
     }
 
-    resolved
+    Ok(index)
 }
 
-/// `content/foo/bar.typ` → `/foo/bar`
-/// `content/index.typ` → `/`
-/// `content/foo/index.typ` → `/foo`
-pub fn file_path_to_url(content_dir: &Path, file_path: &Path) -> String {
-    let relative = file_path
-        .strip_prefix(content_dir)
-        .expect("file_path should be under content_dir");
+async fn process_typst(path: PathBuf, url: String) -> Result<(String, Task, Vec<String>)> {
+    let mut meta = typst::get_metadata(&path)
+        .await
+        .with_context(|| format!("parsing {}", path.display()))?;
+    meta.url = url.clone();
+    let query = mem::take(&mut meta.query);
+    Ok((
+        url,
+        Task {
+            path,
+            ty: TaskType::Page {
+                meta,
+                query_result: "[]".to_string(),
+            },
+        },
+        query,
+    ))
+}
 
-    let without_ext = relative.with_extension("");
-    let path_str = without_ext.to_str().expect("path should be valid UTF-8");
-
-    if path_str == "index" {
-        "/".to_string()
-    } else if let Some(stripped) = path_str.strip_suffix("/index") {
-        format!("/{stripped}")
+/// `index.typ`      → `/`
+/// `cat/index.typ`  → `/cat`
+/// `cat/dog.typ`    → `/cat/dog`
+/// `cat/robots.txt` → `/cat/robots.txt`
+/// `style.scss`     → `/style.css`
+fn make_url(rel: &str) -> String {
+    if let Some(stem) = rel.strip_suffix(".typ") {
+        if stem == "index" {
+            "/".to_string()
+        } else {
+            format!("/{}", stem.strip_suffix("/index").unwrap_or(stem))
+        }
+    } else if let Some(stem) = rel
+        .strip_suffix(".scss")
+        .or_else(|| rel.strip_suffix(".sass"))
+    {
+        format!("/{stem}.css")
     } else {
-        format!("/{path_str}")
+        format!("/{rel}")
     }
 }
 
-pub fn is_hidden_path(path: &Path) -> bool {
-    path.components()
-        .any(|c| c.as_os_str().to_str().is_some_and(|s| s.starts_with('_')))
+fn is_hidden(rel: &str) -> bool {
+    rel.split('/').any(|seg| seg.starts_with('_'))
 }
 
 #[cfg(test)]
@@ -257,36 +182,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_file_path_to_url() {
-        let content = Path::new("./content");
-
-        assert_eq!(
-            file_path_to_url(content, Path::new("./content/index.typ")),
-            "/"
-        );
-        assert_eq!(
-            file_path_to_url(content, Path::new("./content/blog.typ")),
-            "/blog"
-        );
-        assert_eq!(
-            file_path_to_url(content, Path::new("./content/blog/foo.typ")),
-            "/blog/foo"
-        );
-        assert_eq!(
-            file_path_to_url(content, Path::new("./content/blog/igloo/ecs.typ")),
-            "/blog/igloo/ecs"
-        );
-        assert_eq!(
-            file_path_to_url(content, Path::new("./content/projects/index.typ")),
-            "/projects"
-        );
+    fn test_make_url() {
+        assert_eq!(make_url("index.typ"), "");
+        assert_eq!(make_url("cat/index.typ"), "cat");
+        assert_eq!(make_url("cat/dog.typ"), "cat/dog");
+        assert_eq!(make_url("style.scss"), "style.css");
+        assert_eq!(make_url("theme.sass"), "theme.css");
+        assert_eq!(make_url("robots.txt"), "robots.txt");
+        assert_eq!(make_url("img/photo.png"), "img/photo.png");
     }
 
     #[test]
-    fn test_is_hidden_path() {
-        assert!(is_hidden_path(Path::new("content/_shared/template.typ")));
-        assert!(is_hidden_path(Path::new("_foo/bar.typ")));
-        assert!(!is_hidden_path(Path::new("content/blog/foo.typ")));
-        assert!(!is_hidden_path(Path::new("content/index.typ")));
+    fn test_is_hidden() {
+        assert!(is_hidden("_drafts/post.typ"));
+        assert!(is_hidden("blog/_hidden/post.typ"));
+        assert!(!is_hidden("blog/post.typ"));
+        assert!(!is_hidden("underscored_name/post.typ"));
     }
 }

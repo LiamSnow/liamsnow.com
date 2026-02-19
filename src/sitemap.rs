@@ -4,9 +4,10 @@ use std::fmt::Write;
 
 use crate::compiler::Route;
 
+const SITEMAP_PATH: &str = "sitemap.xml";
 const BASE_URL: &str = "https://liamsnow.com";
 
-pub fn generate(routes: &FxHashMap<String, Route>) -> Route {
+pub fn generate(routes: &mut FxHashMap<String, Route>) {
     let mut xml = String::with_capacity(2048);
     xml.push_str(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
     xml.push('\n');
@@ -30,5 +31,9 @@ pub fn generate(routes: &FxHashMap<String, Route>) -> Route {
     }
 
     xml.push_str("</urlset>");
-    Route::from_string(xml, mime::TEXT_XML, None)
+
+    routes.insert(
+        SITEMAP_PATH.to_string(),
+        Route::from_string(xml, mime::TEXT_XML, None),
+    );
 }

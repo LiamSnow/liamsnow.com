@@ -1,20 +1,90 @@
-use anyhow::{Context, Result};
+use crate::indexer::{Task, TaskType};
+use crate::{RoutingTable, sitemap, typst};
+use anyhow::{Context, Result, bail};
 use brotli::{BrotliCompress, enc::BrotliEncoderParams};
 use bytes::Bytes;
 use http::HeaderValue;
 use mime_guess::mime;
-use rustc_hash::{FxBuildHasher, FxHashMap};
-use std::{collections::HashMap, fs};
+use rustc_hash::FxBuildHasher;
+use std::collections::{BTreeMap, HashMap};
+use std::path::{Path, PathBuf};
+use tokio::fs;
 use tokio::task::JoinSet;
-
-use crate::indexer::{FileTask, Index};
-use crate::typst;
 
 pub struct Route {
     pub content_br: Option<Bytes>,
     pub content_identity: Bytes,
     pub content_type: HeaderValue,
     pub cache_control: Option<HeaderValue>,
+}
+
+pub async fn compile(index: BTreeMap<String, Task>) -> Result<RoutingTable> {
+    let mut set = JoinSet::new();
+    let mut routing_table = HashMap::with_capacity_and_hasher(index.len(), FxBuildHasher);
+
+    for (url, task) in index {
+        match task.ty {
+            TaskType::Page { meta, query_result } => {
+                set.spawn(async move {
+                    let content = typst::compile(&task.path, &url, &meta, query_result).await?;
+                    Ok((
+                        url,
+                        Route::from_string(content, mime::TEXT_HTML_UTF_8, None),
+                    ))
+                });
+            }
+            TaskType::File => {
+                set.spawn(process_file(url, task.path));
+            }
+        }
+    }
+
+    while let Some(result) = set.join_next().await {
+        let (url, route) = result??;
+        routing_table.insert(url, route);
+    }
+
+    sitemap::generate(&mut routing_table);
+
+    Ok(routing_table)
+}
+
+async fn process_file(url: String, path: PathBuf) -> Result<(String, Route)> {
+    // SAFETY: extension existance checked by indexer
+    let ext = path.extension().unwrap().to_string_lossy();
+
+    let result = match ext.as_ref() {
+        "scss" | "sass" | "css" => process_css(&path).await,
+        "js" | "txt" | "md" | "csv" => process_static(&path, true).await,
+        _ => process_static(&path, false).await,
+    };
+
+    match result {
+        Ok(route) => Ok((url, route)),
+        Err(e) => {
+            bail!("{}: {e}", path.display());
+        }
+    }
+}
+
+async fn process_css(path: &Path) -> Result<Route> {
+    let opts = grass::Options::default().style(grass::OutputStyle::Compressed);
+    let content = grass::from_path(path, &opts)?;
+    Ok(Route::from_string(content, mime::TEXT_CSS, None))
+}
+
+async fn process_static(path: &Path, compress: bool) -> Result<Route> {
+    let bytes = fs::read(path).await.context("failed to read file")?;
+    let mime = mime_guess::from_path(path).first_or_text_plain();
+
+    let cache_control = (mime.type_() == "font")
+        .then(|| HeaderValue::from_static("public, max-age=31536000, immutable"));
+
+    Ok(if compress {
+        Route::from_bytes(bytes, mime, cache_control)
+    } else {
+        Route::from_bytes_precompressed(bytes, mime, cache_control)
+    })
 }
 
 impl Route {
@@ -67,96 +137,4 @@ fn compress_brotli(input: &[u8]) -> Bytes {
     };
     BrotliCompress(&mut &input[..], &mut output, &params).unwrap();
     Bytes::from(output)
-}
-
-pub async fn compile(index: Index) -> FxHashMap<String, Route> {
-    println!("  Compiling...");
-
-    let mut set = JoinSet::new();
-    let mut routes =
-        HashMap::with_capacity_and_hasher(index.pages.len() + index.files.len(), FxBuildHasher);
-
-    // compile pages
-    for task in index.pages {
-        let query_results = index
-            .resolved_queries
-            .get(&task.url)
-            .cloned()
-            .unwrap_or_default();
-
-        set.spawn(async move {
-            let meta = task.meta.as_ref().expect("metadata should be populated");
-            let result = typst::compile(&task.file_path, &task.url, meta, &query_results).await;
-
-            match result {
-                Ok(content) => Some((
-                    task.url,
-                    Route::from_string(content, mime::TEXT_HTML_UTF_8, None),
-                )),
-                Err(e) => {
-                    eprintln!("{}: {e}", task.file_path.display());
-                    None
-                }
-            }
-        });
-    }
-
-    // compile files
-    for task in index.files {
-        set.spawn(async move { process_file(task) });
-    }
-
-    while let Some(result) = set.join_next().await {
-        if let Ok(Some((url, route))) = result {
-            routes.insert(url, route);
-        }
-    }
-
-    routes
-}
-
-fn process_file(task: FileTask) -> Option<(String, Route)> {
-    let ext = task
-        .file_path
-        .extension()
-        .and_then(|e| e.to_str())
-        .map(str::to_ascii_lowercase);
-
-    let result = match ext.as_deref() {
-        Some("scss" | "sass" | "css") => process_css(&task),
-        Some("js" | "txt" | "md" | "csv") => process_static(&task, true),
-        _ => process_static(&task, false),
-    };
-
-    match result {
-        Ok((url, route)) => Some((url, route)),
-        Err(e) => {
-            eprintln!("{}: {e}", task.file_path.display());
-            None
-        }
-    }
-}
-
-fn process_css(task: &FileTask) -> Result<(String, Route)> {
-    let opts = grass::Options::default().style(grass::OutputStyle::Compressed);
-    let content = grass::from_path(&task.file_path, &opts)?;
-    Ok((
-        task.url.clone(),
-        Route::from_string(content, mime::TEXT_CSS, None),
-    ))
-}
-
-fn process_static(task: &FileTask, compress: bool) -> Result<(String, Route)> {
-    let bytes = fs::read(&task.file_path).context("failed to read file")?;
-    let mime = mime_guess::from_path(&task.file_path).first_or_text_plain();
-
-    let cache_control = (mime.type_() == "font")
-        .then(|| HeaderValue::from_static("public, max-age=31536000, immutable"));
-
-    let route = if compress {
-        Route::from_bytes(bytes, mime, cache_control)
-    } else {
-        Route::from_bytes_precompressed(bytes, mime, cache_control)
-    };
-    Ok((task.url.clone(), route))
 }

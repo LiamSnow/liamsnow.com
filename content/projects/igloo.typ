@@ -8,10 +8,9 @@
     ("Homepage", "https://igloo.rs"),
     ("GitHub", "https://github.com/liamsnow/igloo"),
   ),
-  homepage: true
+  homepage: true,
+  query: ("/blog/igloo/",),
 )) <page>
-
-#metadata("blog/igloo/") <query>
 
 #import "/_shared/template.typ": post, query
 #show: post

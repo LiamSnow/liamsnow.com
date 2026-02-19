@@ -1,8 +1,13 @@
+use crate::compiler::Route;
 use anyhow::Result;
 use arc_swap::ArcSwap;
 use clap::Parser;
 use rustc_hash::FxHashMap;
-use std::{sync::Arc, time::Instant};
+use std::{
+    path::PathBuf,
+    sync::{Arc, LazyLock, OnceLock},
+    time::Instant,
+};
 
 mod compiler;
 mod indexer;
@@ -12,16 +17,9 @@ mod update;
 mod watcher;
 mod web;
 
-pub const CONTENT_DIR: &str = "./content";
-
-pub struct AppState {
-    pub routes: FxHashMap<String, compiler::Route>,
-    pub sitemap: compiler::Route,
-}
-
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Default)]
 #[command(name = "liamsnow-com")]
-struct Args {
+pub struct Args {
     /// Hostname or IP address to bind to
     #[arg(short, long, env = "ADDRESS", default_value = "127.0.0.1")]
     address: String,
@@ -29,6 +27,10 @@ struct Args {
     /// Port number (1-65535)
     #[arg(short, long, env = "PORT", default_value_t = 3232)]
     port: u16,
+
+    /// Path to content directory
+    #[arg(long, env = "CONTENT_DIR", default_value = "./content")]
+    content_dir: PathBuf,
 
     /// Watch content directory for changes and rebuild
     #[arg(short, long, env = "WATCH")]
@@ -59,39 +61,47 @@ struct Args {
     git: String,
 }
 
+pub type RoutingTable = FxHashMap<String, Route>;
+pub static ROUTING_TABLE: LazyLock<ArcSwap<RoutingTable>> =
+    LazyLock::new(|| ArcSwap::from_pointee(RoutingTable::default()));
+pub static CONFIG: OnceLock<Args> = OnceLock::new();
+
 #[tokio::main]
 async fn main() -> Result<()> {
-    let start = Instant::now();
     let args = Args::parse();
 
-    typst::set_binary_path(&args.typst);
-    update::set_cargo_path(&args.cargo);
-    update::set_git_path(&args.git);
-    watcher::set_watch_addr(&args);
-
     if let Some(ref path) = args.github_secret_path {
-        update::init_secret(path)?;
+        update::set_secret(path)?;
         println!("GitHub webhook update enabled");
     }
+
+    CONFIG.set(args).expect("CONFIG already set");
+
+    build().await?;
+
+    if CONFIG.get().unwrap().watch
+        && let Err(e) = watcher::spawn().await
+    {
+        eprintln!("Watcher error: {e}");
+    }
+
+    web::run().await
+}
+
+async fn build() -> Result<()> {
+    let start = Instant::now();
+
+    println!("Starting Build");
 
     println!("Indexing...");
     let index = indexer::index().await?;
 
     println!("Compiling...");
-    let routes = compiler::compile(index).await;
+    let routing_table = compiler::compile(index).await?;
 
-    println!("Building sitemap...");
-    let sitemap = sitemap::generate(&routes);
+    ROUTING_TABLE.store(Arc::new(routing_table));
 
-    let state = Arc::new(ArcSwap::from_pointee(AppState { routes, sitemap }));
+    println!("Build done in {:?}", Instant::now() - start);
 
-    if let Some(addr) = watcher::WATCH_ADDR.get().unwrap()
-        && let Err(e) = watcher::spawn(state.clone(), addr).await
-    {
-        eprintln!("Watcher error: {e}");
-    }
-
-    println!("Startup time = {:?}", Instant::now() - start);
-
-    web::run(state, &args.address, args.port).await
+    Ok(())
 }
