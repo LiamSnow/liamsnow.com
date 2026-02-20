@@ -1,6 +1,5 @@
-#let path = sys.inputs.at("path", default: "/")
-#let page = json.decode(sys.inputs.at("page", default: "{}"))
-#let query = json.decode(sys.inputs.at("query", default: "[]"))
+#let page = sys.inputs.at("page", default: (:))
+#let query = sys.inputs.at("query", default: ())
 
 #let link(text, href) = {
   html.a(href: href)[#text]
@@ -92,7 +91,7 @@
 ) = {
   let title = page.at("title", default: "Liam Snow")
   let desc = page.at("desc", default: "")
-  let canonical-url = "https://liamsnow.com" + path
+  let canonical-url = "https://liamsnow.com" + page.at("url", default: "")
 
   html.html(lang: "en")[
     #html.head[

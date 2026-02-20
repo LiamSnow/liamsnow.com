@@ -1,3 +1,4 @@
+use crate::CONFIG;
 use anyhow::{Result, anyhow, bail};
 use bytes::Bytes;
 use hmac::{Hmac, Mac};
@@ -7,8 +8,6 @@ use hyper::body::Incoming;
 use sha2::Sha256;
 use std::{fs, sync::OnceLock};
 use tokio::process::Command;
-
-use crate::CONFIG;
 
 type HmacSha256 = Hmac<Sha256>;
 

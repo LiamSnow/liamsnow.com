@@ -1,3 +1,5 @@
+use crate::compiler::route::Route;
+use crate::{CONFIG, ROUTING_TABLE, update};
 use anyhow::Result;
 use bytes::Bytes;
 use http::{HeaderValue, Method, Request, Response, StatusCode, header};
@@ -8,9 +10,6 @@ use hyper::service::service_fn;
 use hyper_util::rt::TokioIo;
 use std::convert::Infallible;
 use tokio::net::TcpListener;
-
-use crate::compiler::Route;
-use crate::{CONFIG, ROUTING_TABLE, update};
 
 const UPDATE_PATH: &str = "_update";
 
@@ -24,7 +23,7 @@ pub async fn run() -> Result<()> {
         let (stream, _) = listener.accept().await?;
         tokio::spawn(async move {
             let _ = http1::Builder::new()
-                .serve_connection(TokioIo::new(stream), service_fn(move |req| handle(req)))
+                .serve_connection(TokioIo::new(stream), service_fn(handle))
                 .await;
         });
     }

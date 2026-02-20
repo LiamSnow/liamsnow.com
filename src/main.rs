@@ -1,4 +1,4 @@
-use crate::compiler::Route;
+use ::typst::comemo;
 use anyhow::Result;
 use arc_swap::ArcSwap;
 use clap::Parser;
@@ -9,9 +9,10 @@ use std::{
     time::Instant,
 };
 
+use crate::compiler::route::Route;
+
 mod compiler;
 mod indexer;
-mod sitemap;
 mod typst;
 mod update;
 mod watcher;
@@ -29,8 +30,8 @@ pub struct Args {
     port: u16,
 
     /// Path to content directory
-    #[arg(long, env = "CONTENT_DIR", default_value = "./content")]
-    content_dir: PathBuf,
+    #[arg(short, long, env = "CONTENT_DIR", default_value = "./content")]
+    root: PathBuf,
 
     /// Watch content directory for changes and rebuild
     #[arg(short, long, env = "WATCH")]
@@ -43,10 +44,6 @@ pub struct Args {
     /// Watch websocket hostname or IP address to bind to
     #[arg(long, env = "WATCH_ADDRESS", default_value = "127.0.0.1")]
     watch_address: String,
-
-    /// Path to the typst binary
-    #[arg(short, long, env = "TYPST", default_value = "typst")]
-    typst: String,
 
     /// Path to file containing GitHub webhook secret
     #[arg(long, env = "GITHUB_SECRET_PATH")]
@@ -94,14 +91,16 @@ async fn build() -> Result<()> {
     println!("Starting Build");
 
     println!("Indexing...");
-    let index = indexer::index().await?;
+    let slots = indexer::run().await?;
 
     println!("Compiling...");
-    let routing_table = compiler::compile(index).await?;
+    let routing_table = compiler::run(slots).await?;
 
     ROUTING_TABLE.store(Arc::new(routing_table));
 
     println!("Build done in {:?}", Instant::now() - start);
+
+    comemo::evict(10);
 
     Ok(())
 }

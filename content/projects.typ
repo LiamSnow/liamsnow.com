@@ -1,10 +1,10 @@
 #metadata((
   title: "Liam's Projects",
   desc: "Liam Snow's Projects. Programming, systems, backend, Rust and more.",
-  query: ("/projects/",),
+  queries: ("/projects/",),
 )) <page>
 
-#import "/_shared/template.typ": template, link, link-new-tab, query, lang-display
+#import "_shared/template.typ": template, link, link-new-tab, query, lang-display
 #show: template.with(styles: ("collection",))
 
 #let posts = {

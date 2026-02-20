@@ -1,10 +1,10 @@
 #metadata((
   title: "Liam's Website",
   desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more.",
-  query: ("/projects/", "/blog/"),
+  queries: ("/projects/", "/blog/"),
 )) <page>
 
-#import "/_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social, lang-icon
+#import "_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social, lang-icon
 #show: template.with(
   styles: ("index",),
   jsonld: read("_shared/ld.json"),

@@ -11,7 +11,7 @@ use tokio::{
 };
 use tokio_tungstenite::tungstenite::Message;
 
-const DEBOUNCE_MS: u64 = 100;
+const DEBOUNCE_MS: u64 = 1000;
 
 pub async fn spawn() -> Result<()> {
     let cfg = CONFIG.get().unwrap();
@@ -29,7 +29,7 @@ pub async fn spawn() -> Result<()> {
 
     // watch fs and rebuild
     tokio::spawn(async move {
-        if let Err(e) = watch(on_rebuild_tx, &cfg.content_dir).await {
+        if let Err(e) = watch(on_rebuild_tx, &cfg.root).await {
             eprintln!("Watcher error: {e}");
         }
     });
@@ -42,11 +42,9 @@ async fn ws_handler(
     raw_stream: TcpStream,
     addr: SocketAddr,
 ) {
-    println!("New websocket connection @ {addr}");
     let mut stream = tokio_tungstenite::accept_async(raw_stream)
         .await
         .expect("Error during the websocket handshake occurred");
-    println!("Websocket connected @ {addr}");
 
     loop {
         tokio::select! {
@@ -67,8 +65,6 @@ async fn ws_handler(
             }
         }
     }
-
-    println!("Websocket disconnected @ {addr}");
 }
 
 /// Watch `content/` and trigger rebuilds
@@ -94,10 +90,6 @@ async fn watch(ws_tx: broadcast::Sender<()>, content_dir: &Path) -> Result<()> {
     println!("Watching {} for changes...", content_dir.display());
 
     while rx.recv().await.is_some() {
-        // lil debounce
-        sleep(Duration::from_millis(DEBOUNCE_MS)).await;
-        while rx.try_recv().is_ok() {}
-
         println!("Change detected, rebuilding...");
 
         if let Err(e) = build().await {
@@ -106,6 +98,7 @@ async fn watch(ws_tx: broadcast::Sender<()>, content_dir: &Path) -> Result<()> {
             println!("Notified {n} websockets");
         }
 
+        sleep(Duration::from_millis(DEBOUNCE_MS)).await;
         while rx.try_recv().is_ok() {}
     }
 

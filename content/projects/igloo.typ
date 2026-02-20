@@ -9,7 +9,7 @@
     ("GitHub", "https://github.com/liamsnow/igloo"),
   ),
   homepage: true,
-  query: ("/blog/igloo/",),
+  queries: ("/blog/igloo/",),
 )) <page>
 
 #import "/_shared/template.typ": post, query

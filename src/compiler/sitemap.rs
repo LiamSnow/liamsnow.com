@@ -1,13 +1,12 @@
+use crate::{RoutingTable, compiler::route::Route};
 use mime_guess::mime;
-use rustc_hash::FxHashMap;
 use std::fmt::Write;
-
-use crate::compiler::Route;
 
 const SITEMAP_PATH: &str = "sitemap.xml";
 const BASE_URL: &str = "https://liamsnow.com";
 
-pub fn generate(routes: &mut FxHashMap<String, Route>) {
+// TODO this can be run after indexing (might be more useful?)
+pub fn generate(routes: &RoutingTable) -> (String, Route) {
     let mut xml = String::with_capacity(2048);
     xml.push_str(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
     xml.push('\n');
@@ -32,8 +31,8 @@ pub fn generate(routes: &mut FxHashMap<String, Route>) {
 
     xml.push_str("</urlset>");
 
-    routes.insert(
-        SITEMAP_PATH.to_string(),
-        Route::from_string(xml, mime::TEXT_XML, None),
-    );
+    let route = Route::from_string(xml, mime::TEXT_XML, None);
+    (SITEMAP_PATH.to_string(), route)
 }
+
+// TODO testing!!
