@@ -11,7 +11,7 @@ use hyper_util::rt::TokioIo;
 use std::convert::Infallible;
 use tokio::net::TcpListener;
 
-const UPDATE_PATH: &str = "_update";
+const UPDATE_PATH: &str = "/_update";
 
 pub async fn run() -> Result<()> {
     let config = CONFIG.get().unwrap();
