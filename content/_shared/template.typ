@@ -21,10 +21,20 @@
       #html.nav(class: "nav")[
         #html.button(class: "light-dark", aria-label: "Toggle dark mode")[
           #html.span(class: "moon", style: "display: none")[
-            #html.img(src: "/icons/moon.svg", alt: "Enable dark mode icon")
+            #html.img(
+              src: "/icons/moon.svg",
+              alt: "Enable dark mode icon",
+              width: 26,
+              height: 26
+            )
           ]
           #html.span(class: "sun", style: "display: none")[
-            #html.img(src: "/icons/sun.svg", alt: "Enable light mode icon")
+            #html.img(
+              src: "/icons/sun.svg",
+              alt: "Enable light mode icon",
+              width: 26,
+              height: 26
+            )
           ]
         ]
         #link("BLOG", "/blog")
@@ -38,25 +48,45 @@
   html.div(class: "social")[
     #html.div[
       #html.a(target: "_blank", href: "mailto:mail@liamsnow.com")[
-        #html.img(src: "/icons/email.svg", alt: "Email Icon")
+        #html.img(
+          src: "/icons/email.svg",
+          alt: "Email Icon",
+          width: 20,
+          height: 20
+        )
         Email
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://www.linkedin.com/in/william-snow-iv-140438169/")[
-        #html.img(src: "/icons/linkedin.svg", alt: "LinkedIn Icon")
+        #html.img(
+          src: "/icons/linkedin.svg",
+          alt: "LinkedIn Icon",
+          width: 20,
+          height: 20
+        )
         LinkedIn
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://github.com/liamsnow")[
-        #html.img(src: "/icons/github.svg", alt: "GitHub Icon")
+        #html.img(
+          src: "/icons/github.svg",
+          alt: "GitHub Icon",
+          width: 20,
+          height: 20
+        )
         GitHub
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://github.com/LiamSnow/resume/blob/main/resume.pdf")[
-        #html.img(src: "/icons/resume.svg", alt: "Resume Icon")
+        #html.img(
+          src: "/icons/resume.svg",
+          alt: "Resume Icon",
+          width: 20,
+          height: 20
+        )
         Resume
       ]
     ]
@@ -74,7 +104,7 @@
         #linebreak()
         #html.div[
           #html.a(target: "_blank", href: "https://github.com/liamsnow/liamsnow.com")[
-            #html.img(src: "/icons/code.svg", alt: "Source Code Icon")
+            #html.img(src: "/icons/code.svg", alt: "Source Code Icon", width: 20, height: 20)
             Source Code
           ]
         ]
@@ -157,11 +187,11 @@
 
 #let lang-icon(lang) = {
   if lang == "Rust" {
-    html.img(src: "/icons/cuddlyferris.svg", alt: "Rust Icon")
+    html.img(src: "/icons/cuddlyferris.svg", alt: "Rust Icon", width: 22, height: 16)
   } else if lang == "SystemVerilog" {
-    html.img(src: "/icons/xor.svg", alt: "SystemVerilog Icon") 
+    html.img(src: "/icons/xor.svg", alt: "SystemVerilog Icon", width: 22, height: 15) 
   } else {
-    html.img(src: "/icons/code.svg", alt: "Other Programming Language Icon")
+    html.img(src: "/icons/code.svg", alt: "Other Programming Language Icon", width: 22, height: 22)
   }
 }
 
@@ -183,7 +213,7 @@
         #html.ul(id: "post-stats")[
           #if "written" in page {
             html.li[
-              #html.img(src: "/icons/written.svg", alt: "Written Icon")
+              #html.img(src: "/icons/written.svg", alt: "Written Icon", width: 22, height: 22)
               #html.p[Written:]
               #html.p(class: "date")[
                 #page.at("written")
@@ -193,7 +223,7 @@
         
           #if "updated" in page {
             html.li[
-              #html.img(src: "/icons/updated.svg", alt: "Updated Icon")
+              #html.img(src: "/icons/updated.svg", alt: "Updated Icon", width: 22, height: 22)
               #html.p[Updated:]
               #html.p(class: "date")[
                 #page.at("updated")
@@ -203,7 +233,7 @@
 
           #if "started" in page {
             html.li[
-              #html.img(src: "/icons/rocket_launch.svg", alt: "Started Icon")
+              #html.img(src: "/icons/rocket_launch.svg", alt: "Started Icon", width: 22, height: 22)
               #html.p[Started:]
               #html.p(class: "date")[
                 #page.at("started")
@@ -215,10 +245,10 @@
             html.li[
               #let ended = page.at("ended")
               #if ended == "Now" {
-                html.img(src: "/icons/infinite.svg", alt: "Ongoing Project Icon")
+                html.img(src: "/icons/infinite.svg", alt: "Ongoing Project Icon", width: 22)
                 html.p[Ongoing]
               } else {
-                html.img(src: "/icons/done_all.svg", alt: "Project End Date Icon")
+                html.img(src: "/icons/done_all.svg", alt: "Project End Date Icon", height: 22)
                 html.p[Ended:]
                 html.p(class: "date")[
                   #ended

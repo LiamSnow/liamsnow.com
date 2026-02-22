@@ -33,10 +33,10 @@
         #html.div[
           #let ended = post.at("ended", default: "")
           #if ended == "Now" {
-            html.img(src: "/icons/infinite.svg", alt: "Ongoing project icon")
+            html.img(src: "/icons/infinite.svg", alt: "Ongoing project icon", width: 22, height: 22)
             html.p[Ongoing]
           } else {
-            html.img(src: "/icons/done_all.svg", alt: "Project end date icon")
+            html.img(src: "/icons/done_all.svg", alt: "Project end date icon", width: 22, height: 22)
             html.p[Ended:]
             html.p(class: "date")[
               #ended

@@ -21,7 +21,7 @@
     #block[
       Hi, I'm William (Liam) Snow IV
       - CS MS & ECE BS @ Worcester Polytechnic Institute
-      - Rust #html.img(src: "icons/cuddlyferris.svg", width: 23, alt: "Rust icon"), systems, backend, & more
+      - Rust #html.img(src: "icons/cuddlyferris.svg", width: 23, height: 17, alt: "Rust icon"), systems, backend, & more
     ]
 
     *#underline[Nothing] on this website is written by AI* 
@@ -53,9 +53,9 @@
           #if "ended" in item {
             let ended = item.at("ended")
             if ended == "Now" {
-              html.div[#html.img(src: "icons/infinite.svg", alt: "Ongoing project icon")]
+              html.div[#html.img(src: "icons/infinite.svg", alt: "Ongoing project icon", width: 22, height: 22)]
             } else {
-              html.div[#html.img(src: "icons/done_all.svg", alt: "Completed project icon")]
+              html.div[#html.img(src: "icons/done_all.svg", alt: "Completed project icon", width: 22, height: 22)]
             }
           }
           
