@@ -8,7 +8,7 @@ document.onscroll = () => {
   }
 };
 
-// convert all fixed time (.date) to relative time
+// convert all fixed time (.date) -> relative time
 // TODO eventually should bake into SSG
 const HOUR = 60 * 60;
 const DAY = HOUR * 24;
