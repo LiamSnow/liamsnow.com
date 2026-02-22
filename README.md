@@ -8,13 +8,14 @@ hosted on [Helios](https://github.com/oxidecomputer/helios)
  - All content and layout written in Typst
    - NextJS-esq routing
    - Can query metadata from other pages (see [blog.typ](content/blog.typ))
- - Watcher mode for development
- - Parallel compilation (~250ms startup time)
- - Pre-compressed responses
- - SCSS & SASS support
- - Self-updating via GitHub webhooks
+   - Uses Typst as a library with a custom world for blazingly fast build times
+ - Rayon parallel compilation (~10ms dev build time, ~130ms normally)
+ - Zero-copy responses via pre-compiled and compressed responses 
+ - Hand rolled HTTP/1.1 server
+ - Hot reloading / watcher mode for development
+ - SCSS support
+ - Continuous deployment (GitHub webhooks trigger self-update)
  - Sitemap generation
- - Directly uses [hyper](https://hyper.rs/) :)
 
 [See More](https://liamsnow.com/projects/liamsnow_com)
 
