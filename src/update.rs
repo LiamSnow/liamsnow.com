@@ -59,25 +59,19 @@ pub fn run() -> Result<()> {
     println!("Starting self-update...");
 
     println!("  Pulling changes...");
-    let output = Command::new(GIT.get().unwrap()).arg("pull").output()?;
+    let status = Command::new(GIT.get().unwrap()).arg("pull").status()?;
 
-    if !output.status.success() {
-        bail!(
-            "git pull failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
+    if !status.success() {
+        bail!("git pull failed with {status}");
     }
 
     println!("  Building...");
-    let output = Command::new(CARGO.get().unwrap())
+    let status = Command::new(CARGO.get().unwrap())
         .args(["build", "--release"])
-        .output()?;
+        .status()?;
 
-    if !output.status.success() {
-        bail!(
-            "cargo build failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
+    if !status.success() {
+        bail!("cargo build failed with {status}");
     }
 
     println!("Update complete. Exiting for restart...");
