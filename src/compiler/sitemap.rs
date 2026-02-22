@@ -38,5 +38,3 @@ pub fn generate(routes: &RoutingTable, watch: &WatchArgs) -> Result<(String, Rou
     let route = Route::compile(&id, xml.into(), &mime::TEXT_XML, watch.watch)?;
     Ok((SITEMAP_PATH.to_string(), route))
 }
-
-// TODO testing!!
