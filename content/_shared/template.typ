@@ -135,10 +135,11 @@
         html.script(type: "application/ld+json")[#jsonld]
       }
 
-      #html.script(type: "text/javascript", src: "/scripts/preload.js")
-      #html.script(type: "text/javascript", src: "/scripts/light_dark.js")
-      #html.script(type: "text/javascript", src: "/scripts/header.js")
-      #html.script(type: "text/javascript", src: "/scripts/date.js")
+      #html.elem("script", attrs: (
+        type: "text/javascript",
+        src: "/main.js",
+        defer: "true"
+      ))
     ]
     #html.body[
       #header()
