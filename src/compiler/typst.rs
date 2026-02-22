@@ -9,8 +9,8 @@ use codespan_reporting::diagnostic::{Diagnostic, Label};
 use codespan_reporting::term;
 use codespan_reporting::term::termcolor::{ColorChoice, StandardStream};
 use rustc_hash::FxHashMap;
-use std::path::PathBuf;
-use std::sync::{Arc, LazyLock};
+use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use typst::comemo::Track;
 use typst::diag::{
     FileError, FileResult, HintedStrResult, Severity, SourceDiagnostic, Warned, bail,
@@ -25,49 +25,44 @@ use typst::{Feature, Library, LibraryExt, World, WorldExt};
 use typst_eval::eval_string;
 use typst_html::HtmlDocument;
 
-use crate::CONFIG;
-use crate::indexer::FileSlot;
+use crate::WatchArgs;
+use crate::indexer::{FileSlot, SlotType, Slots};
 
 static BOOK: LazyLock<LazyHash<FontBook>> = LazyLock::new(|| LazyHash::new(FontBook::default()));
 static WORKDIR: LazyLock<PathBuf> = LazyLock::new(|| std::env::current_dir().unwrap());
-static STDLIB: LazyLock<LazyHash<Library>> = LazyLock::new(|| {
-    LazyHash::new(
-        Library::builder()
-            .with_features([Feature::Html].into_iter().collect())
-            .build(),
-    )
-});
 
-pub struct LiamsWorld {
+pub struct LiamsWorld<'a> {
     /// The root relative to which absolute paths are resolved.
     // root: PathBuf,
     /// The input path.
     main: FileId,
     /// Typst's standard library.
-    library: Option<LazyHash<Library>>,
+    library: LazyHash<Library>,
     /// Maps file ids to source files and buffers.
-    slots: Arc<FxHashMap<FileId, FileSlot>>,
+    slots: &'a FxHashMap<FileId, FileSlot>,
+    root: &'a Path,
+    watch: &'a WatchArgs,
 }
 
-pub fn library(inputs: Dict) -> LazyHash<Library> {
-    LazyHash::new(
-        Library::builder()
-            .with_features([Feature::Html].into_iter().collect())
-            .with_inputs(inputs)
-            .build(),
-    )
-}
-
-impl LiamsWorld {
+impl<'a> LiamsWorld<'a> {
     pub fn new(
         main: FileId,
-        slots: Arc<FxHashMap<FileId, FileSlot>>,
-        library: Option<LazyHash<Library>>,
+        slots: &'a Slots,
+        inputs: Dict,
+        root: &'a Path,
+        watch: &'a WatchArgs,
     ) -> Self {
         Self {
             main,
-            library,
+            library: LazyHash::new(
+                Library::builder()
+                    .with_features([Feature::Html].into_iter().collect())
+                    .with_inputs(inputs)
+                    .build(),
+            ),
             slots,
+            root,
+            watch,
         }
     }
 
@@ -97,24 +92,30 @@ impl LiamsWorld {
             }
         };
 
-        let cfg = CONFIG.get().unwrap();
-
-        if cfg.watch {
-            html = html.replacen("</head>", &format!(r#"
+        if self.watch.watch {
+            html = html.replacen(
+                "</head>",
+                &format!(
+                    r#"
             <script>
-                (function() {{                                                                              
-                    const ws = new WebSocket(`ws://{}:{}`);                              
-                    ws.onmessage = () => location.reload();                                                  
-                    ws.onclose = () => setTimeout(() => location.reload(), 1000);                            
+                (function() {{
+                    const ws = new WebSocket(`ws://{}:{}`);
+                    ws.onmessage = () => location.reload();
+                    ws.onclose = () => setTimeout(() => location.reload(), 1000);
                 }})();
             </script>
             </head>
-            "#, cfg.watch_address, cfg.watch_port), 1);
+            "#,
+                    self.watch.watch_address, self.watch.watch_port
+                ),
+                1,
+            );
         }
 
         Ok(html)
     }
 
+    #[allow(unused)]
     /// Query the document
     /// Must be called after `.compile`
     /// This is effectively equivalent to:
@@ -162,9 +163,9 @@ impl LiamsWorld {
     }
 }
 
-impl World for LiamsWorld {
+impl<'a> World for LiamsWorld<'a> {
     fn library(&self) -> &LazyHash<Library> {
-        self.library.as_ref().unwrap_or(&STDLIB)
+        &self.library
     }
 
     fn book(&self) -> &LazyHash<FontBook> {
@@ -177,8 +178,11 @@ impl World for LiamsWorld {
 
     fn source(&self, id: FileId) -> FileResult<Source> {
         let slot = self.slots.get(&id).ok_or(FileError::AccessDenied)?;
-        let source = slot.source.as_ref().ok_or(FileError::NotSource)?;
-        Ok(source.clone())
+
+        match &slot.ty {
+            SlotType::Typst(tslot) => Ok(tslot.source.clone()),
+            _ => Err(FileError::NotSource),
+        }
     }
 
     fn file(&self, id: FileId) -> FileResult<Bytes> {
@@ -195,7 +199,7 @@ impl World for LiamsWorld {
     }
 }
 
-impl LiamsWorld {
+impl<'a> LiamsWorld<'a> {
     pub fn print_diagnostics(
         &self,
         errors: &[SourceDiagnostic],
@@ -250,18 +254,17 @@ impl LiamsWorld {
     pub fn lookup(&self, id: FileId) -> CodespanResult<Lines<String>> {
         let slot = self.slots.get(&id).ok_or(CodespanError::FileMissing)?;
 
-        if let Some(source) = &slot.source {
-            Ok(source.lines().clone())
-        } else {
-            Ok(Lines::new(String::from_utf8_lossy(&slot.file).to_string()))
-        }
+        Ok(match &slot.ty {
+            SlotType::Typst(tslot) => tslot.source.lines().clone(),
+            _ => Lines::new(String::from_utf8_lossy(&slot.file).to_string()),
+        })
     }
 }
 
 type CodespanResult<T> = Result<T, CodespanError>;
 type CodespanError = codespan_reporting::files::Error;
 
-impl<'a> codespan_reporting::files::Files<'a> for LiamsWorld {
+impl<'a, 'b> codespan_reporting::files::Files<'a> for LiamsWorld<'b> {
     type FileId = FileId;
     type Name = String;
     type Source = Lines<String>;
@@ -273,7 +276,7 @@ impl<'a> codespan_reporting::files::Files<'a> for LiamsWorld {
         } else {
             // Try to express the path relative to the working directory.
             vpath
-                .resolve(&CONFIG.get().unwrap().root)
+                .resolve(self.root)
                 .and_then(|abs| pathdiff::diff_paths(abs, &*WORKDIR))
                 .as_deref()
                 .unwrap_or_else(|| vpath.as_rootless_path())

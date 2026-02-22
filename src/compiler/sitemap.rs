@@ -1,12 +1,14 @@
-use crate::{RoutingTable, compiler::route::Route};
+use crate::{RoutingTable, WatchArgs, web::route::Route};
+use anyhow::Result;
 use mime_guess::mime;
 use std::fmt::Write;
+use typst::syntax::{FileId, VirtualPath};
 
 const SITEMAP_PATH: &str = "sitemap.xml";
 const BASE_URL: &str = "https://liamsnow.com";
 
 // TODO this can be run after indexing (might be more useful?)
-pub fn generate(routes: &RoutingTable) -> (String, Route) {
+pub fn generate(routes: &RoutingTable, watch: &WatchArgs) -> Result<(String, Route)> {
     let mut xml = String::with_capacity(2048);
     xml.push_str(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
     xml.push('\n');
@@ -31,8 +33,10 @@ pub fn generate(routes: &RoutingTable) -> (String, Route) {
 
     xml.push_str("</urlset>");
 
-    let route = Route::from_string(xml, mime::TEXT_XML, None);
-    (SITEMAP_PATH.to_string(), route)
+    let vp = VirtualPath::new("sitemap.xml");
+    let id = FileId::new_fake(vp);
+    let route = Route::compile(&id, xml.into(), &mime::TEXT_XML, watch.watch)?;
+    Ok((SITEMAP_PATH.to_string(), route))
 }
 
 // TODO testing!!

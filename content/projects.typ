@@ -1,14 +1,15 @@
 #metadata((
   title: "Liam's Projects",
   desc: "Liam Snow's Projects. Programming, systems, backend, Rust and more.",
-  queries: ("/projects/",),
 )) <page>
 
-#import "_shared/template.typ": template, link, link-new-tab, query, lang-display
+#metadata((projects: "/projects/")) <query>
+
+#import "_shared/template.typ": template, link, link-new-tab, lang-display
 #show: template.with(styles: ("collection",))
 
 #let posts = {
-  query.at(0, default: ())
+  sys.inputs.at("projects", default: ())
     .sorted(key: p => p.at("ended", default: "")).rev()
 }
 
@@ -23,7 +24,7 @@
       ]
       #html.div(class: "stats")[
         #html.div[
-          #image("icons/rocket_launch.svg", alt: "Project start date icon")
+          #html.img(src: "/icons/rocket_launch.svg", alt: "Project start date icon")
           #html.p[Started:]
           #html.p(class: "date")[
             #post.at("started", default: "")
@@ -32,10 +33,10 @@
         #html.div[
           #let ended = post.at("ended", default: "")
           #if ended == "Now" {
-            image("icons/infinite.svg", alt: "Ongoing project icon")
+            html.img(src: "/icons/infinite.svg", alt: "Ongoing project icon")
             html.p[Ongoing]
           } else {
-            image("icons/done_all.svg", alt: "Project end date icon")
+            html.img(src: "/icons/done_all.svg", alt: "Project end date icon")
             html.p[Ended:]
             html.p(class: "date")[
               #ended

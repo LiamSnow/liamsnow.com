@@ -9,10 +9,11 @@
     ("GitHub", "https://github.com/liamsnow/igloo"),
   ),
   homepage: true,
-  queries: ("/blog/igloo/",),
 )) <page>
 
-#import "/_shared/template.typ": post, query
+#metadata((blogs: "/blog/igloo/")) <query>
+
+#import "../_shared/template.typ": post 
 #show: post
 
 = Background
@@ -41,7 +42,7 @@ I am building Igloo.
 = Updates/Blog
 
 #let posts = {
-  query.at(0, default: ())
+  sys.inputs.at("blogs", default: ())
     .sorted(key: p => p.at("updated", default: "")).rev()
 }
 

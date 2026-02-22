@@ -1,75 +1,99 @@
-use crate::RoutingTable;
-use crate::compiler::route::Route;
-use crate::indexer::Slots;
-use crate::typst::LiamsWorld;
-use anyhow::{Result, bail};
-use mime_guess::mime;
-use rustc_hash::FxBuildHasher;
-use std::collections::HashMap;
-use std::sync::Arc;
-use tokio::task::JoinSet;
-use typst::syntax::FileId;
+use crate::compiler::scss::GrassSlotsFs;
+use crate::compiler::typst::LiamsWorld;
+use crate::indexer::{MetaMap, SlotType, Slots, TypstSlot};
+use crate::web::route::Route;
+use crate::{RoutingTable, WatchArgs};
+use ::typst::foundations::{Dict, Value};
+use ::typst::syntax::FileId;
+use anyhow::{Context, Result, anyhow, bail};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use std::ops::Bound;
+use std::path::Path;
 
-pub mod route;
 mod scss;
 mod sitemap;
-mod r#static;
+mod typst;
 
-pub async fn run(slots: Slots) -> Result<RoutingTable> {
-    let mut tasks = JoinSet::new();
-    let slots = Arc::new(slots);
+pub fn run(slots: Slots, metamap: MetaMap, root: &Path, watch: &WatchArgs) -> Result<RoutingTable> {
+    let mut routing_table = slots
+        .par_iter()
+        .filter(|(_, slot)| !slot.hidden)
+        .map(|(id, slot)| {
+            let content = match &slot.ty {
+                SlotType::Typst(tslot) => compile_typst(id, tslot, &slots, &metamap, root, watch),
+                SlotType::Scss => compile_scss(id, &slots),
+                SlotType::Other => Ok(slot.file.to_vec()),
+            }
+            .with_context(|| format!("{id:?}"))?;
 
-    for id in slots.keys().cloned() {
-        if slots[&id].is_hidden {
-            continue;
-        }
+            let route = Route::compile(id, content, &slot.mime, watch.watch)?;
+            Ok((slot.url.clone(), route))
+        })
+        .collect::<Result<RoutingTable>>()?;
 
-        let slots = slots.clone();
-        tasks.spawn(async move { compile_one(id, slots) });
-    }
-
-    let mut routing_table = HashMap::with_capacity_and_hasher(tasks.len(), FxBuildHasher);
-
-    while let Some(result) = tasks.join_next().await {
-        let (url, route) = result??;
-        routing_table.insert(url, route);
-    }
-
-    let (url, route) = sitemap::generate(&routing_table);
+    let (url, route) = sitemap::generate(&routing_table, watch)?;
     routing_table.insert(url, route);
 
     Ok(routing_table)
 }
 
-fn compile_one(id: FileId, slots: Arc<Slots>) -> Result<(String, Route)> {
-    let slot = &slots[&id];
-    let url = slot.url.clone();
-
-    let should_compress = matches!(
-        slot.ext.as_ref(),
-        "typ" | "scss" | "js" | "txt" | "md" | "csv"
-    );
-
-    let result = match slot.ext.as_ref() {
-        "typ" => compile_one_typst(id, slots),
-        "scss" => scss::compile(slot, &slots),
-        _ => r#static::compile(slot),
-    };
-
-    match result {
-        Ok(route) => Ok((url, route)),
-        Err(e) => {
-            bail!("{id:?}: {e}");
-        }
-    }
+fn compile_scss(id: &FileId, slots: &Slots) -> Result<Vec<u8>> {
+    let fs = GrassSlotsFs(slots);
+    let opts = grass::Options::default()
+        .style(grass::OutputStyle::Compressed)
+        .input_syntax(grass::InputSyntax::Scss)
+        .fs(&fs);
+    let path = id.vpath().as_rooted_path();
+    let content = grass::from_path(path, &opts).map_err(|e| anyhow!("{e}"))?;
+    Ok(content.into())
 }
 
-fn compile_one_typst(id: FileId, slots: Arc<Slots>) -> Result<Route> {
-    let slot = &slots[&id];
-    let inputs = slot.inputs.as_ref().unwrap().clone();
-    let lib = Some(crate::typst::library(inputs));
-    let mut world = LiamsWorld::new(id, slots, lib);
+fn compile_typst(
+    id: &FileId,
+    tslot: &TypstSlot,
+    slots: &Slots,
+    metamap: &MetaMap,
+    root: &Path,
+    watch: &WatchArgs,
+) -> Result<Vec<u8>> {
+    let mut inputs = Dict::new();
+
+    if let Some(page_meta) = &tslot.page_meta {
+        inputs.insert("page".into(), Value::Dict(page_meta.clone()));
+    }
+
+    if let Some(queries) = &tslot.queries {
+        for (name, query) in queries {
+            inputs.insert(name.clone(), eval_query(query, metamap)?);
+        }
+    }
+
+    let mut world = LiamsWorld::new(*id, slots, inputs, root, watch);
     let doc = world.compile()?;
     let html = world.html(&doc)?;
-    Ok(Route::from_string(html, mime::TEXT_HTML_UTF_8, None))
+    Ok(html.into())
+}
+
+/// Evaluate a query `/projects/` into an array of the metadata
+/// of each page where its url is prefixed `/projects/`
+fn eval_query(query: &Value, metamap: &MetaMap) -> Result<Value> {
+    let Value::Str(query) = query else {
+        bail!("`{query:?}` is not a valid query. Must be a string.");
+    };
+
+    let mut end = query.clone().to_string();
+    if let Some(last) = end.as_bytes().last().copied() {
+        end.pop();
+        end.push((last + 1) as char);
+    }
+
+    Ok(Value::Array(
+        metamap
+            .range::<str, _>((
+                Bound::Included(query.as_str()),
+                Bound::Excluded(end.as_str()),
+            ))
+            .map(|(_, meta)| Value::Dict(meta.clone()))
+            .collect(),
+    ))
 }

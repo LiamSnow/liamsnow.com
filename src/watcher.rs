@@ -1,106 +1,94 @@
-use crate::{CONFIG, build};
+use crate::{WatchArgs, build};
 use anyhow::Result;
-use bytes::Bytes;
-use futures::{SinkExt, StreamExt};
 use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher, event::ModifyKind};
-use std::{net::SocketAddr, path::Path, time::Duration};
-use tokio::{
-    net::{TcpListener, TcpStream},
-    sync::{broadcast, mpsc},
-    time::sleep,
-};
-use tokio_tungstenite::tungstenite::Message;
+use std::net::{SocketAddr, TcpListener, TcpStream};
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex, mpsc};
+use std::time::Duration;
+use std::{mem, thread};
+use tungstenite::{Message, WebSocket, accept};
+
+type ClientList = Arc<Mutex<Vec<WebSocket<TcpStream>>>>;
 
 const DEBOUNCE_MS: u64 = 1000;
 
-pub async fn spawn() -> Result<()> {
-    let cfg = CONFIG.get().unwrap();
-    let addr = format!("{}:{}", cfg.watch_address, cfg.watch_port);
-    let listener = TcpListener::bind(&addr).await?;
+pub fn run(root: PathBuf, args: WatchArgs) -> Result<()> {
+    let addr = SocketAddr::new(args.watch_address, args.watch_port);
+    let listener = TcpListener::bind(addr)?;
+    let pending: ClientList = Arc::new(Mutex::new(Vec::new()));
+    let (tx, rx) = mpsc::channel();
 
-    let (on_rebuild_tx, on_rebuild_rx) = broadcast::channel(1);
+    println!("Watching {} for changes...", root.display());
 
-    // accept ws connections
-    tokio::spawn(async move {
-        while let Ok((stream, addr)) = listener.accept().await {
-            tokio::spawn(ws_handler(on_rebuild_rx.resubscribe(), stream, addr));
-        }
-    });
-
-    // watch fs and rebuild
-    tokio::spawn(async move {
-        if let Err(e) = watch(on_rebuild_tx, &cfg.root).await {
-            eprintln!("Watcher error: {e}");
-        }
-    });
+    spawn_accept_loop(listener, Arc::clone(&pending));
+    create_watcher(&root, tx)?;
+    spawn_rebuild_loop(rx, pending, root, args);
 
     Ok(())
 }
 
-async fn ws_handler(
-    mut on_rebuild: broadcast::Receiver<()>,
-    raw_stream: TcpStream,
-    addr: SocketAddr,
-) {
-    let mut stream = tokio_tungstenite::accept_async(raw_stream)
-        .await
-        .expect("Error during the websocket handshake occurred");
-
-    loop {
-        tokio::select! {
-            _ = on_rebuild.recv() => {
-                if let Err(e) = stream.send(Message::Binary(Bytes::new())).await {
-                    eprintln!("Error sending to websocket @ {addr}: {e}");
-                    break;
+/// Accepts new websocket connections
+fn spawn_accept_loop(listener: TcpListener, pending: ClientList) {
+    thread::spawn(move || {
+        while let Ok((stream, addr)) = listener.accept() {
+            match accept(stream) {
+                Ok(ws) => {
+                    println!("WebSocket connected: {addr}");
+                    pending.lock().unwrap().push(ws);
                 }
-            }
-            res = stream.next() => {
-                match res {
-                    None => break,
-                    Some(Result::Err(e)) => {
-                        eprintln!("Error from websocket @ {addr}: {e}");
-                    }
-                    _ => {}
-                }
+                Err(e) => eprintln!("Handshake failed for {addr}: {e}"),
             }
         }
-    }
+    });
 }
 
-/// Watch `content/` and trigger rebuilds
-async fn watch(ws_tx: broadcast::Sender<()>, content_dir: &Path) -> Result<()> {
-    let (tx, mut rx) = mpsc::channel::<()>(1);
-
+/// Recursively watches fs `root` directory
+fn create_watcher(root: &Path, tx: mpsc::Sender<()>) -> Result<()> {
     let mut watcher = RecommendedWatcher::new(
-        move |res: Result<notify::Event, notify::Error>| {
+        move |res: std::result::Result<notify::Event, notify::Error>| {
             if let Ok(notify::Event {
                 kind:
                     EventKind::Create(_) | EventKind::Remove(_) | EventKind::Modify(ModifyKind::Data(_)),
                 ..
             }) = res
             {
-                let _ = tx.blocking_send(());
+                _ = tx.send(());
             }
         },
         notify::Config::default(),
     )?;
-
-    watcher.watch(content_dir, RecursiveMode::Recursive)?;
-
-    println!("Watching {} for changes...", content_dir.display());
-
-    while rx.recv().await.is_some() {
-        println!("Change detected, rebuilding...");
-
-        if let Err(e) = build().await {
-            eprintln!("Rebuild failed: {e}");
-        } else if let Ok(n) = ws_tx.send(()) {
-            println!("Notified {n} websockets");
-        }
-
-        sleep(Duration::from_millis(DEBOUNCE_MS)).await;
-        while rx.try_recv().is_ok() {}
-    }
-
+    watcher.watch(root, RecursiveMode::Recursive)?;
+    mem::forget(watcher);
     Ok(())
+}
+
+/// Rebuilds on fs change & notifies websockets
+fn spawn_rebuild_loop(
+    rx: mpsc::Receiver<()>,
+    pending: ClientList,
+    root: PathBuf,
+    watch_args: WatchArgs,
+) {
+    thread::spawn(move || {
+        let mut clients: Vec<WebSocket<TcpStream>> = Vec::new();
+        while rx.recv().is_ok() {
+            while rx.try_recv().is_ok() {}
+
+            println!("Change detected, rebuilding...");
+
+            clients.append(&mut pending.lock().unwrap());
+
+            match build(&root, &watch_args) {
+                Err(e) => eprintln!("Rebuild failed: {e}"),
+                Ok(()) => {
+                    clients.retain_mut(|ws| ws.send(Message::Binary(vec![].into())).is_ok());
+                    println!("Notified {} client(s)", clients.len());
+                }
+            }
+
+            thread::sleep(Duration::from_millis(DEBOUNCE_MS));
+            while rx.try_recv().is_ok() {}
+        }
+        println!("Watcher rebuild loop stopped.");
+    });
 }

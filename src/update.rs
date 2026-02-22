@@ -1,82 +1,45 @@
-use crate::CONFIG;
-use anyhow::{Result, anyhow, bail};
-use bytes::Bytes;
+use crate::UpdateArgs;
+use anyhow::{Context, Result, bail};
 use hmac::{Hmac, Mac};
-use http::{Response, StatusCode};
-use http_body_util::{BodyExt, Full};
-use hyper::body::Incoming;
 use sha2::Sha256;
+use std::path::PathBuf;
+use std::process::Command;
 use std::{fs, sync::OnceLock};
-use tokio::process::Command;
+
+pub const GH_HEADER: &str = "X-Hub-Signature-256";
+pub static SECRET: OnceLock<String> = OnceLock::new();
+pub static CARGO: OnceLock<PathBuf> = OnceLock::new();
+pub static GIT: OnceLock<PathBuf> = OnceLock::new();
 
 type HmacSha256 = Hmac<Sha256>;
 
-static WEBHOOK_SECRET: OnceLock<String> = OnceLock::new();
+pub fn set_cfg(cfg: UpdateArgs) -> Result<()> {
+    let Some(sec_path) = cfg.github_secret else {
+        println!("GitHub webhook disabled. Path was not supplied");
+        return Ok(());
+    };
 
-pub fn set_secret(path: &str) -> Result<()> {
-    let secret = fs::read_to_string(path).map(|s| s.trim().to_string())?;
-    WEBHOOK_SECRET
-        .set(secret)
-        .map_err(|_| anyhow!("Secret already initialized"))?;
+    let secret = fs::read_to_string(sec_path)
+        .map(|s| s.trim().to_string())
+        .context("Reading GitHub webhook secret file")?;
+
+    SECRET.set(secret).unwrap();
+    CARGO.set(cfg.cargo).unwrap();
+    GIT.set(cfg.git).unwrap();
+
+    println!("GitHub webhook update enabled");
+
     Ok(())
 }
 
-pub async fn handle(req: http::Request<Incoming>) -> Response<Full<Bytes>> {
-    if WEBHOOK_SECRET.get().is_none() {
-        return Response::builder()
-            .status(StatusCode::NOT_FOUND)
-            .body(Full::new(Bytes::new()))
-            .unwrap();
-    }
+pub fn verify(sig: &[u8], body: Vec<u8>) -> bool {
+    let sig = String::from_utf8_lossy(sig);
 
-    let signature = req
-        .headers()
-        .get("X-Hub-Signature-256")
-        .and_then(|v| v.to_str().ok())
-        .map(|s| s.to_string());
-
-    let Some(signature) = signature else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(Full::new(Bytes::from("Missing signature header")))
-            .unwrap();
-    };
-
-    let body = match req.into_body().collect().await {
-        Ok(collected) => collected.to_bytes(),
-        Err(_) => {
-            return Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(Full::new(Bytes::from("Failed to read body")))
-                .unwrap();
-        }
-    };
-
-    if !verify_signature(&signature, &body) {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(Full::new(Bytes::from("Invalid signature")))
-            .unwrap();
-    }
-
-    tokio::spawn(async {
-        if let Err(e) = execute().await {
-            eprintln!("Update failed: {e}");
-        }
-    });
-
-    Response::builder()
-        .status(StatusCode::OK)
-        .body(Full::new(Bytes::from("Update initiated")))
-        .unwrap()
-}
-
-fn verify_signature(sig_header: &str, body: &[u8]) -> bool {
-    let Some(secret) = WEBHOOK_SECRET.get() else {
+    let Some(secret) = SECRET.get() else {
         return false;
     };
 
-    let Some(hex_sig) = sig_header.strip_prefix("sha256=") else {
+    let Some(hex_sig) = sig.strip_prefix("sha256=") else {
         return false;
     };
 
@@ -88,16 +51,15 @@ fn verify_signature(sig_header: &str, body: &[u8]) -> bool {
         return false;
     };
 
-    mac.update(body);
+    mac.update(&body);
     mac.verify_slice(&expected_sig).is_ok()
 }
 
-async fn execute() -> Result<()> {
-    let cfg = CONFIG.get().unwrap();
+pub fn run() -> Result<()> {
     println!("Starting self-update...");
 
-    println!("  Running git pull...");
-    let output = Command::new(&cfg.git).arg("pull").output().await?;
+    println!("  Pulling changes...");
+    let output = Command::new(GIT.get().unwrap()).arg("pull").output()?;
 
     if !output.status.success() {
         bail!(
@@ -105,13 +67,11 @@ async fn execute() -> Result<()> {
             String::from_utf8_lossy(&output.stderr)
         );
     }
-    println!("  git pull succeeded");
 
-    println!("  Running cargo build --release...");
-    let output = Command::new(&cfg.cargo)
+    println!("  Building...");
+    let output = Command::new(CARGO.get().unwrap())
         .args(["build", "--release"])
-        .output()
-        .await?;
+        .output()?;
 
     if !output.status.success() {
         bail!(
@@ -119,7 +79,6 @@ async fn execute() -> Result<()> {
             String::from_utf8_lossy(&output.stderr)
         );
     }
-    println!("  cargo build succeeded");
 
     println!("Update complete. Exiting for restart...");
     std::process::exit(0);

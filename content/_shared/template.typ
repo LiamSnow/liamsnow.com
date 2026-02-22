@@ -1,5 +1,4 @@
 #let page = sys.inputs.at("page", default: (:))
-#let query = sys.inputs.at("query", default: ())
 
 #let link(text, href) = {
   html.a(href: href)[#text]
@@ -22,10 +21,10 @@
       #html.nav(class: "nav")[
         #html.button(class: "light-dark", aria-label: "Toggle dark mode")[
           #html.span(class: "moon", style: "display: none")[
-            #image("../icons/moon.svg", alt: "Enable dark mode icon")
+            #html.img(src: "/icons/moon.svg", alt: "Enable dark mode icon")
           ]
           #html.span(class: "sun", style: "display: none")[
-            #image("../icons/sun.svg", alt: "Enable light mode icon")
+            #html.img(src: "/icons/sun.svg", alt: "Enable light mode icon")
           ]
         ]
         #link("BLOG", "/blog")
@@ -39,25 +38,25 @@
   html.div(class: "social")[
     #html.div[
       #html.a(target: "_blank", href: "mailto:mail@liamsnow.com")[
-        #image("../icons/email.svg", alt: "Email Icon")
+        #html.img(src: "/icons/email.svg", alt: "Email Icon")
         Email
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://www.linkedin.com/in/william-snow-iv-140438169/")[
-        #image("../icons/linkedin.svg", alt: "LinkedIn Icon")
+        #html.img(src: "/icons/linkedin.svg", alt: "LinkedIn Icon")
         LinkedIn
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://github.com/liamsnow")[
-        #image("../icons/github.svg", alt: "GitHub Icon")
+        #html.img(src: "/icons/github.svg", alt: "GitHub Icon")
         GitHub
       ]
     ]
     #html.div[
       #html.a(target: "_blank", href: "https://github.com/LiamSnow/resume/blob/main/resume.pdf")[
-        #image("../icons/resume.svg", alt: "Resume Icon")
+        #html.img(src: "/icons/resume.svg", alt: "Resume Icon")
         Resume
       ]
     ]
@@ -75,7 +74,7 @@
         #linebreak()
         #html.div[
           #html.a(target: "_blank", href: "https://github.com/liamsnow/liamsnow.com")[
-            #image("../icons/code.svg", alt: "Source Code Icon")
+            #html.img(src: "/icons/code.svg", alt: "Source Code Icon")
             Source Code
           ]
         ]
@@ -92,6 +91,7 @@
   let title = page.at("title", default: "Liam Snow")
   let desc = page.at("desc", default: "")
   let canonical-url = "https://liamsnow.com" + page.at("url", default: "")
+  styles.insert(0, "main");
 
   html.html(lang: "en")[
     #html.head[
@@ -117,9 +117,9 @@
       #html.link(rel: "alternate", type: "application/rss+xml", title: "Liam Snow's Blog", href: "/blog/rss.xml")
       #html.link(rel: "alternate", type: "application/rss+xml", title: "Liam Snow's Projects", href: "/projects/rss.xml")
 
-      #html.elem("link", attrs: (rel: "preload", href: "/fonts/DINNextSlabBlack.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
-      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
-      #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Bold.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      // #html.elem("link", attrs: (rel: "preload", href: "/fonts/DINNextSlabBlack.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      // #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      // #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Bold.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
 
       #for style in styles {
         html.elem("link", attrs: (rel: "preload", href: "/styles/" + style + ".css", ("as"): "style"))
@@ -135,10 +135,10 @@
         html.script(type: "application/ld+json")[#jsonld]
       }
 
-      #html.script(type: "text/javascript")[#read("preload.js")]
-      #html.script(type: "text/javascript")[#read("light_dark.js")]
-      #html.script(type: "text/javascript")[#read("header.js")]
-      #html.script(type: "text/javascript")[#read("date.js")]
+      #html.script(type: "text/javascript", src: "/scripts/preload.js")
+      #html.script(type: "text/javascript", src: "/scripts/light_dark.js")
+      #html.script(type: "text/javascript", src: "/scripts/header.js")
+      #html.script(type: "text/javascript", src: "/scripts/date.js")
     ]
     #html.body[
       #header()
@@ -156,11 +156,11 @@
 
 #let lang-icon(lang) = {
   if lang == "Rust" {
-    image("/icons/cuddlyferris.svg", alt: "Rust Icon")
+    html.img(src: "/icons/cuddlyferris.svg", alt: "Rust Icon")
   } else if lang == "SystemVerilog" {
-    image("/icons/xor.svg", alt: "SystemVerilog Icon") 
+    html.img(src: "/icons/xor.svg", alt: "SystemVerilog Icon") 
   } else {
-    image("/icons/code.svg", alt: "Other Programming Language Icon")
+    html.img(src: "/icons/code.svg", alt: "Other Programming Language Icon")
   }
 }
 
@@ -182,7 +182,7 @@
         #html.ul(id: "post-stats")[
           #if "written" in page {
             html.li[
-              #image("/icons/written.svg", alt: "Written Icon")
+              #html.img(src: "/icons/written.svg", alt: "Written Icon")
               #html.p[Written:]
               #html.p(class: "date")[
                 #page.at("written")
@@ -192,7 +192,7 @@
         
           #if "updated" in page {
             html.li[
-              #image("/icons/updated.svg", alt: "Updated Icon")
+              #html.img(src: "/icons/updated.svg", alt: "Updated Icon")
               #html.p[Updated:]
               #html.p(class: "date")[
                 #page.at("updated")
@@ -202,7 +202,7 @@
 
           #if "started" in page {
             html.li[
-              #image("/icons/rocket_launch.svg", alt: "Started Icon")
+              #html.img(src: "/icons/rocket_launch.svg", alt: "Started Icon")
               #html.p[Started:]
               #html.p(class: "date")[
                 #page.at("started")
@@ -214,10 +214,10 @@
             html.li[
               #let ended = page.at("ended")
               #if ended == "Now" {
-                image("/icons/infinite.svg", alt: "Ongoing Project Icon")
+                html.img(src: "/icons/infinite.svg", alt: "Ongoing Project Icon")
                 html.p[Ongoing]
               } else {
-                image("/icons/done_all.svg", alt: "Project End Date Icon")
+                html.img(src: "/icons/done_all.svg", alt: "Project End Date Icon")
                 html.p[Ended:]
                 html.p(class: "date")[
                   #ended

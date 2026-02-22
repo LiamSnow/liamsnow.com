@@ -1,14 +1,15 @@
 #metadata((
   title: "Liam's Blog",
   desc: "Liam Snow's Blog. Programming, systems, backend, Rust and more.",
-  queries: ("/blog/",)
 )) <page>
 
-#import "_shared/template.typ": template, link, link-new-tab, query
+#metadata((blogs: "/blog/")) <query>
+
+#import "_shared/template.typ": template, link, link-new-tab
 #show: template.with(styles: ("collection",))
 
 #let posts = {
-  query.at(0, default: ())
+  sys.inputs.at("blogs", default: ())
     .sorted(key: p => p.at("updated", default: "")).rev()
 }
 
@@ -23,14 +24,14 @@
       ]
       #html.div(class: "stats")[
         #html.div[
-          #image("icons/written.svg", alt: "Blog start date icon")
+          #html.img(src: "/icons/written.svg", alt: "Blog start date icon")
           #html.p[Written:]
           #html.p(class: "date")[
             #post.at("written", default: "")
           ]
         ]
         #html.div[
-          #image("icons/updated.svg", alt: "Blog updated icon")
+          #html.img(src: "/icons/updated.svg", alt: "Blog updated icon")
           #html.p[Updated:]
           #html.p(class: "date")[
             #post.at("updated", default: "")

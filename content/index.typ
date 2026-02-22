@@ -1,10 +1,12 @@
 #metadata((
   title: "Liam's Website",
   desc: "Liam Snow's personal website! Programming, systems, backend, Rust and more.",
-  queries: ("/projects/", "/blog/"),
 )) <page>
 
-#import "_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, query, social, lang-icon
+#metadata((projects: "/projects/")) <query>
+#metadata((blogs: "/blog/")) <query>
+
+#import "_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, social, lang-icon
 #show: template.with(
   styles: ("index",),
   jsonld: read("_shared/ld.json"),
@@ -19,7 +21,7 @@
     #block[
       Hi, I'm William (Liam) Snow IV
       - CS MS & ECE BS @ Worcester Polytechnic Institute
-      - Rust #image("icons/cuddlyferris.svg", width: 18pt, alt: "Rust icon"), systems, backend, & more
+      - Rust #html.img(src: "icons/cuddlyferris.svg", width: 23, alt: "Rust icon"), systems, backend, & more
     ]
 
     *#underline[Nothing] on this website is written by AI* 
@@ -51,9 +53,9 @@
           #if "ended" in item {
             let ended = item.at("ended")
             if ended == "Now" {
-              html.div[#image("icons/infinite.svg", alt: "Ongoing project icon")]
+              html.div[#html.img(src: "icons/infinite.svg", alt: "Ongoing project icon")]
             } else {
-              html.div[#image("icons/done_all.svg", alt: "Completed project icon")]
+              html.div[#html.img(src: "icons/done_all.svg", alt: "Completed project icon")]
             }
           }
           
@@ -71,11 +73,11 @@
 }
 
 #let projects = {
-  query.at(0, default: ()).filter(item => item.at("homepage", default: false))
+  sys.inputs.at("projects", default: ()).filter(item => item.at("homepage", default: false))
     .sorted(key: item => item.at("ended", default: "")).rev()
 }
 #let blogs = {
-  query.at(1, default: ()).filter(item => item.at("homepage", default: false))
+  sys.inputs.at("blogs", default: ()).filter(item => item.at("homepage", default: false))
     .sorted(key: item => item.at("updated", default: "")).rev()
 }
 #html.div(id: "sections")[

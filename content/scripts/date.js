@@ -7,9 +7,6 @@ window.addEventListener('load', () => {
     { label: "month", seconds: DAY * 30 },
     { label: "week", seconds: DAY * 7 },
     { label: "day", seconds: DAY },
-    { label: "hour", seconds: HOUR },
-    { label: "minute", seconds: 60 },
-    { label: "second", seconds: 1 },
   ];
 
   function getRelativeTime(dateString) {
