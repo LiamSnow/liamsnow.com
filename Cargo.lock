@@ -1670,7 +1670,6 @@ dependencies = [
  "hex",
  "hmac",
  "httparse",
- "lightningcss",
  "memchr",
  "mime_guess",
  "minify-html",

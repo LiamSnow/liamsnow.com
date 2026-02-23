@@ -174,11 +174,10 @@
         html.script(type: "application/ld+json")[#jsonld]
       }
 
-      #html.elem("script", attrs: (
-        type: "text/javascript",
-        // src: "/main.js",
-        defer: "true"
-      ))[#read("main.js")]
+      #html.script(type: "text/javascript")[#read("preload.js")]
+      #html.script(type: "text/javascript")[#read("light_dark.js")]
+      #html.script(type: "text/javascript")[#read("header.js")]
+      #html.script(type: "text/javascript")[#read("date.js")]
     ]
     #html.body[
       #header()
