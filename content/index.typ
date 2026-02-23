@@ -5,10 +5,10 @@
 
 #metadata((projects: "/projects/")) <query>
 #metadata((blogs: "/blog/")) <query>
+#metadata((css: "/styles/index.scss")) <css>
 
 #import "_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, social, lang-icon
 #show: template.with(
-  styles: ("index",),
   jsonld: read("_shared/ld.json"),
 )
 

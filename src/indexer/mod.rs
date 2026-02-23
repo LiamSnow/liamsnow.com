@@ -1,4 +1,4 @@
-use crate::indexer::meta::{PAGE_KEY, QUERY_KEY};
+use crate::indexer::meta::{CSS_KEY, PAGE_KEY, QUERY_KEY};
 use anyhow::{Context, Result, bail};
 use mime_guess::{Mime, mime};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -33,6 +33,7 @@ pub struct TypstSlot {
     /// None for hidden files
     pub page_meta: Option<Dict>,
     pub queries: Option<Dict>,
+    pub css: Option<String>,
 }
 
 struct WalkEntry {
@@ -163,6 +164,7 @@ impl TypstSlot {
                 source,
                 page_meta: None,
                 queries: None,
+                css: None,
             });
         }
 
@@ -179,6 +181,12 @@ impl TypstSlot {
             source,
             page_meta: Some(page_meta),
             queries: all_meta.remove(QUERY_KEY),
+            css: all_meta.remove(CSS_KEY).and_then(|dict| {
+                dict.get(CSS_KEY).ok().and_then(|val| match val {
+                    Value::Str(s) => Some(s.to_string()),
+                    _ => None,
+                })
+            }),
         })
     }
 }

@@ -6,6 +6,7 @@ use typst::syntax::ast::{self, Arg, ArrayItem, DictItem, Expr, Markup};
 
 pub const PAGE_KEY: &str = "page";
 pub const QUERY_KEY: &str = "query";
+pub const CSS_KEY: &str = "css";
 
 /// A somewhat hacky way to get around using typst introspection/querying
 /// which requires the entire file to be compiled and then queryed.

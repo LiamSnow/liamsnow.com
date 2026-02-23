@@ -4,7 +4,7 @@ use crate::indexer::{MetaMap, SlotType, Slots, TypstSlot};
 use crate::web::route::Route;
 use crate::{RoutingTable, WatchArgs};
 use ::typst::foundations::{Dict, Value};
-use ::typst::syntax::FileId;
+use ::typst::syntax::{FileId, VirtualPath};
 use anyhow::{Context, Result, anyhow, bail};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::ops::Bound;
@@ -44,8 +44,8 @@ fn compile_scss(id: &FileId, slots: &Slots) -> Result<Vec<u8>> {
         .input_syntax(grass::InputSyntax::Scss)
         .fs(&fs);
     let path = id.vpath().as_rooted_path();
-    let content = grass::from_path(path, &opts).map_err(|e| anyhow!("{e}"))?;
-    Ok(content.into())
+    let css = grass::from_path(path, &opts).map_err(|e| anyhow!("{e}"))?;
+    Ok(css.into())
 }
 
 fn compile_typst(
@@ -68,10 +68,27 @@ fn compile_typst(
         }
     }
 
+    if let Some(css_path) = &tslot.css {
+        let vp = VirtualPath::new(css_path);
+        let id = FileId::new(None, vp);
+        let bytes = compile_scss(&id, slots)?;
+        let text = String::from_utf8_lossy(&bytes);
+        inputs.insert("css".into(), Value::Str(text.into()));
+    }
+
     let mut world = LiamsWorld::new(*id, slots, inputs, root, watch);
     let doc = world.compile()?;
     let html = world.html(&doc)?;
-    Ok(html.into())
+
+    let cfg = minify_html::Cfg {
+        keep_html_and_head_opening_tags: true,
+        minify_css: true,
+        minify_js: true,
+        preserve_brace_template_syntax: true,
+        preserve_chevron_percent_template_syntax: true,
+        ..Default::default()
+    };
+    Ok(minify_html::minify(&html.into_bytes(), &cfg))
 }
 
 /// Evaluate a query `/projects/` into an array of the metadata

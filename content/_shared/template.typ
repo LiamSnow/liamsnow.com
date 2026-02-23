@@ -147,7 +147,10 @@
       #html.link(rel: "alternate", type: "application/rss+xml", title: "Liam Snow's Blog", href: "/blog/rss.xml")
       #html.link(rel: "alternate", type: "application/rss+xml", title: "Liam Snow's Projects", href: "/projects/rss.xml")
 
-      // #html.elem("link", attrs: (rel: "preload", href: "/fonts/DINNextSlabBlack.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      #if page.at("url", default: "") == "/" {
+        html.elem("link", attrs: (rel: "preload", href: "/fonts/DINNextSlabBlack.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
+      }
+
       #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Regular.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
       #html.elem("link", attrs: (rel: "preload", href: "/fonts/SpaceGrotesk-Bold.woff2", ("as"): "font", type: "font/woff2", crossorigin: "anonymous"))
 
@@ -155,8 +158,14 @@
         html.elem("link", attrs: (rel: "preload", href: "/styles/" + style + ".css", ("as"): "style"))
       }
 
+      #html.style()[#read("fonts.css")]
+
       #for style in styles {
         html.link(rel: "stylesheet", href: "/styles/" + style + ".css")
+      }
+
+      #if "css" in sys.inputs {
+        html.style()[#sys.inputs.at("css")]
       }
 
       #html.script(type: "application/ld+json")[#read("schema.json")]
@@ -167,9 +176,9 @@
 
       #html.elem("script", attrs: (
         type: "text/javascript",
-        src: "/main.js",
+        // src: "/main.js",
         defer: "true"
-      ))
+      ))[#read("main.js")]
     ]
     #html.body[
       #header()

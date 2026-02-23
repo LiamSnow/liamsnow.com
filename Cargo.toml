@@ -28,6 +28,7 @@ httparse = "1.10.1"
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 tungstenite = "0.28.0"
 rayon = "1.11.0"
+minify-html = "0.18.1"
 
 [profile.release]
 opt-level = 3

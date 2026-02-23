@@ -1,4 +1,4 @@
-// header shadow
+/* header shadow */
 document.onscroll = () => {
   const header = document.querySelector("header");
   if (window.scrollY > 0) {
@@ -8,8 +8,8 @@ document.onscroll = () => {
   }
 };
 
-// convert all fixed time (.date) -> relative time
-// TODO eventually should bake into SSG
+/* convert all fixed time (.date) -> relative time */
+/* TODO eventually should bake into SSG */
 const HOUR = 60 * 60;
 const DAY = HOUR * 24;
 
@@ -56,7 +56,7 @@ document.querySelectorAll(".date").forEach((el) => {
   el.title = fullDate;
 });
 
-// light dark
+/* light dark */
 var button = document.querySelector('.light-dark');
 if (!button) {
   console.error("Could not find light-dark button!");
@@ -107,7 +107,7 @@ if (!button) {
   });
 }
 
-// McMaster-like preload
+/* McMaster-like preload */
 const prefetched = new Set();
 let hoverTimer = null;
 
