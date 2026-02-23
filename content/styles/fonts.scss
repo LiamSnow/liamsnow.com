@@ -31,6 +31,16 @@
 }
 
 @font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('serif');
+  font-weight: 700;
+  size-adjust: 110%;
+  /* ascent-override: 50%; */
+  /* descent-override: 22%; */
+  /* line-gap-override: 0%; */
+}
+
+@font-face {
   font-family: 'DIN Next Slab Black';
   src: url('/fonts/DINNextSlabBlack.woff2') format('woff2');
   font-weight: 700;

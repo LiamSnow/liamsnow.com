@@ -83,5 +83,8 @@ $stats-icon-color: rgb(184, 77, 148);
 $stats-icon-filter: brightness(0) saturate(100%) invert(45%) sepia(26%) saturate(1236%) hue-rotate(267deg) brightness(85%) contrast(92%);
 
 $font-fancy: 'DIN Next Slab Black', serif;
-$font-main: 'Space Grotesk', serif;
+$font-main: 'Space Grotesk', 'Space Grotesk Fallback', serif;
+/* $font-main: 'Space Grotesk', serif; */
+/* $font-main: 'Space Grotesk Fallback', serif; */
 $font-mono: 'Ioskeley Mono', monospace;
+/* $font-mono: monospace; */
