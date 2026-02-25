@@ -186,8 +186,15 @@ impl<'a> World for LiamsWorld<'a> {
     }
 
     fn file(&self, id: FileId) -> FileResult<Bytes> {
-        let slot = self.slots.get(&id).ok_or(FileError::AccessDenied)?;
-        Ok(slot.file.clone())
+        match self.slots.get(&id) {
+            Some(slot) => Ok(slot.file.clone()),
+            None => {
+                let pack = id.package().unwrap();
+                let vp = id.vpath();
+                println!("failed to get {id:?}, pack={pack:?}, vp={vp:?}");
+                Err(FileError::AccessDenied)
+            }
+        }
     }
 
     fn font(&self, _: usize) -> Option<Font> {

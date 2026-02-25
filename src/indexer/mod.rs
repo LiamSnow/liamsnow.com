@@ -1,12 +1,14 @@
 use crate::indexer::meta::{CSS_KEY, PAGE_KEY, QUERY_KEY};
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, anyhow, bail};
 use mime_guess::{Mime, mime};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use std::collections::{BTreeMap, HashMap};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use typst::foundations::{Bytes, Dict, Value};
+use typst::syntax::package::PackageSpec;
 use typst::syntax::{FileId, Source, VirtualPath};
 
 mod meta;
@@ -92,9 +94,13 @@ fn read_and_parse(entries: Vec<WalkEntry>) -> Result<(Slots, MetaMap)> {
     let results = entries
         .into_par_iter()
         .map(|entry| {
-            let vp = VirtualPath::new(&entry.rootless);
-            let id = FileId::new(None, vp);
-            let slot = FileSlot::new(id, entry)?;
+            let rootless_str = entry
+                .rootless
+                .to_str()
+                .with_context(|| format!("`{:?}`'s path is not valid UTF-8", entry.path))?;
+
+            let id = make_id(&entry.rootless, rootless_str)?;
+            let slot = FileSlot::new(id, entry.path, rootless_str)?;
             Ok((id, slot))
         })
         .collect::<Result<Vec<(FileId, FileSlot)>>>()?;
@@ -115,22 +121,17 @@ fn read_and_parse(entries: Vec<WalkEntry>) -> Result<(Slots, MetaMap)> {
 }
 
 impl FileSlot {
-    fn new(id: FileId, entry: WalkEntry) -> Result<Self> {
-        let file = std::fs::read(&entry.path)?;
+    fn new(id: FileId, path: PathBuf, rootless_str: &str) -> Result<Self> {
+        let file = fs::read(&path)?;
 
-        let rootless_str = entry
-            .rootless
-            .to_str()
-            .with_context(|| format!("`{:?}`'s path is not valid UTF-8", entry.path))?;
         let url = make_url(rootless_str);
         let hidden = is_hidden(rootless_str);
 
-        let ext = entry
-            .path
+        let ext = path
             .extension()
             .unwrap_or_default()
             .to_str()
-            .with_context(|| format!("File `{:?}`'s extension is not valid UTF-8", entry.path))?;
+            .with_context(|| format!("File `{:?}`'s extension is not valid UTF-8", path))?;
 
         let mime = match ext {
             "typ" => mime::TEXT_HTML_UTF_8,
@@ -211,7 +212,23 @@ fn make_url(rel: &str) -> String {
 }
 
 fn is_hidden(rel: &str) -> bool {
-    rel.split('/').any(|seg| seg.starts_with('_'))
+    rel.split('/')
+        .any(|seg| seg.starts_with('_') | seg.starts_with('@'))
+}
+
+fn make_id(rootless: &Path, s: &str) -> Result<FileId> {
+    // normal file
+    if !s.starts_with("@") {
+        let vp = VirtualPath::new(rootless);
+        return Ok(FileId::new(None, vp));
+    }
+
+    // package
+    let split = s.match_indices('/').nth(1).map_or(s.len(), |(i, _)| i);
+    let spec = PackageSpec::from_str(&s[..split]).map_err(|e| anyhow!("{e}"))?;
+    let vpath = VirtualPath::new(Path::new(&s[split..]));
+    let id = FileId::new(Some(spec), vpath);
+    Ok(id)
 }
 
 #[cfg(test)]
@@ -232,6 +249,7 @@ mod tests {
     fn test_is_hidden() {
         assert!(is_hidden("_drafts/post.typ"));
         assert!(is_hidden("blog/_hidden/post.typ"));
+        assert!(is_hidden("@preview/post.typ"));
         assert!(!is_hidden("blog/post.typ"));
         assert!(!is_hidden("underscored_name/post.typ"));
     }
