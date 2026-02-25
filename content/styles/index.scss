@@ -137,7 +137,7 @@ header:not(.scroll) {
         font-size: 1.25rem;
         font-weight: 600;
         color: $alt-color;
-        margin: 0 5px 0 0;
+        margin: 0 3px 0 0;
         text-decoration: none;
         cursor: pointer;
         transition: color 0.2s ease;
@@ -150,7 +150,7 @@ header:not(.scroll) {
       img {
         width: 22px;
         transform: translateY(1px);
-        margin-left: 2px;
+        margin-left: 4px;
       }
 
       >div:not(.lang) {
