@@ -1,6 +1,6 @@
 #metadata((
   title: "igloo",
-  desc: "A secure, fast, & intuitive smart home platform",
+  desc: "A powerful DIY smart home Rust library",
   started: "2025-01-01",
   ended: "Now",
   lang: "Rust",
