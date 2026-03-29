@@ -1,6 +1,6 @@
 #metadata((
   title: "HomeLab",
-  desc: "Docker, Kubernetes, NixOS, Helios Illumos",
+  desc: "A server rack in my closet running NixOS & Helios illumos",
   started: "2024-04-11",
   ended: "Now",
   homepage: true
