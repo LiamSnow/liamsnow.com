@@ -1,6 +1,6 @@
 #metadata((
   title: "An update on Igloo",
-  desc: "Changing priorities and more to come!",
+  desc: "Abandoning V2 and moving to V3",
   written: "2026-02-24",
   updated: "2026-02-24",
   links: (
