@@ -11,29 +11,24 @@
   homepage: true
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "/_shared/template.typ": post, link-new-tab
 #show: post
 
-liamsnow.com is fast website written in Rust
-that has all content and layout written in #link("https://typst.app")[Typst].
-There is no HTML, only Typst and SCSS.
+I've been reading other programmers' blogs for a long time and have made many attempts at my own. Now that I'm a lot better at programming and technical writing, I have a new version of the website which looks good, is fast, accessible, and a joy to write content for.
 
 = Features
- - Typst as a library with a custom world for blazingly fast build times
- - Rayon parallel compilation (\~10ms dev build time, \~130ms normally)
- - Zero-copy responses via pre-compiled and compressed responses 
- - Hand rolled HTTP/1.1 server
+ - Custom #link-new-tab("Typst", "https://typst.app") integration with a custom world for blazingly fast build times (\~130ms)
+ - Hand rolled HTTP/1.1 server + (near) Zero-copy response dispatching via pre-compressed & pre-encoded responses 
  - Hot reloading / watcher mode for development
  - SCSS support
  - Continuous deployment (GitHub webhooks trigger self-update)
+ - Rayon parallel compilation 
 
 = Why Build This?
 
-While many SSGs would work:
- + I am very particular with what I want
- + I want bleeding edge performance
- + It needs to run on illumos
- + I want to write everything in Typst
+While I could've used an existing SSGs (server-side generators),
+none support Typst, most would require tweaking to run on illumos,
+and none were exactly what I wanted.
 
 = Why Typst?
 For about a year in college I wrote all my notes in Obsidian.
@@ -41,93 +36,129 @@ After so much frustration with Obsidian being slow,
 having to pay for syncing to mobile, and it being exceptionally hard
 to write extensions (at the time), I decided I needed something else.
 
-I started just writing my notes in Markdown, using
-#link("https://pandoc.org/")[pandoc] to compile it.
-I made a Neovim extension to automatically open up a browser preview of this.
+I switched to NeoVim, using Markdown, #link-new-tab("pandoc", "https://pandoc.org/"),
+and my NeoVim live-preview extension.
 I experimented with writing all my notes in LaTeX, but it was just too
-tedious and time consuming.
+tedious and time-consuming.
 
-Eventually I discovered Typst. It was the best of both worlds,
-the power of LaTeX (and more) with the ease of Markdown.
-It completely transformed my note taking experience.
+Eventually I discovered Typst. It was the best of both worlds:
+the power of LaTeX with the ease of Markdown (and scripting!).
+It completely transformed my note-taking experience.
 
-When I was making the #link("liamsnow_com/v1")[original version]
-of my website, Typst HTML export was just not ready, so
-I set it up to use Markdown.
+I waited a long time for Typst HTML output to stabilize,
+but eventually got impatient, and decided to use it even while experimental.
+#link-new-tab("Sometimes it breaks", "https://github.com/typst/typst/pull/7783"),
+and it's not perfect, but its good enough.
 
-I used this for about half a year, but, I just always had this
-feeling that I had to do this in Typst.
-It would give me so much more power and make writing easier.
-Typst HTML export was in better state, but still not ready.
-It doesn't have multi-page export and
-#link("https://github.com/typst/typst/pull/7783")[randomly breaks].
-However, I persevered through and was able to get it all working.
+= URLs & Queries
+I debated a few ways to handle routing, and landed on file path-based URLs, which is clean and easy to work with:
+ - `content/index.typ` → `/`
+ - `content/blog.typ` → `/blog`
+ - `content/main.js` → `/main.js`
+ - `content/blog/igloo/penguin.typ` → `/blog/igloo/penguin`
+ - `content/blog/igloo/index.typ` → `/blog/igloo`
 
-= How it Works
-== Indexer
-The indexer has two purposes:
- + discover all files in the content directory
- + read all files in memory
- + grab Typst metadata `#metadata((title: "..", ..)) <page>`
+But I had a problem -- how will `/blog` know about all the blog posts (to be able to link them)?
+If we chose a different model, like URLs specified in JSON files, it could simply read those files -- here we don't have this luxury.
 
-The first two parts are pretty simply, just recursively walk
-the file tree, then use Rayon to read all files in parallel.
+While we could make the Rust code know about the specific structure of the website (IE it would know to pass in blog posts when compiling `blog.typ`), it's not very clean. We could also separately maintain JSON files just for `blog.typ`, but that's also not great. 
 
-The metadata part is where is gets tricky.
-If we want to use #link("https://typst.app/docs/reference/introspection/")[Typst introspection]
-to get data from the page, we have to compile it. If we want to compile the
-file, we need to have all files already in memory, so it can properly read
-everything it imports without throwing an error.
-If we compiled during indexing, we would still have to recompile later,
-with the new inputs (Dict of its own metadata and potentially metadata from other pages).
+Instead, I found a clean solution that fits perfectly into Typst:
+ + Require each page to specify #link-new-tab("metadata", "https://typst.app/docs/reference/introspection/metadata/"), which is like Markdown front matter
+ + Allow pages to query for the metadata of other pages
+   - The result of the query should then be passed in as a #link-new-tab("system input", "https://typst.app/docs/reference/foundations/sys/")
 
-This effectively doubles our compilation time. I tried a lot of ways to get around this
-and ultimately ended up on making my own Typst parser. Its extremely simple, with no
-evaluation or anything fancy -- it just parses the metadata.
 
-== Compiler
-The compiler's goal is to take everything from the indexer
-and come up with a shared routing table that maps path → HTTP/1.1 responses.
+```typst
+// metadata for this page
+#metadata((title: "..", ..)) <page>
 
-=== Compiling Typst
-With the index and metadata about all pages, we can form our inputs to the Typst compiler:
- + The metadata for its own page
- + The metadata other pages it asked for. Ex. `blog.typ` asks for metadata for `blog/*.typ`.
-    - We use a b-tree map formed by the indexer to quickly evaluate.
+// request metadata for all pages under `/blog/*`
+// then, pass the result back as the system input `blogs`
+#metadata((blogs: "/blog/")) <query>
 
-Typst doesn't pretend to be meant to be used as a library. They publish many crates,
-but a lot of the implementation still lives in `typst-cli` which is not a library we can use.
-However, our life is a bit easier because we don't need that many features.
-We can skip downloading packages, fonts, queries, watching, PDF output, etc.
+#let posts = {
+  // grab result of query, sort it by update date
+  sys.inputs.at("blogs", default: ())
+    .sorted(key: p => p.at("updated", default: "")).rev()
+}
+```
 
-Basically, you just create a "world" for the Typst compiler to use. This provides
-methods for it to find the standard library, source files, etc. Since we already
-have all our files loaded into memory, we can make our world extremely efficient.
+This system is particularly nice because of its flexibility. While `blog.typ` only reads blog posts, `index.typ` needs blog posts + projects. We can even do fancier things, like on #link("igloo")[igloo's project page], grabbing only the blog posts for igloo, and splitting them into categories based on their publish date.
 
-The code for this is actually pretty simple. It was mostly just difficult to figure
-out what to do and required reading through a ton of source code.
+= The Code
+The code is divided up into 3 key parts:
+ + *Indexer* (could use a better name):
+   - Walks the root directory, discovering all files (Typst, SCSS, and other)
+   - Reads all files into memory
+   - Retrieves the metadata of all Typst pages 
+   - Guesses #link-new-tab("MIME types", "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types")
+   - Computes URLs from file paths (as shown above)
+ + *Compiler*: uses the index (indexer output)
+   - Compiles Typst → HTML, SCSS → CSS, and keeps other file as-are 
+   - Creates routing table (URL path → HTTP response)
+     - Requires making responses for each path: uncompressed/identy responses, #link-new-tab("Brotli", "https://brotli.org/") compressed responses, 304 not modified, etag
+ + *Web*: The HTTP/1.1 server
+   - Uses routing table to quickly dispatch responses
 
-=== Compiling SCSS
-This was made super easy via #link("https://crates.io/crates/grass")[grass].
-Grass is super cool because it lets us plug in our own file system provider.
-Just like in the Typst world, we already have files in memory, so we can just
-expose it like a virtual filesystem.
+_Note_: Both the indexer and compiler leverage #link-new-tab("rayon", "https://crates.io/crates/rayon") to parallelize their steps. This was chosen over Tokio because of its synchronous nature (file reading, Typst compilation, ...).
 
-=== Compiling Responses
-Now that we have all content compiled, the last step is generating HTTP
-responses. It's pretty straight forward, but I have had a few features.
-Each response struct has:
- + An identity (uncompressed) version
- + A max quality Brotli version
- + An ETag + 304 response for caching 
 
-== HTTP Server
+= Integrating Typst
+
+My first prototype would simply spawn the Typst CLI as a process.
+It ran on every file to query the metadata, and then it would be run again to compile the files.
+I knew that this would always be slow, and getting around that would require me to integrate Typst directly.
+
+Sadly, it was never intended to be used as a library, and it doesn’t make it easy. I found some experiments (#link-new-tab("1", "https://github.com/tfachmann/typst-as-library"), #link-new-tab("2", "https://github.com/Relacibo/typst-as-lib")) that succeeded in doing it, but none supported:
+ - *#link-new-tab("Introspection", "https://typst.app/docs/reference/introspection/")*: needed to read metadata
+ - *Good Error Messages*: column + line numbers, fancy formatting (what you get in the CLI)
+ - *Root Directory Handling*: `content/blog/igloo.typ` must read `content/_shared/template.typ`, which gets access denied (outside root directory), unless a proper root directory is specified
+
+Furthermore, I wasn't super happy with their implementations.
+Instead, I opted to reference Typst internals directly.
+I spent a long time understanding the internals, and was eventually able to build my own #link-new-tab("Typst World", "https://github.com/LiamSnow/liamsnow.com/blob/main/src/compiler/typst.rs") (which supplies everything needed to compile a Typst file, like file IO).
+
+I designed this world with all the features I wanted, and to integrate seamlessly into my codebase. For example, I made it use an in-memory file system, removing all IO and repeated reads. Common dependencies, such as template files, are read once when the program starts (in the indexer), rather than on every compilation.
+
+= Retrieving Typst Metadata
+As mentioned, I used Typst #link-new-tab("introspection", "https://typst.app/docs/reference/introspection/") for retrieving metadata of every page.
+But it was frustrating:
+ + To introspect a Typst file, it must be compiled
+ + To compile, the world must be set up
+ + The world requires the in-memory file system
+ + The file system requires the indexer to complete
+
+This means that we must have an entire step dedicated to retrieving metadata at the end of the indexer. Not only does that directly slow us down, we just wasted time compiling a file, only to read \~7 constant lines (IE lines with no variables or dependencies).
+ 
+Can't we just merge this step with the compiler? No -- to be able to compile `blog.typ` (a page with a query), we must know the metadata of other pages.
+
+Well then, can keep the compilation from the indexer to produce the output HTML?
+Also no -- the compilation is invalid for actual output, because it had no system inputs.
+ - we compiled `blog.typ` without any system inputs in order to retrieve the metadata
+ - the actual output must be compiled with the query result in the system inputs
+
+== A Custom Parser
+My solution is to skip compilation and the Typst world, implementing
+#link-new-tab("my own parser", "https://github.com/LiamSnow/liamsnow.com/blob/main/src/indexer/meta.rs")
+that only parses the metadata fields.
+It took a bit of digging through Typst source code, and mostly fighting their visibility, but was not too hard. 
+
+Using this, we can combine the metadata retrieval with the file reading. This reduces complexity and has *much* better performance.
+
+= HTTP/1.1 Server
 This ended up being a lot simpler than I thought.
 Since we already have all our responses generated, we only need a few things:
  + Reading headers to find method, path, ETag, and Brotli support
  + GET + HEAD handling
  + TCP keep alive
  + POST + body reading for GitHub webhooks
+
+= Other Features
+
+== SCSS
+I let #link("https://crates.io/crates/grass")[grass] handle most of the
+work for compiling SCSS, but also expose my in-memory file system to it.
 
 == Hot Reloading
 Having a hot reload system really helps with writing posts.
