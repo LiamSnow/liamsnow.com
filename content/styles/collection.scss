@@ -27,6 +27,15 @@ main {
   }
 }
 
+.preface {
+  font-size: 1.2em;
+  /* background: $alt-bg; */
+  /* color: $alt-color-alt; */
+  border-radius: 0.5rem;
+  padding: 0 1.5rem 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .posts {
   list-style-type: none;
 
