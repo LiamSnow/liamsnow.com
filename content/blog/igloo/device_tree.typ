@@ -8,7 +8,7 @@
     ("Homepage", "https://igloo.rs"),
     ("GitHub", "https://github.com/liamsnow/igloo"),
   ),
-  homepage: true
+  homepage: false
 )) <page>
 
 #import "/_shared/template.typ": post
