@@ -3,7 +3,7 @@
   desc: "A server rack in my closet running NixOS & Helios illumos",
   started: "2024-04-11",
   ended: "Now",
-  homepage: true
+  homepage: false
 )) <page>
 
 #import "/_shared/template.typ": post, link-new-tab

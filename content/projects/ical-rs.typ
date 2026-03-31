@@ -7,7 +7,7 @@
   links: (
     ("GitHub", "https://github.com/liamsnow/ical-rs"),
   ),
-  homepage: true
+  homepage: false
 )) <page>
 
 #import "/_shared/template.typ": post
