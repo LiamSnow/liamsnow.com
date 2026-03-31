@@ -8,6 +8,13 @@
 #import "_shared/template.typ": template, link, link-new-tab, lang-display
 #show: template.with(styles: ("collection",))
 
+#html.div(class: "preface")[
+  = Liam's Projects
+
+  My favorite and best projects I've worked on over the years.
+  Many of my older projects are missing from here, but I've been slowly adding them.
+]
+
 #let posts = {
   sys.inputs.at("projects", default: ())
     .sorted(key: p => p.at("ended", default: "")).rev()

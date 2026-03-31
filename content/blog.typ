@@ -8,6 +8,12 @@
 #import "_shared/template.typ": template, link, link-new-tab
 #show: template.with(styles: ("collection",))
 
+#html.div(class: "preface")[
+  = Liam's Blog
+
+  Updates & explanations of projects. One day, I’ll add more ramblings & takes.
+]
+
 #let posts = {
   sys.inputs.at("blogs", default: ())
     .sorted(key: p => p.at("written", default: "")).rev()
