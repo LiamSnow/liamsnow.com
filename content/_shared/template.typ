@@ -18,28 +18,7 @@
       #html.div(class: "left")[
         #link("IV", "/")
       ]
-      #html.nav(class: "nav")[
-        #html.button(class: "light-dark", aria-label: "Toggle dark mode")[
-          #html.span(class: "moon", style: "display: none")[
-            #html.img(
-              src: "/icons/moon.svg",
-              alt: "Enable dark mode icon",
-              width: 26,
-              height: 26
-            )
-          ]
-          #html.span(class: "sun", style: "display: none")[
-            #html.img(
-              src: "/icons/sun.svg",
-              alt: "Enable light mode icon",
-              width: 26,
-              height: 26
-            )
-          ]
-        ]
-        #link("BLOG", "/blog")
-        #link("PROJECTS", "/projects")
-      ]
+      #html.nav(class:"nav")[#html.a(class: "light-dark", aria-label: "Toggle dark mode")[ #html.div(class: "moon", style: "display: none")[ #html.img( src: "/icons/moon.svg", alt: "Enable dark mode icon", width: 26, height: 26 ) ] #html.div(class: "sun", style: "display: none")[ #html.img( src: "/icons/sun.svg", alt: "Enable light mode icon", width: 26, height: 26 ) ] ]#html.a(href:"/blog")[BLOG]#html.a(href:"/projects")[PROJECTS]#html.a(href:"/notes")[NOTES] ]
     ]
   ]
 }

@@ -25,6 +25,7 @@ $grey-770: hsl(48, 2%, 33%);
 $grey-800: hsl(48, 2%, 31%);
 $grey-850: hsl(48, 2%, 25%);
 $grey-900: hsl(48, 1%, 20%);
+$grey-910: hsl(48, 1%, 18%);
 $grey-920: hsl(48, 1%, 15%);
 $grey-930: hsl(48, 1%, 12%);
 $grey-940: hsl(48, 1%, 10%);
@@ -72,6 +73,7 @@ $main-color-light: light-dark($grey-600, $grey-500);
 $main-shadow-color: light-dark($yellow-900, $green-950);
 $main-bg: light-dark($grey-100, $grey-900);
 $main-bg-dark: light-dark($grey-200, $grey-950);
+$main-bg-ldark: light-dark($grey-250, $grey-930);
 
 $header-bg: light-dark($green-900, $grey-950);
 $header-bg-hover: light-dark($green-890, $grey-940);

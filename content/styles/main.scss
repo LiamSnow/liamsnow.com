@@ -69,6 +69,7 @@ header {
     letter-spacing: -3px;
     position: relative;
     transition: color 0.2s ease;
+    margin-right: 1rem;
 
     &::after {
       content: "";
@@ -95,24 +96,29 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1.5rem;
 
-    button {
+    .light-dark {
       background: none;
       border: none;
       cursor: pointer;
-    }
 
-    button img {
-      width: 26px;
+      >div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-      &:hover {
-        filter: $green-600-filter;
+        >img {
+          width: 26px;
+
+          &:hover {
+            filter: $green-600-filter;
+          }
+        }
       }
     }
 
     a {
-      margin-left: 1.5rem;
       transition: color 0.2s ease;
 
       &:hover {
@@ -128,6 +134,37 @@ header {
     text-decoration: none;
     color: white;
     font-weight: 600;
+  }
+}
+
+@media (max-width: 530px) {
+  header>.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  header>.container>.nav {
+    gap: 0;
+
+    a {
+      margin-left: 1rem;
+    }
+  }
+}
+
+@media (max-width: 350px) {
+  header>.container>.nav a {
+    display: inline-block;
+    overflow: hidden;
+    max-width: 2em;
+  }
+}
+
+@media (max-width: 260px) {
+  header>.container>.nav a {
+    max-width: 1.5em;
   }
 }
 
