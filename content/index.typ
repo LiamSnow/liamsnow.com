@@ -33,12 +33,10 @@
   ]
 ]
 
-#let make-section(name, href, preface, items) = {
+#let make-section(name, href, items) = {
   html.section[
     #html.div(class: "header")[
       #link(name, href)
-
-      #preface
     ]
     #html.ol(class: "posts")[
       #items.map(item => html.li(
@@ -91,24 +89,7 @@
 }
 
 #html.div(id: "sections")[
-  #make-section(
-    "Projects",
-    "projects",
-    [My favorite and best projects I've worked on over the years],
-    projects
-  )
-  
-  #make-section(
-    "Blog",
-    "blog",
-    [Updates & explanations of projects. One day, I'll add more ramblings & takes.],
-    blogs
-  )
-  
-  #make-section(
-    "Notes",
-    "notes",
-    [I spend a lot of time reading and listening about programming, but had never taken notes. I've been making an effort to do this, and hopefully this collection will grow into a great database of knowledge.],
-    notes
-  )
+  #make-section("Projects", "projects", projects)
+  #make-section("Blog", "blog", blogs)
+  #make-section("Notes", "notes", notes)
 ]

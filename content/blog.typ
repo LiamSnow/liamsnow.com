@@ -11,7 +11,6 @@
 #html.div(class: "preface")[
   = Liam's Blog
 
-  Updates & explanations of projects. One day, I’ll add more ramblings & takes.
 ]
 
 #let posts = {
