@@ -44,8 +44,8 @@ Igloo is a DIY smart home Rust library. It provides a cohesive system and collec
     .sorted(key: p => p.at("updated", default: ""))
 }
 
-#let new-posts = all-posts.filter(p => p.at("updated", default: "") >= cutoff).rev()
-#let old-posts = all-posts.filter(p => p.at("updated", default: "") < cutoff).rev()
+#let new-posts = all-posts.filter(p => p.at("written", default: "") >= cutoff).rev()
+#let old-posts = all-posts.filter(p => p.at("written", default: "") < cutoff).rev()
 
 = V3 Updates
 
