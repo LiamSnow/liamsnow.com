@@ -10,7 +10,7 @@
 
 #let posts = {
   sys.inputs.at("blogs", default: ())
-    .sorted(key: p => p.at("updated", default: "")).rev()
+    .sorted(key: p => p.at("written", default: "")).rev()
 }
 
 #html.ol(class: "posts")[
