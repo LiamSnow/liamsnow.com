@@ -5,6 +5,7 @@
 
 #metadata((projects: "/projects/")) <query>
 #metadata((blogs: "/blog/")) <query>
+#metadata((notes: "/notes/")) <query>
 #metadata((css: "/styles/index.scss")) <css>
 
 #import "_shared/template.typ": template, link, link-new-tab, link-new-tab-highlight, social, lang-icon
@@ -32,10 +33,12 @@
   ]
 ]
 
-#let make-section(name, href, items) = {
+#let make-section(name, href, preface, items) = {
   html.section[
     #html.div(class: "header")[
       #link(name, href)
+
+      #preface
     ]
     #html.ol(class: "posts")[
       #items.map(item => html.li(
@@ -76,11 +79,36 @@
   sys.inputs.at("projects", default: ()).filter(item => item.at("homepage", default: false))
     .sorted(key: item => item.at("ended", default: "")).rev()
 }
+
 #let blogs = {
   sys.inputs.at("blogs", default: ()).filter(item => item.at("homepage", default: false))
-    .sorted(key: item => item.at("updated", default: "")).rev()
+    .sorted(key: item => item.at("written", default: "")).rev()
 }
+
+#let notes = {
+  sys.inputs.at("notes", default: ()).filter(item => item.at("homepage", default: false))
+    .sorted(key: item => item.at("written", default: "")).rev()
+}
+
 #html.div(id: "sections")[
-  #make-section("Projects", "projects", projects)
-  #make-section("Blog", "blog", blogs)
+  #make-section(
+    "Projects",
+    "projects",
+    [My favorite and best projects I've worked on over the years],
+    projects
+  )
+  
+  #make-section(
+    "Blog",
+    "blog",
+    [Updates & explanations of projects. One day, I'll add more ramblings & takes.],
+    blogs
+  )
+  
+  #make-section(
+    "Notes",
+    "notes",
+    [I spend a lot of time reading and listening about programming, but had never taken notes. I've been making an effort to do this, and hopefully this collection will grow into a great database of knowledge.],
+    notes
+  )
 ]

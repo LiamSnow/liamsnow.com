@@ -89,12 +89,16 @@ header:not(.scroll) {
 
     >.header {
       padding: 0;
-      font-size: 1.8rem;
       margin-bottom: 3rem;
-      font-weight: 600;
-      font-family: $font-fancy;
+
+      p {
+        font-size: 1.07rem;
+      }
 
       a {
+        font-size: 1.8rem;
+        font-weight: 600;
+        font-family: $font-fancy;
         text-decoration: none;
         color: $main-color;
         transition: color 0.2s ease;
