@@ -17,7 +17,7 @@ main {
 #post-header,
 #post-body {
   border-radius: 0.5rem;
-  padding: 1.5rem 2rem;
+  padding: 1.2rem 2rem 1.5rem 2rem;
   background: $alt-bg;
   box-shadow: 0 1px 3px $main-shadow-color;
 }
@@ -53,7 +53,7 @@ main {
 
   #post-body,
   #post-header {
-    padding: 0.6rem 0.6rem;
+    padding: 1.2rem 0.6rem 0.6rem 0.6rem;
   }
 
   #post-header {
@@ -132,8 +132,12 @@ main {
 }
 
 #post-body {
-  >:first-child {
+  >h2:first-child {
     margin-top: 0;
+  }
+
+  >:first-child:not(h2) {
+    margin-top: 0.4em;
   }
 
   h2,
@@ -167,49 +171,49 @@ main {
   h2 {
     font-size: 2em;
     margin-top: 1.2em;
-    line-height: 1.2;
-    position: relative;
-    display: flex;
-    /* transform: translateY(0.7em); */
-    width: 100%;
-
-    &::after {
-      content: "";
-      border-top: 1px solid light-dark($yellow-500, $grey-900);
-      height: 1.5em;
-      margin-left: 0.5em;
-      flex: 1;
-      transform: translateY(0.5em);
-    }
+    margin-bottom: 0.4em;
+    width: calc(100% + 1em);
+    margin-left: -0.5em;
+    padding-left: 0.5em;
+    border-radius: 5px;
+    background: $main-bg-ldark;
   }
 
   h3 {
     font-size: 1.6em;
-    margin-top: 0.8em;
-    margin-bottom: 0.2em;
-    line-height: 1.2;
-    /* transform: translateY(0.5em); */
+    margin-top: 1.0em;
+    margin-bottom: 0.3em;
+    background: $main-bg-ldark;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    margin-left: -0.3em;
+    border-radius: 5px;
   }
 
   h4 {
-    margin-top: 0.6em;
-    font-size: 1.3em;
-    /* transform: translateY(0.3em); */
+    font-size: 1.4em;
+    margin-top: 1.0em;
+    margin-bottom: 0.3em;
+    background: $main-bg-ldark;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+    margin-left: -0.2em;
+    border-radius: 5px;
   }
 
   h5 {
-    margin-top: 0.2em;
     font-size: 1em;
-    /* transform: translateY(0.1em); */
+    margin-top: 0.2em;
   }
 
   h6 {
-    margin-top: 0.1em;
     font-size: 0.8em;
+    margin-top: 0.1em;
   }
 
   ol+p,
   ul+p,
+  p+dl,
   dl+p,
   table+p,
   p+p {
@@ -294,8 +298,7 @@ main {
   }
 
   dl {
-    margin-left: 1em;
-    padding-left: 1rem;
+    margin-top: 0.7em;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.3em 0.4em;
