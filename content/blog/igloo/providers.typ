@@ -11,14 +11,17 @@
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
-If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
+*Context*:
+ - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/")
+ - It should be able to work with any smart home device
 
-For this article I will refer to the following:
- - _Provider_: Provides integration to smart home platforms like ESPHome, Apple HomeKit, MQTT, etc.
- - _Extension_: a superset of a provider. Can provide other/more functionality like custom dashboard elements.
+*Nomenclature*:
+ - *Provider*: Bridge vendor-specific interfaces (ex. ESPHome, Apple HomeKit) to Igloo (effectively device drivers)
+ - *Extension*: A process provides additional features to Igloo (a superset of a provider)
+ - Note: every post after this simply refers to these as the same thing (sorry!)
 
 = Objectives
 In order of priority:

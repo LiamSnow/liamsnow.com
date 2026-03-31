@@ -17,7 +17,7 @@
 *Context*:
  - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/")
  - It should be able to work with any smart home device
- - Igloo extensions are separate processes that are effectively device drivers (IE they create a bridge between Igloo and a vendor-specific interface)
+ - Igloo extensions are separate processes that are effectively device drivers (bridging vendor-specific interfaces and Igloo)
 
 = The Problem
 We need a way to abstract away the nuances of the vendor-specific interfaces to their devices. Without this, we'd break the cohesion of Igloo.

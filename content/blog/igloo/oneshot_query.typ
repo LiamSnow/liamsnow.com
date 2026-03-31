@@ -11,12 +11,15 @@
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
-This article assumes you are familiar with both
-Igloo's #link("ecs")[ECS] system and #link("device_tree")[device tree].
-If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
+*Context*:
+ - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/"), connecting any smart home device into a cohesive system
+ - Igloo extensions are separate processes that are effectively device drivers (bridging vendor-specific interfaces and Igloo)
+ - Igloo abstracts devices using the ECS model
+
+\* I'd highly recommend reading my posts about Igloo's #link("ecs")[ECS] system and #link("device_tree")[device tree] first.
 
 The query engine is a massive project and I cannot cover all of it here.
 To avoid making this article unnecessarily long, I will walk through only how one-shot get value aggregated component queries work (ex. get average brightness of lights in the kitchen).

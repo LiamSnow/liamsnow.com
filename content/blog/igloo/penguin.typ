@@ -11,24 +11,18 @@
   homepage: true
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
 #html.img(src: "penguin.png")
 
-If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
-
-This is not the best write up about Penguin, so I'd highly recommend
-you browse the
-#link("https://github.com/LiamSnow/igloo/tree/main/penguin/")[GitHub].
+*Context*: Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/"), connecting any smart home device into a cohesive system.
 
 = Background
 
-An essential piece of making Igloo powerful and intuitive,
-is making a good automation system. This is where Penguin
-comes in, it's a visual node-based programming language that
-makes it possible for people to quickly and easily make
-their automations.
+An essential piece of making Igloo powerful and intuitive, is making a good automation system.
+This is where Penguin comes in -- it's a visual programming language that
+makes it possible for people to quickly and easily make their automations.
 
 = Block or Node Based
 When I started I saw 3 clear ways to make Igloo:

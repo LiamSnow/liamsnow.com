@@ -11,12 +11,14 @@
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "/_shared/template.typ": post, link-new-tab
 #show: post
 
-If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
-
-#link("https://github.com/LiamSnow/igloo/tree/main/server/src/tree")[GitHub Link]
+*Context*:
+ - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/")
+ - It should be able to work with any smart home device
+ - Igloo extensions are separate processes that are effectively device drivers (IE they create a bridge between Igloo and a vendor-specific interface)
+ - Igloo abstracts devices using the ECS model #link("ecs")[(see post)]
 
 = What
 Igloo's device tree needs to represent:

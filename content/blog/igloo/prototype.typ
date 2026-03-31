@@ -11,15 +11,15 @@
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
-If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
+*Context*: Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/")
 
-Initially I set out with a very different goal for Igloo.
-I wanted a smart home platform for power users that was reliable and fast.
+Initially (and what this is), I set out with a very different goal for Igloo -- 
+a smart home platform for power users that was reliable and fast.
+
 I knew this would be a big project, but it turned out to be much bigger than I thought.
-
 Overall, I would call this version a failure. However, it was a great learning experience.
 
 = What I Built

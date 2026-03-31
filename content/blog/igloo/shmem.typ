@@ -14,6 +14,13 @@
 #import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
+*Context*:
+ - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/"), connecting any smart home device into a cohesive system
+ - Igloo extensions are effectively device drivers (bridging vendor-specific interfaces and Igloo)
+ - Igloo currently runs extensions as separate processes #link("providers")[(see post)]
+ - Igloo abstracts devices using the ECS model #link("ecs")[(see post)]
+
+= Background
 The current IPC is 1 Unix socket between the core and each extension.
 This is not only a massive bottleneck (serializing device communication),
 but also means each extension needs to route commands.
