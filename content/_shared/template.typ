@@ -182,6 +182,14 @@
   }
 }
 
+#let quick-link-icon(link) = {
+  if link.contains("github") {
+    html.img(src: "/icons/github.svg", alt: "GitHub Icon", width: 20, height: 20)
+  } else {
+    html.img(src: "/icons/link.svg", alt: "Generic Link Icon", width: 20, height: 20)
+  }
+}
+
 #let lang-display(lang) = {
   lang-icon(lang)
   html.p[Language:]
@@ -253,7 +261,12 @@
 
         #html.div(id: "post-quick-links")[
           #for item in page.at("links", default: ()) {
-            link-new-tab(item.at(0), item.at(1))
+            html.div[
+              #html.a(target: "_blank", href: item.at(1))[
+                #quick-link-icon(item.at(1))
+                #item.at(0)
+              ]
+            ]
           }
         ]
       ]
