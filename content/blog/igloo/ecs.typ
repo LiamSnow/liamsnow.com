@@ -1,8 +1,8 @@
 #metadata((
   title: "Bringing ECS to smart homes",
-  desc: "Igloo's device model",
+  desc: "Why ECS is a good abstraction for smart home devices",
   written: "2025-08-27",
-  updated: "2025-08-27",
+  updated: "2026-03-30",
   links: (
     ("Project Page", "/projects/igloo"),
     ("Homepage", "https://igloo.rs"),
@@ -11,60 +11,99 @@
   homepage: true
 )) <page>
 
-#import "/_shared/template.typ": post, link-new-tab
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
-If you don't know what Igloo is please check out the #link("/projects/igloo")[Project Page].
+*Context*:
+ - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/")
+ - It should be able to work with any smart home device
+ - Igloo extensions are separate processes that are effectively device drivers (IE they create a bridge between Igloo and a vendor-specific interface)
 
-There are a lot of ways to represent devices and their state in smart homes.
-Through my research and experimentation, I landed on using the ECS model, which
-I think is a great system for Igloo.
+= The Problem
+We need a way to abstract away the nuances of the vendor-specific interfaces to their devices. Without this, we'd break the cohesion of Igloo.
 
-Before diving into it, I want to walk you through how I came to this conclusion.
+*Ex.* Let's say a user has 4 lights in their kitchen, all from different vendors. The user must be able simply turn off all the lights together, without ever thinking about the different vendor-specific interfaces.
 
-= Objectives
-First, I outlined my objectives:
- + *Backwards-compatible*: New versions of Igloo must be able to work with old Extensions
- + *Structured but Flexible*: We need to have clearly defined types to create a cohesive system. I don't want a situation where ESPHome has one light type and HomeKit has another, meaning we need different dashboard elements and Penguin nodes for each. At the same time, I want to have the flexibility to support both:
-     + New types of devices that aren't yet built into Igloo
-     + Extensions to existing types - maybe a new provider has a Fan with 10 different modes, but Igloo only has 8
- + *Intuitive*: Understandable for the average _contributor_
- + *Cross-language*: While Rust will have primary support, having support for at least Python is essential.
- + *Composable*: We need a way to group things with similar functionality. For example, maybe I want to control the color of everything that can be colored (Light Bulbs, LED strips, etc.)
+== Goals for the Abstraction
+We have a few goals for the abstraction
+ - Some goals fight against each other -- it's a balancing game
 
-= How Home Assistant Does It
-Devices contain many entities. For example, my Athom light bulb contains a RGBCT_Light entity,
-a safe mode (switch) entity, etc.
+*Exposes Nuances*:
+ - Devices shouldn't be handicapped. Maybe some lights support a transition time, and others support effects -- all of these should be exposed
+ - New types of devices should be fit in
 
-At the time of writing this, #link("https://developers.home-assistant.io/docs/core/entity/light/")[Home Assistant has 47 hard-coded models]
-for each type of entity (light, lawn mower, media player, etc.).
-This makes a lot of sense. You get a strict structure for how to represent things,
-but also you get flexibility with optional parameters for each entity.
-However, it comes with some downsides:
- - Must define and keep 3 models in sync: storage struct, command enum, and status update enum
- - New types of devices cannot be represented
- - May not align well with other providers
+*Cohesive*: See example above
+
+*Easy to Use*: It shouldn't be extremely complicated to use
+
+*Polyglot*: Must work well in at least Rust & Python, and ideally also Go & TypeScript
+
+= Case Studies
+== Home Assistant
+In Home Assistant, a device is broken up into entities.
+Each entity has a name and follows a strict structure.
+Currently, there are
+#link-new-tab("47 entity types", "https://developers.home-assistant.io/docs/core/entity/light/"),
+with everything from a light to a lawn mower.
+
+*Ex.* A #link-new-tab("Athom Color Bulb", "https://www.athom.tech/blank-1/15w-color-bulb-for-esphome") contains many entities:
+ - `"RGBCT_Light"`: light
+ - `"Status"`: string
+ - `"IP Address"`: string
+ - `"MAC Address"`: string
+ - `"Uptime Sensor"`: sensor
+ - ...
+
+*Pros*: Cohesive, easy to work with, fits perfectly into any language
+
+*Cons*: Hides nuances until (and if) the definition is updated
+ - New types of devices can't be added until respective definition(s) are
+ - Handicaps devices that have functionality outside definition
+ - Sometimes doesn't map cleanly to vendor specific interfaces
+
+== OpenHAB
+#link-new-tab("OpenHAB", "https://www.openhab.org/") takes a more
+#link-new-tab("flexible approach", "https://www.openhab.org/docs/configuration/things.html") which is quite interesting.
+
+It aligns much more with my goals (notably not hiding nuance),
+but I think that ECS just handles it better.
+
 
 = ECS Model
 If you're outside the game-development world, you may have never heard of the
 #link("https://en.wikipedia.org/wiki/Entity_component_system")[ECS (Entity-Component-System)] model.
-It's a powerful, composable architecture.
- - *Entity*: Simply a grouping of components. Each entity can have 1 of each component.
- - *Component*: A model for a very specific thing. In game development this might be Position3D.
- - *System*: The business-logic that works on components
+It's a powerful, composable architecture where you have:
+ - *Entity*: set/group of components
+    - Each entity can only contain 1 of each component (it's a set)
+ - *Component*: a small & primitive value (or ZST/tag)
+    - In games, you'll normally see `Position` and `Velocity`
+ - *System*: logic that operates on components
+    - Instead of having specific functions to move every game object, you'd make a tick-based system that simply applies the `Velocity` to the `Position` (although its probably more complex than that) 
+    - Commonly, systems use a #link-new-tab("\"query\" functionality", "https://bevy-cheatbook.github.io/programming/queries.html") -- a mechanism to specify what entities the system targets (what components the entity must have or must not have)
 
-While using an ECS model for a smart home initially sounds like a strange concept,
-it actually makes a lot of sense for our goals.
-We can very easily design it to be both structured and very flexible,
-representing potentially an infinite amount of different devices.
-It has some great benefits:
- - We don't need to explicitly define each type of entity
- - No need for many optional fields, if a light doesn't accept a color, it simply won't have that component
- - Easily backwards-compatible: We enforce an append-only schema where components are never changed or deleted, only added. This provides forward compatibility, old systems simply ignore new components they don't understand.
+In a smart home, a light entity could be:
+ - `(Switch(false))`
+ - `(Switch(false), Dimmer(0.5))`
+ - `(Switch(false), Dimmer(0.5), Color(..))`
+ - or include any other nuance
 
-== What This Looks Like
+To aid with queries, tags/ZST are useful. By adding a `Light` component to a light entity, queries can be more explicit. Notably, the use of that component in a query is entirely optional (up to the user).
 
-This is a representation of an Athom RGBCT ESPHome Light Bulb in Igloo's ECS model:
+This system achieves our goals:
+ - *Cohesive*: a system could simply look for entities with `Switch` and turn them off
+ - *Exposes Nuance*: nuance is easy via composing any combination of components
+ - *Easy to Use*: while harder than Home Assistant's model, it's relatively easy to understand and work with (via queries)
+ - *Polyglot*: by all means this system is polyglot, however, it works best if targeting only Rust
+
+Additionally:
+ - We don't have to constantly update the definition for a light, and in many cases, we might not even have to add new components for new devices
+ - If we keep components as what they should be (small & primitive), we can simply make them immutable (making the defined components append-only). Doing this makes the system easily backwards-compatible (IE Igloo could interact with older extensions)
+ - No need for definitions with many optional fields -- if a light doesn't accept a color, it just won't have the component
+
+== A Complete Example
+
+This is what our #link-new-tab("Athom Color Bulb", "https://www.athom.tech/blank-1/15w-color-bulb-for-esphome") looks like in this:
+ - *Note*: I've given entities names here which is not standard ECS. This can simply be replaced via a `Name(String)` component.
 
 ```rust
 "Status": [
@@ -83,7 +122,7 @@ This is a representation of an Athom RGBCT ESPHome Light Bulb in Igloo's ECS mod
   Icon("mdi:timer-outline"), DeviceClass("duration"),
   Unit(Seconds), AccuracyDecimals(0), Real(54.01900100708008)
 ],
-"${friendly_name} WiFi Signal": [
+"WiFi Signal": [
   Sensor, Diagnostic, SensorStateClass(Measurement),
   DeviceClass("signal_strength"), Unit(DecibelsMilliwatt),
   AccuracyDecimals(0), Real(-57.0)
@@ -98,14 +137,7 @@ This is a representation of an Athom RGBCT ESPHome Light Bulb in Igloo's ECS mod
 ```
 
 == Implementation
-To implement this ECS model I decided to go with a
-#link-new-tab("build script", "https://doc.rust-lang.org/cargo/reference/build-scripts.html")
-for code generation in a shared crate called `igloo-interface`.
-This interface crate will be used by both the core system, frontend,
-extensions, and scripts.
-
-Code generation allows us to easily generate Rust and Python code from a TOML file.
-In `igloo-interface` we have a file called `components.toml`:
+Because this needs to be polyglot, I've opted to with code generation from a TOML file. Rust #link-new-tab("build scripts", "https://doc.rust-lang.org/cargo/reference/build-scripts.html") will take this TOML and output both Rust & Python typings.
 
 ```toml
 [[components]]
@@ -138,14 +170,9 @@ kind = "Real"
 desc = "Range: 0.0 (0%) - 1.0 (100%)"
 ```
 
-=== Component Types
- - *Single Value*: This is most components, just store 1 value (like `Dimmer`)
- - *Enum*: Generate a custom enum (like `Weekday`)
- - *Marker*: Marker components (also called tag components) are zero-sized types that contain no data. They're used purely for filtering and queries. The `Light` marker is a perfect example: you can query for all entities with both `Light` and `Dimmer` components to find all dimmable lights in the system.
-
 === Values
-I decided to limit the number of types we have in Components.
-This small subset simplifies FFI with Python and other languages by avoiding complex types that don't map cleanly across language boundaries.
+Given that we are supporting Python, I've decided to limit the types.
+For example, we only have 1 integer type and not all possible Rust ints.
 
 ```rust
 type IglooInteger = i64;
@@ -179,3 +206,13 @@ type IglooColorList = Vec<IglooColor>;
 type IglooDateList = Vec<IglooDate>;
 type IglooTimeList = Vec<IglooTime>;
 ```
+
+= Conclusion & Post-Mortem
+I was unhappy with existing smart home device abstractions,
+and decided to look for a new one.
+#link-new-tab("Bevy", "https://bevy.org/") inspired me to apply ECS here, and it worked out well.
+
+I don't think ECS is perfect -- it's not the most ergonomic, can be unintuitive for new users, and is not the easiest to implement. But, I think it's the least bad.
+
+As I've been working through this project, I've constantly questioned if it's the right abstraction, and explored other options. But I keep coming back to it -- which is why I'm confident it's the best choice here.
+
