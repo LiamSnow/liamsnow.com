@@ -148,6 +148,7 @@ main {
   dl,
   dt,
   dd,
+  table,
   p:not(:has(img)) {
     position: relative;
     width: fit-content;
@@ -210,6 +211,7 @@ main {
   ol+p,
   ul+p,
   dl+p,
+  table+p,
   p+p {
     margin-top: 1em;
   }
@@ -298,21 +300,69 @@ main {
     grid-template-columns: auto 1fr;
     gap: 0.3em 0.4em;
     align-items: baseline;
-  }
 
-  dt {
-    font-weight: bold;
-    font-size: 20px;
-    color: $alt-color;
+    dt {
+      font-weight: bold;
+      font-size: 20px;
+      color: $alt-color;
 
-    &::after {
-      content: ":";
+      &::after {
+        content: ":";
+      }
+    }
+
+    dd {
+      margin-left: 0;
+      font-size: 20px;
     }
   }
 
-  dd {
-    margin-left: 0;
-    font-size: 20px;
+  table {
+    $header: light-dark($grey-300, $grey-900);
+
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid $header;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    width: fit-content;
+
+    td {
+      padding: 0.4em 0.8em;
+      border: 1px solid $header;
+    }
+
+    // Typst doesn't output valid tables,
+    // (this is the header)
+    tr:first-child {
+      td {
+        font-weight: bold;
+        color: $alt-color;
+        text-align: left;
+        background: $header;
+      }
+    }
+
+    tr:nth-child(odd) {
+      background: light-dark($grey-250, $grey-930);
+    }
+
+    tr:first-child th:first-child {
+      border-top-left-radius: 0.5rem;
+    }
+
+    tr:first-child th:last-child {
+      border-top-right-radius: 0.5rem;
+    }
+
+    tr:last-child td:first-child {
+      border-bottom-left-radius: 0.5rem;
+    }
+
+    tr:last-child td:last-child {
+      border-bottom-right-radius: 0.5rem;
+    }
   }
 }
 
