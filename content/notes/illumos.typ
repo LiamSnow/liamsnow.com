@@ -1,6 +1,6 @@
 #metadata((
   title: "illumos",
-  desc: "",
+  desc: "The powerful Unix operating system",
   homepage: false,
 )) <page>
 
