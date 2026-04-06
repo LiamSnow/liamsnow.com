@@ -4,9 +4,7 @@
   written: "2025-08-27",
   updated: "2026-03-30",
   links: (
-    ("Project Page", "/projects/igloo"),
-    ("Homepage", "https://igloo.rs"),
-    ("GitHub", "https://github.com/liamsnow/igloo"),
+    ("Igloo", "/projects/igloo"),
   ),
   homepage: true
 )) <page>

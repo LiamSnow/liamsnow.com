@@ -261,11 +261,20 @@
 
         #html.div(id: "post-quick-links")[
           #for item in page.at("links", default: ()) {
+            let text = str(item.at(0))
+            let href = str(item.at(1))
             html.div[
-              #html.a(target: "_blank", href: item.at(1))[
-                #quick-link-icon(item.at(1))
-                #item.at(0)
-              ]
+              #if "." in href {
+                html.a(target: "_blank", href: href)[
+                  #quick-link-icon(item.at(1))
+                  #item.at(0)
+                ]
+              } else {
+                html.a(href: href)[
+                  #quick-link-icon(item.at(1))
+                  #item.at(0)
+                ]
+              }
             ]
           }
         ]

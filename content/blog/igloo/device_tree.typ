@@ -4,14 +4,12 @@
   written: "2025-09-30",
   updated: "2025-09-30",
   links: (
-    ("Project Page", "/projects/igloo"),
-    ("Homepage", "https://igloo.rs"),
-    ("GitHub", "https://github.com/liamsnow/igloo"),
+    ("Igloo", "/projects/igloo"),
   ),
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post, link-new-tab
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
 *Context*:

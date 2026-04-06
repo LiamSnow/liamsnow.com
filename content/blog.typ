@@ -46,7 +46,11 @@
     ]
     #html.div(class: "quick-links")[
       #for item in post.at("links", default: ()) {
-        link-new-tab(item.at(0), item.at(1))
+        if "." in item.at(1) {
+          link-new-tab(item.at(0), item.at(1))
+        } else {
+          link(item.at(0), item.at(1))
+        }
       }
     ]
   ]).join()
