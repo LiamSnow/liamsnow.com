@@ -91,5 +91,5 @@
 #html.div(id: "sections")[
   #make-section("Projects", "projects", projects)
   #make-section("Blog", "blog", blogs)
-  #make-section("Notes", "notes", notes)
+  // #make-section("Notes", "notes", notes)
 ]
