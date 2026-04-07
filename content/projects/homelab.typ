@@ -6,13 +6,13 @@
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post, link-new-tab
+#import "../_shared/template.typ": post, link, link-new-tab
 #show: post
 
 Once upon a time, I decided that I really wanted to start self-hosting
 many of services. Specifically, hosting my photos and files.
 I did this for a few reasons:
- + I want control of my data
+ + I want to control of my data
  + I was not happy with existing options (Google Drive, Proton Drive, etc. all have slow syncing and don't have ignore rules)
 
 = A First Version: Monolith
@@ -117,7 +117,7 @@ on `<service>.liamsnow.com` domains.
 
 However, it limited what services I could run.
 I gave up trying to run Jellyfin (and accompanying services).
-It was also quite a pain to manage - because I am just
+It was also quiet a pain to manage - because I am just
 not a Kubernetes expert. In many ways it taught me
 I never wanted to work in infrastructure lol.
 
@@ -146,21 +146,21 @@ Some sources:
  - #link-new-tab("Key metrics for monitoring etcd", "https://www.datadoghq.com/blog/etcd-key-metrics/")
 
 So, I worked on getting Flake 1 back up and running. I had to:
-+ SSH tunnel iDRAC through my PC so I could remotely manage Flake1
-+ Split the RAID array into two parts (one for Talos, one for mayastor)
-+ Reinstall Talos, by using virtual media in iDRAC
-+ Set up the node back into the cluster
+ + SSH tunnel iDRAC through my PC so I could remotely manage Flake1
+ + Split the RAID array into two parts (one for Talos, one for mayastor)
+ + Reinstall Talos, by using virtual media in iDRAC
+ + Set up the node back into the cluster
 
 But this didn't work. The cluster was broken and Flake 1 couldn't recover the damage it did.
 
 I was frustrated and wanted to give up. But I couldn't go back to
-a bunch of Docker containers..
+a bunch of Docker containers...
 
 = NixOS
 NixOS seemed like everything I wanted.
 Everything was defined from config files,
 it made adding services easy, and had
-proper segmentation of services without needing docker.
+proper segmentation of services without needing Docker.
 
 It was quite a great experience. I basically got immich running with just:
 
@@ -173,7 +173,7 @@ rollback when things broke, add automatic updating, and more.
 
 But I soon encountered that NixOS is double-edged sword:
  + Services work great when their popular. Their nixpkgs are maintained and constantly upgraded
- + Unpopular services have either no nixpkg, it's out of date, or its #link-new-tab("completely broken", "https://github.com/NixOS/nixpkgs/issues/438433")
+ + Unpopular services have either no nixpkg, it's out-of-date, or its #link-new-tab("completely broken", "https://github.com/NixOS/nixpkgs/issues/438433")
 
 I do love self-hosting, but I can't always dedicate that much time to it.
 This means that I am just simply not very good at writing Nix derivations
@@ -183,29 +183,31 @@ pretty horrible sometimes.
 Even with its faults, I still choose to host most of my of services on NixOS.
 
 = Helios
-I am planning to apply to #link-new-tab("Oxide", "https://oxide.computer/").
-So, I want to familiarize myself with
-#link-new-tab("Helios", "https://github.com/oxidecomputer/helios"),
-Oxide's OS built on #link-new-tab("illumos", "https://illumos.org/").
+Before applying to #link-new-tab("Oxide", "https://oxide.computer/"), I want to familiarize myself with
+#link-new-tab("Helios", "https://github.com/oxidecomputer/helios")
+(an #link-new-tab("illumos", "https://illumos.org/") distro).
+After following #link-new-tab("helios-engvm", "https://github.com/oxidecomputer/helios-engvm") and a bunch of patching (see below), I managed to get _this website_ hosted on Helios!
 
-Since I am just running NixOS on Flake 2, I have Flake 1 free
-to be my experimentation server. I managed to get Helios
-running on it with no trouble at all. In fact, I would say it
-was easier than Arch linux to setup.
+== Fish
+Next, I attempted to compile my favorite shell, #link-new-tab("Fish", "https://fishshell.com/"), which completely failed.
+I found a long-standing #link-new-tab("issue", "https://github.com/fish-shell/fish-shell/issues/11099") for illumos support that had been held up while waiting for changes to #link-new-tab("nix", "https://crates.io/crates/nix"), which had now been resolved.
+I spent time properly handling illumos-specific issues -- `POSIX_SPAWN` flags being `i16`, no good way to check whether a directory is remote, and missing `MEMLOCK`/`NPROC` limits.
+I noticed that `_CS_PATH` was missing from libc, so I added a workaround for Fish and a proper #link-new-tab("PR back to libc", "https://github.com/rust-lang/libc/pull/4956").
+Finally, I put all of this into a #link-new-tab("PR", "https://github.com/fish-shell/fish-shell/pull/12410"), and now #link-new-tab("Fish 4.5.0", "https://github.com/fish-shell/fish-shell/releases/tag/4.5.0") has illumos support.
 
-It has only been a great experience learning more about illumos.
-I had some trouble getting some things running
-(ex. #link-new-tab("my fish shell fork", "https://github.com/LiamSnow/illumos-fish-shell"))
-but nothing was too hard.
+== Zones
+The part I was most excited about in hosting on Helios was using zones. I spent some time #link("learning about zones", "../notes/illumos") and setting up a few of them. One of them hosts my website and has a simple continuous deployment system using GitHub webhooks. Another is for the reverse proxy.
 
-I have moved my reverse proxy
-(#link-new-tab("Caddy", "https://caddyserver.com/docs/quick-starts/reverse-proxy"))
-and this website to Helios, with each in their own zone.
+== rust-rpxy
+I chose #link-new-tab("rust-rpxy", "https://github.com/junkurihara/rust-rpxy") for the reverse proxy.
+It was close to compiling and only required gating out all `SO_REUSEPORT` calls in illumos.
+After compiling and running it, it would segfault due to an address boundary error.
+After tracing it with truss and exploring possible causes, I noticed it was probably #link-new-tab("mimalloc", "https://github.com/microsoft/mimalloc").
+I couldn’t find any mention of illumos on mimalloc, and decided that gating it out for illumos was the right option.
+I put these changes back into a #link-new-tab("PR to rust-rpxy", "https://github.com/junkurihara/rust-rpxy/pull/478").
+
 
 = Conclusion
-I am super happy I decided to start self-hosting.
-It has taught me so many invaluable skills and let
-me take back control of my data.
-
-I'm excited for what the future holds for my homelab!
+Self-hosting has been a long and interesting journey, teaching me invaluable skills outside of programming itself.
+I certainly don't expect this to end here, and I'm excited for the future holds for my homelab!
 
