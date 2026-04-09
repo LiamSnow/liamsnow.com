@@ -51,22 +51,13 @@ but eventually got impatient, and decided to use it even while experimental.
 and it's not perfect, but its good enough.
 
 = URLs & Queries
-I debated a few ways to handle routing, and landed on file path-based URLs, which is clean and easy to work with:
- - `content/index.typ` → `/`
- - `content/blog.typ` → `/blog`
- - `content/main.js` → `/main.js`
- - `content/blog/igloo/penguin.typ` → `/blog/igloo/penguin`
- - `content/blog/igloo/index.typ` → `/blog/igloo`
+I saw two ways to handle routing: explicitly defined URLs in files or implicitly defined URLs based of file path.
+Explicit is simple to implement and makes indexing easy.
+For example, since `/blog` needs to know about all the blog posts, it can simply read the file and build links to each post.
 
-But I had a problem -- how will `/blog` know about all the blog posts (to be able to link them)?
-If we chose a different model, like URLs specified in JSON files, it could simply read those files -- here we don't have this luxury.
-
-While we could make the Rust code know about the specific structure of the website (IE it would know to pass in blog posts when compiling `blog.typ`), it's not very clean. We could also separately maintain JSON files just for `blog.typ`, but that's also not great. 
-
-Instead, I found a clean solution that fits perfectly into Typst:
- + Require each page to specify #link-new-tab("metadata", "https://typst.app/docs/reference/introspection/metadata/"), which is like Markdown front matter
- + Allow pages to query for the metadata of other pages
-   - The result of the query should then be passed in as a #link-new-tab("system input", "https://typst.app/docs/reference/foundations/sys/")
+I really wanted to do implicit because it was nice to work with, but to do this, I needed a solution for indexes. The cleanest solution I came up with was to require each page to:
+ + Require each page to specify #link-new-tab("metadata", "https://typst.app/docs/reference/introspection/metadata/") (like Markdown front matter)
+ + Allow pages to query for the metadata of other pages, passing the result when compiling that file as a #link-new-tab("system input", "https://typst.app/docs/reference/foundations/sys/")
 
 
 ```typst
@@ -84,10 +75,11 @@ Instead, I found a clean solution that fits perfectly into Typst:
 }
 ```
 
-This system is particularly nice because of its flexibility. While `blog.typ` only reads blog posts, `index.typ` needs blog posts + projects. We can even do fancier things, like on #link("igloo")[igloo's project page], grabbing only the blog posts for igloo, and splitting them into categories based on their publish date.
+This system is both elegant and powerful.
+It supports `blog.typ` (needs blog posts), `index.typ` (blog posts and projects), and even #link("igloo")[igloo's project page] (blog posts on only igloo, split by version).
 
 = The Code
-The code is divided up into 3 key parts:
+The code is divided up into 3 key modules:
  + *Indexer* (could use a better name):
    - Walks the root directory, discovering all files (Typst, SCSS, and other)
    - Reads all files into memory
@@ -98,7 +90,9 @@ The code is divided up into 3 key parts:
    - Compiles Typst → HTML, SCSS → CSS, and keeps other file as-are 
    - Creates routing table (URL path → HTTP response)
      - Requires making responses for each path: uncompressed/identy responses, #link-new-tab("Brotli", "https://brotli.org/") compressed responses, 304 not modified, etag
- + *Web*: The HTTP/1.1 server
+ + *Web*: the HTTP/1.1 server
+   - Accepts TCP connections
+   - Reads headers to find method, path, ETag, and Brotli support
    - Uses routing table to quickly dispatch responses
 
 _Note_: Both the indexer and compiler leverage #link-new-tab("rayon", "https://crates.io/crates/rayon") to parallelize their steps. This was chosen over Tokio because of its synchronous nature (file reading, Typst compilation, ...).
@@ -146,14 +140,6 @@ It took a bit of digging through Typst source code, and mostly fighting their vi
 
 Using this, we can combine the metadata retrieval with the file reading. This reduces complexity and has *much* better performance.
 
-= HTTP/1.1 Server
-This ended up being a lot simpler than I thought.
-Since we already have all our responses generated, we only need a few things:
- + Reading headers to find method, path, ETag, and Brotli support
- + GET + HEAD handling
- + TCP keep alive
- + POST + body reading for GitHub webhooks
-
 = Other Features
 
 == SCSS
@@ -163,9 +149,9 @@ work for compiling SCSS, but also expose my in-memory file system to it.
 == Hot Reloading
 Having a hot reload system really helps with writing posts.
 So I set up a pretty simple system for this:
- + Inject some code into the website which will connect to a websocket. When it recieves a message, refresh the page.
+ + Inject some code into the website which will connect to a WebSocket. When it receives a message, refresh the page.
  + Watch for any file modifications in `content/` (create, remove, modify)
-   + Upon change, rebuild, then notify websockets
+   + Upon change, rebuild, then notify WebSockets
 
 I couldn't use `typst watch` for a few reasons:
  + Typst doesn't know about our dependencies from our custom query system
