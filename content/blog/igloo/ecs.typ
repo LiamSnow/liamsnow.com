@@ -18,9 +18,9 @@
  - Igloo extensions are separate processes that are effectively device drivers (bridging vendor-specific interfaces and Igloo)
 
 = The Problem
-We need a way to abstract away the nuances of the vendor-specific interfaces to their devices. Without this, we'd break the cohesion of Igloo.
-
-*Ex.* Let's say a user has 4 lights in their kitchen, all from different vendors. The user must be able simply turn off all the lights together, without ever thinking about the different vendor-specific interfaces.
+Igloo needs a way to bring to cohesion into a world of non-cohesive devices.
+This is a very important part of what a smart home platform does.
+For example, let's say a user has 4 lights in their kitchen, all from different vendors. The user must be able simply turn off all the lights together.
 
 == Goals for the Abstraction
 We have a few goals for the abstraction
