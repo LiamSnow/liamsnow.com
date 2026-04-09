@@ -22,19 +22,7 @@ Igloo needs a way to bring to cohesion into a world of non-cohesive devices.
 This is a very important part of what a smart home platform does.
 For example, let's say a user has 4 lights in their kitchen, all from different vendors. The user must be able simply turn off all the lights together.
 
-== Goals for the Abstraction
-We have a few goals for the abstraction
- - Some goals fight against each other -- it's a balancing game
-
-*Exposes Nuances*:
- - Devices shouldn't be handicapped. Maybe some lights support a transition time, and others support effects -- all of these should be exposed
- - New types of devices should be fit in
-
-*Cohesive*: See example above
-
-*Easy to Use*: It shouldn't be extremely complicated to use
-
-*Polyglot*: Must work well in at least Rust & Python, and ideally also Go & TypeScript
+Along with this, the model must be easy to use and polyglot -- working in at least Rust and Python. Ideally, the model should expose as much nuance as possible -- device's shouldn't be handicapped in order to fit in.
 
 = Case Studies
 == Home Assistant
