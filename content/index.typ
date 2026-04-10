@@ -23,7 +23,7 @@
       Hi, I'm William (Liam) Snow IV
       - CS MS & ECE BS @ Worcester Polytechnic Institute
       - Rust #html.img(src: "icons/cuddlyferris.svg", width: 23, height: 17, alt: "Rust icon"), systems, backend, & more
-      - My #link("programming journey", "journey")
+      - My programming #link("journey", "journey")
     ]
 
     Everything on this website is written by me (not an AI).

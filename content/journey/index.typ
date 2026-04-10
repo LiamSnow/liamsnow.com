@@ -8,7 +8,12 @@
 #import "../_shared/template.typ": post, link, link-new-tab 
 #show: post
 
-I started programming at a very young age, and over the years, I have explored many areas, experienced plenty of burnout, and even considered leaving it entirely. This is my recount of that journey.
+I started programming at a very young age, and over the years, I have explored many areas, experienced plenty of burnout, and even considered leaving it entirely. This is my recount of that journey, and what I've learned along the way.
+
+*TL;DR*: Minecraft got me into programming, I really got into it in high school, JavaScript and front-end made me hate it, and Rust made me love it again (and more than I had before). I also learned:
+ + Learning by doing is great, but it can never replace the need for plain learning
+ + Documenting is as important, if not more, than learning and doing
+ + I'd rather do less, but do it right. I wouldn't call myself a perfectionist, but I am quite restless about quality.
 
 = Elementary & Middle School
 
@@ -204,10 +209,3 @@ Sometimes I wish my CS journey went differently -- that I spent more time learni
 But, I can't be happier with where am I know and what I've accomplished.
 Through this extremely non-linear, mostly self-guided journey I've managed to achieve a lot.
 
-I've learned a lot of lessons the hard way, which sucks, but means they've really stuck:
- + *Learning by doing is great, but it can never replace the need for plain learning*
-   - While I initially learned this in middle school (making Unreal Engine games), I don't think I truly spent enough time learning until junior year of college
- + *Documenting is as important, if not more, than learning and doing*
- + A balanced life makes me a better person and programmer (spending time with friends, working out, eating well, etc.)
- + I'd rather do less, but do it right. I wouldn't call myself a perfectionist, but I am quite restless about quality.
- + I just don't like JavaScript/TypeScript and front-end
