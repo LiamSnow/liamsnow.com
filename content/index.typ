@@ -23,11 +23,12 @@
       Hi, I'm William (Liam) Snow IV
       - CS MS & ECE BS @ Worcester Polytechnic Institute
       - Rust #html.img(src: "icons/cuddlyferris.svg", width: 23, height: 17, alt: "Rust icon"), systems, backend, & more
+      - My #link("programming journey", "journey")
     ]
 
-    *#underline[Nothing] on this website is written by AI* 
+    Everything on this website is written by me (not an AI).
 
-    Please give feedback/critiques via #link-new-tab("email", "mailto:mail@liamsnow.com")!
+    I always love feedback/critiques -- #link-new-tab("email", "mailto:mail@liamsnow.com") is best for that!
 
     #social()
   ]

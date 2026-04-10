@@ -186,34 +186,6 @@ main {
     margin-top: 0.4em;
   }
 
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  a:not(.post-back):not(.post),
-  ol,
-  ul,
-  li,
-  dl,
-  dt,
-  dd,
-  table,
-  p:not(:has(img)) {
-    position: relative;
-    width: fit-content;
-
-    &::before {
-      content: "";
-      z-index: -1;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-  }
-
   h2 {
     font-size: 2em;
     margin-top: 1.2em;
@@ -229,6 +201,7 @@ main {
     font-size: 1.6em;
     margin-top: 1.0em;
     margin-bottom: 0.3em;
+    width: fit-content;
     background: $main-bg-ldark;
     padding-left: 0.3em;
     padding-right: 0.3em;
@@ -240,6 +213,7 @@ main {
     font-size: 1.4em;
     margin-top: 1.0em;
     margin-bottom: 0.3em;
+    width: fit-content;
     background: $main-bg-ldark;
     padding-left: 0.4em;
     padding-right: 0.4em;
@@ -250,6 +224,7 @@ main {
   h5 {
     font-size: 1em;
     margin-top: 0.2em;
+    width: fit-content;
   }
 
   h6 {
@@ -262,7 +237,8 @@ main {
   p+dl,
   dl+p,
   table+p,
-  p+p {
+  p+p,
+  details+p {
     margin-top: 1em;
   }
 
@@ -413,6 +389,19 @@ main {
       border-bottom-right-radius: 0.5rem;
     }
   }
+
+  details {
+    margin-top: 1em;
+    padding: 0 1em 0 1em;
+    border: 1px solid $grey-border;
+    border-radius: 10px;
+
+    summary {
+      font-size: 20px;
+      cursor: pointer;
+    }
+  }
+
 }
 
 .posts {
