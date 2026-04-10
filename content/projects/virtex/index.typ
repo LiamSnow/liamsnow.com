@@ -5,43 +5,67 @@
   ended: "2022-05-28",
   lang: "SystemVerilog",
   links: (
-    ("GitHub", "https://github.com/34-Engineering"),
+    ("HDL", "https://github.com/34-Engineering/Virtex-HDL"),
+    ("PCBs", "https://github.com/34-Engineering/Virtex-PCBs"),
+    ("CAD", "https://github.com/34-Engineering/Virtex-CAD"),
+    ("App", "https://github.com/34-Engineering/Virtex-App")
   ),
   homepage: false
 )) <page>
 
-#import "/_shared/template.typ": post
+#import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
-During COVID-19, I designed an FPGA-based vision camera for FIRST Robotics Competition to address latency issues in existing solutions like LimeLight. LimeLight had 50-100ms latency, which required control algorithms to compensate for outdated position data. For example, a turret tracking a target needs to account for where the target was 50ms ago, not where it is now.
+= Context
+In FRC (#link-new-tab("FIRST Robotics Competition", "https://www.firstinspires.org/programs/frc/")), its quite common to need to use a camera to track the position of target.
+For a long time, these targets were simply retro-reflective tape.
+Teams struggled with this challenge for a long time, but eventually the #link-new-tab("LimeLight", "https://limelightvision.io/") came out, which enabled teams to easily setup vision systems.
+It was a camera module, RPi compute module, custom PCB, green LEDs, and fan packaged into a nice module, with pre-made software and FRC integration.
 
-Virtex achieved 815fps retro-reflective target tracking with minimal latency, eliminating the need for latency compensation in control systems.
+The LimeLight made FRC vision systems easy, buts it's high latency (50-100ms), required a lot of workarounds.
+If it were placed on a turret, which was then on a moving robot, the control algorithms simply could not run off of its data directly.
+Many teams, including mine, would run control algorithms on encoder positions, updating their target position based on LimeLight data.
+Additionally, latency compensation was often necessary -- updating the target encoder position based off where it was when the image was taken, not where it is now.
 
-== Technical Approach
+Furthermore, LimeLight's use of green LEDs to highlight the retro-reflective target, led to unrealibility in different environments.
+It was almost necessary for teams to tune their LimeLight vision pipelines at each competition, and if sunlight was involved, it could break the entire system. 
 
-The main challenge was implementing vision processing entirely in the FPGA pipeline without external RAM. Traditional vision processing uses multiple stages with intermediate buffering, but I had to design a single-pass pipeline that processed each frame in one shot. This constraint required reimagining standard vision algorithms to work within the FPGA's block RAM limitations.
+= Introduction
+I wanted to make something better than LimeLight, and started this project.
+I had two keys ideas:
+ + Use 940nm (barely emitted by the sun) to avoid the green LED problem
+ + Do all the vision processing on an FPGA for "real-time" processing
 
-The hardware consisted of a compact 1.5" x 2" eight-layer PCB integrating an Artix-7 FPGA (XC7A35T), FTDI USB chip, and Onsemi image sensor.
+This project was extremely difficult, requiring three of the most complicated PCBs I had designed before, a custom housing, working with Chinese manufacturers, and a lot of SystemVerilog.
 
-== Outcome
+While the project was successful, FRC switched from retro-reflective tape to April tags before I released it -- something that is _probably_ impossible to fully process on a reasonably priced FPGA.
 
-I successfully demonstrated 815fps tracking, but FIRST Robotics Competition switched from retro-reflective tape to AprilTags before the project could be deployed. This architectural change made the specialized hardware obsolete, and I shelved the project.
+= Implementation
 
-= Sources
- - #link("https://github.com/34-Engineering/Virtex-HDL")[Virtex HDL]: Xilinx Vivado project for the Artix-7 FPGA
- - #link("https://github.com/34-Engineering/Virtex-PCBs")[Virtex PCBs]: Altium source for PCBs and adapter board
- - #link("https://github.com/34-Engineering/Virtex-CAD")[Virtex CAD]: Fusion 360 CAD files
- - #link("https://github.com/34-Engineering/Virtex-App")[Virtex App]: Angular + Electron desktop application for configuration and camera stream viewing
+I wanted the camera to be quite small, which made the PCB design exceptionally hard.
+The final version had 3x 1.5" x 2" PCBs: an aluminum PCB for the 940nm IR LEDs, a PCB for power and connections, and an eight-layer PCB.
+The eight-layer PCB held most of the complexity: an Artix-7 FPGA (XC7A35T), FTDI USB chip, and Onsemi Python 300 image sensor (915 fps \@ 480p).
+
+To keep the latency down, I opted for single-pass vision processing with no external RAM (extremely uncommon).
+I couldn't find anything about this style of vision processing (single-pass, no RAM, quadrilateral detection), and had to come up with something completely novel.
+I certainly don't think it's the best design, but it did work.
+Initially, I prototyped designs in MATLAB, and later in TypeScript.
+While somewhat helpful, doing this also hurt me, because I'd try to map traditional code into HDL, which didn't make sense.
+
+(Maybe one-day I'll compile my massive Virtex log into this post)
+
 
 = Images
+#html.elem("img", attrs: (
+  src: "virtex/virtex_main_pcb_back.jpeg",
+  width: "50%"
+))
+
+#html.elem("img", attrs: (
+  src: "virtex/virtex_main_pcb_front.jpeg",
+  width: "50%"
+))
+
 #html.img(src: "virtex/virtex2_on.jpeg")
 
 #html.img(src: "virtex/virtex2_desk.jpeg")
-
-== PCB
-
-Eight-layer PCB integrating FTDI USB chip, Artix-7 FPGA, and Onsemi image sensor:
-
-#html.img(src: "virtex/virtex_main_pcb_back.jpeg")
-
-#html.img(src: "virtex/virtex_main_pcb_front.jpeg")
