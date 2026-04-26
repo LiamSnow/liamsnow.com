@@ -1,10 +1,12 @@
 #metadata((
-  title: "Making a blazing fast node-based editor",
-  desc: "How I made Igloo Penguin in Rust WASM",
-  written: "2025-10-05",
-  updated: "2025-10-05",
+  title: "Penguin",
+  desc: "A Node-Based Visual Programming Language in Rust WebAssembly",
+  started: "2025-09-05",
+  ended: "2025-10-05",
+  lang: "Rust",
   links: (
-    ("Igloo", "/projects/igloo"),
+    ("GitHub", "https://github.com/liamsnow/penguin"),
+    ("Demo", "/projects/penguin/demo.html"),
   ),
   homepage: true
 )) <page>
@@ -12,24 +14,14 @@
 #import "../../_shared/template.typ": post, link-new-tab
 #show: post
 
-#html.img(src: "penguin.png")
+#html.a(target: "_blank", href: "/projects/penguin/demo.html")[
+    #html.img(src: "penguin/screenshot.png")
+]
 
-*Context*: Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/"), connecting any smart home device into a cohesive system.
+Penguin is a visual programming language (VPL) for automations in #link("/projects/igloo", "Igloo").
+It's a node-based VPL (as opposed to Scratch/Blockly) to enable easily creating branching logic, while keeping the code clean.
+I also just think they look cool!
 
-= Background
-
-An essential piece of making Igloo powerful and intuitive, is making a good automation system.
-This is where Penguin comes in -- it's a visual programming language that
-makes it possible for people to quickly and easily make their automations.
-
-= Block or Node Based
-When I started I saw 3 clear ways to make Igloo:
- + Block-based like #link("https://scratch.mit.edu/")[Scratch] and #link("https://developers.google.com/blockly")[Blockly]
- + Node-based like #link("https://www.unrealengine.com/fr/blog/introduction-to-blueprints")[Unreal Engine Blueprints], #link("https://www.ni.com/en/shop/labview.html")[LabVIEW], #link("https://n8n.io/")[n8n], and others
-
-I chose node-based for two key reasons:
- + Execution flow is much easier to follow in node-based, simply follow the white wire. In block-based it can be all of the place with different functions and long blocks for conditionals.
- + n8n has shown a lot of success for creating automations and is loved among users who have minimal or no coding experience
 
 = What Makes a Good VPL
 My experience with visual programming languages (VPLs) has been pretty mixed.
@@ -231,7 +223,7 @@ Now, in the dirty tracking system:
 I'm super happy with the final solution.
 It's performance while still being easy to read, follow, and add new features to.
 
-#html.img(src: "penguin.png")
+#html.img(src: "penguin/screenshot.png")
 
 = What's Next
 Eventually I need to work on the Penguin executor, but before that's possible,
