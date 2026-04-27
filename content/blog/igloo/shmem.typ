@@ -1,6 +1,6 @@
 #metadata((
-  title: "Distributed Device Tree & New IPC",
-  desc: "Shared memory, ring buffers, atomics, seqlocks, & more",
+  title: "Lock-Free Concurrent State Storage",
+  desc: "Designing ECS storage & queries for Igloo",
   written: "2026-02-23",
   updated: "2026-02-23",
   links: (
@@ -13,22 +13,24 @@
 #show: post
 
 *Context*:
- - Igloo is a smart home platform like #link-new-tab("Home Assistant", "https://www.home-assistant.io/"), connecting any smart home device into a cohesive system
- - Igloo extensions are effectively device drivers (bridging vendor-specific interfaces and Igloo)
- - Igloo currently runs extensions as separate processes #link("providers")[(see post)]
- - Igloo abstracts devices using the ECS model #link("ecs")[(see post)]
+ - Igloo is a smart home platform, connecting any smart home device into a cohesive system
+ - Igloo device drivers bridge vendor-specific interfaces to Igloo
+ - Igloo currently runs device drivers & automations as separate processes
+ - Igloo uses entities and components to model devices #link("model")[(see post)]
+
+Note: This post is slightly out-of-date.
 
 = Background
-The current IPC is 1 Unix socket between the core and each extension.
+The current IPC is 1 Unix socket between the core and each driver/automation.
 This is not only a massive bottleneck (serializing device communication),
-but also means each extension needs to route commands.
+but also means each driver/automation needs to route commands.
 IE:
- + An extension gets a request over the socket
+ + An driver/automation gets a request over the socket
  + Looks up device in table, finds spsc channel
  + Sends request through spsc channel
  + Device's Tokio task wakes up, dispatches over TCP
 
-This bottleneck also applies for the reverse directory (extension committing
+This bottleneck also applies for the reverse directory (driver/automation committing
 change to the core).
 
 This problem can be somewhat mitigated by splitting the TCP socket
@@ -41,9 +43,9 @@ to explore an option that would give us better speed and remove
 the bottleneck.
 
 = Ring Buffers
-Shared memory means both the core and the extension can see this memory.
+Shared memory means both the core and the driver/automation can see this memory.
 We can have the core create shared memory and send the file-descriptor
-over a Unix socket for the extension to see. 
+over a Unix socket for the driver/automation to see. 
 
 A very common use of shared memory is ring buffers.
 We'd basically make two shared memory spsc (single-producer single-consumer)
@@ -54,7 +56,7 @@ meaning the core could talk directly to each device's Tokio task.
 
 == Notifications
 There's a slight hiccup here and that's a notification system.
-We need a way for the extension and core to know when to check their rx buffers.
+We need a way for the driver/automation and core to know when to check their rx buffers.
 
 Luckily, this is solved problem and has a few answers:
  + *Futex*: reader does a `FUTEX_WAIT` on a count and writer does `FUTEX_WAKE` after putting something new in.
@@ -79,7 +81,7 @@ A nice part is that this has been done and in Rust (#link-new-tab("shmem-ipc", "
 = Distributing the Device Tree
 In the current model, even if we replace Unix sockets with ring buffers,
 we'll always have a bottle neck -- the main thread.
-The main thread owns the device tree. This means any read queries, write queries, or commits from extensions MUST flow through it.
+The main thread owns the device tree. This means any read queries, write queries, or commits from driver/automation MUST flow through it.
 
 So let's get rid of it!
  + Distribute metadata (attached devices, names, groups, etc):

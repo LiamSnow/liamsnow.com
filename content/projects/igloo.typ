@@ -1,13 +1,9 @@
 #metadata((
-  title: "igloo",
-  desc: "A powerful DIY smart home Rust library",
+  title: "Igloo",
+  desc: "A truly smart, smart home platform",
   started: "2025-01-01",
   ended: "Now",
   lang: "Rust",
-  links: (
-    ("Homepage", "https://igloo.rs"),
-    ("GitHub", "https://github.com/liamsnow/igloo"),
-  ),
   homepage: true,
 )) <page>
 
@@ -16,55 +12,100 @@
 #import "../_shared/template.typ": post, link-new-tab 
 #show: post
 
+= Motivation
+
+Most smart homes aren't smart.
+They replace a light switch with a phone app or voice commands, physical timers with timer-based routines, and motion sensing lights with location-based automations.
+
+In my opinion, a smart home should:
+ + Be *semi-autonomous*: not always require initiation (through dashboard or voice)
+ + Have *complex orchestrations* between many heterogeneous sensors and devices
+ + Be *adaptable* and *dynamic*
+
+Some theoretical ideas:
+ - *Alerts* like calendar events, fire alarms, air quality problems, etc.
+    - go beyond one-off notifications
+    - display on screens & output sound
+    - use multiple notification systems
+    - escalate priority if unhandled
+ - *Alarms*
+    - control many devices like lights, speakers, bed temperature, AC, etc.
+    - know off if you're in bed, and awake or deeply asleep
+    - understand urgency like if today is an important event
+ - *Initiate*: read your day plan when you get out of bed (instead of when prompted to)
+    - must understand context: distinguish you getting out of bed in the morning from a nap or simply sitting in bed
+    - adjust depending on: the day, if a guest is present, from calendar data, to-do lists changes, sleep data from that night, etc.
+
+Existing graphical and markup-based (ex. YAML) smart home automation builders either make this impossible or impractical.
+Instead, code must be used, but almost zero tooling exists to help.
+Implementing the complex automations alone is hard, but the dynamic, adaptable, and interruptable parts are especially hard.
+Practically, this is out of reach for a single person to develop and maintain for their home.
+
+
+
 = Background
 
-#link-new-tab("Home Assistant", "https://www.home-assistant.io/") (HASS)
-is a smart home platform that can connect nearly any smart home product. It breaks down vendor lock-in and gives you a single platform to manage your entire home. On top of this, it supports scripting, custom dashboards, and automation. It makes smart homes fun and powerful.
+Smart devices have become cheaper, better, and abundant:
+ - *Household*: lights, speakers, air conditioners, blinds, beds, locks, vacuums, washing machines, etc.
+ - *Sensors*: energy meters, cameras, smoke detectors, air quality sensors, motion detectors, temperature sensors, pool pH sensors, etc.
 
-Home Assistant got me interested in smart homes, and while I think it’s an amazing tool, it has many flaws. In summary:
- - *Resource Hog*: Takes a lot of system resources. In my case, 0.7-1GB of RAM, which is ridiculous for what it's doing. While they claim it can run fine on a RPi 3B+, my experience and the experience of others differs (#link-new-tab("1", "https://community.home-assistant.io/t/twenty-two-things-i-wish-id-known/585631")).
- - *Unintuitive*: HASS has a ton of features, a poorly laid out UI, and essentially turned YAML into a programming language. (#link-new-tab("1", "https://www.thesmarthomehookup.com/home-assistant-beginners-guide-2020-installation-addons-integrations-scripts-scenes-and-automations/"), #link-new-tab("2", "https://community.home-assistant.io/t/twenty-two-things-i-wish-id-known/585631"))
- - *Security*: Has had many security vulnerabilities, and consistently has bad responses (#link-new-tab("1", "https://www.elttam.com/blog/pwnassistant/"))
- - *Architecture*: This is much more of personal gripe than anything. I disagree with implementing device drivers & protocols in Python. Furthermore, it uses JSON strings all over the place which is not only slow, but unreliable. The history system also uses JSON strings and puts them in SQL database, making it take a lot more space than it needs to.
+How these devices communicate is equally varied.
+Some professional systems use wired connections like Ethernet or proprietary serial buses.
+Most consumer devices are wireless, but even among these, there is little consistency.
+A Philips Hue bulb and a TP-Link plug may both be on the same Wi-Fi network but speak entirely different application-level protocols.
+Others use low-power mesh networks like Zigbee, Z-Wave, or Thread, which require a dedicated hub or radio to bridge into the home network.
 
-While the Home Assistant developers and community are working hard to improve it, I think the real solution is a complete rewrite and re-thinking of how it works. This is why I am building Igloo.
+Smart home platforms bridge this, connecting together many devices.
+But, the dominate commercial platforms (Alexa, Google Home, HomeKit, SmartThings) have vendor lock-in, forcing you to use their devices, or devices which support them.
+They also have limited automation capability because they focus on appealing to nontechnical consumers.
 
-= Goals
-Initially, Igloo was meant to be a direct HASS replacement (V2), appealing to a wide audience. This is no longer the goal of it (V3), and is instead made for a niche audience of power users who know Rust.
+#link-new-tab("Home Assistant", "https://www.home-assistant.io/") is much better alternative to these.
+It's a FOSS platform you can throw on a Raspberry Pi which can basically work with any smart home devices (thousands of integrations).
+It's automation system is also pretty limited, forcing Python for anything complex.
 
-Igloo is a DIY smart home Rust library. It provides a cohesive system and collection of crates to help code your own smart home program. Its goals are:
- + *Cohesion*: provides cohesion between device drivers to allow for an ecosystem to exist around Igloo. IE a dashboard crate for Igloo should automatically work with and any and new device drivers
- + *Power*: doesn't limit what you can do in your smart home, and makes advanced functionality easy
- + *Ergonomics*: is a good experience to use
 
-#let cutoff = "2026-02-24"
+= This Project
 
-#let all-posts = {
-  sys.inputs.at("blogs", default: ())
-    .sorted(key: p => p.at("written", default: ""))
+Igloo is trying to enable the complex home automation that I want.
+It's an automation system & a platform that empowers it.
+Like Home Assistant, the platform will connect any smart home device, but it will additionally attempt to:
+ - Expose more features from devices
+ - Be extremely reliable
+ - Have better performance
+ - Consume less resources, enabling it run on more affordable hardware
+ - Start from first principals and going against the status quo when justified
+
+= Igloo's History
+
+Igloo has been the biggest and longest project I have ever worked on.
+I naively started this project thinking it would take month to make a simpler #link-new-tab("Home Assistant", "https://www.home-assistant.io/") replacement (#link("/blog/igloo/v1")[see V1 post]), but turns out, smart homes are trickier than they look!
+
+And yet, I've stuck with this project for so long mostly because the programming is super interesting and it constantly challenges me.
+It's improved me as programmer more than I could've imagined.
+
+As time has gone on, I've changed many technical parts of the project, but also evolved the goal of it.
+I kept trying to make a popular and intuitive Home Assistant competitor (#link-new-tab("see V2 branch", "https://github.com/LiamSnow/igloo/tree/v2")), but it forced the project into directions which I didn't want to go.
+
+I wanted to "have my cake and eat it too:" an intuitive & accessible platform that could also enable really complex home automation.
+These are usually contradictory, and at the end of the day, I realized I wanted the ladder (complex home automation).
+I also just didn't want to be spending my time adding Python support and developing a dashboard with good UI/UX.
+
+
+
+
+
+= Blog Posts
+
+#let posts = {
+  sys.inputs.at("blogs", default: ()).sorted(key: p => p.at("written", default: "")).rev()
 }
 
-#let new-posts = all-posts.filter(p => p.at("written", default: "") >= cutoff).rev()
-#let old-posts = all-posts.filter(p => p.at("written", default: "") < cutoff).rev()
-
-= V3 Updates
 
 #html.div(class: "posts")[
-  #new-posts.map(post => html.a(href: post.url, class: "post")[
+  #posts.map(post => html.a(href: post.url, class: "post")[
     #html.div(class: "title")[#post.title]
     #html.div(class: "desc")[#post.at("desc", default: "")]
   ]).join()
 ]
 
 
-= History
-As I mentioned earlier, Igloo V2 was initially intended to be a direct replacement for HASS. These posts are all related to that version:
-
-#linebreak()
-
-#html.div(class: "posts")[
-  #old-posts.map(post => html.a(href: post.url, class: "post")[
-    #html.div(class: "title")[#post.title]
-    #html.div(class: "desc")[#post.at("desc", default: "")]
-  ]).join()
-]
