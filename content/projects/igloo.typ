@@ -15,7 +15,7 @@
 = Motivation
 
 Most smart homes aren't smart.
-They replace a light switch with a phone app or voice commands, physical timers with timer-based routines, and motion sensing lights with location-based automations.
+They replace a light switch with a phone app or voice commands, outlet timers with timer-based routines, and motion sensing lights with location-based automations.
 
 In my opinion, a smart home should:
  + Be *semi-autonomous*: not always require initiation (through dashboard or voice)
