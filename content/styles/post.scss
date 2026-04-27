@@ -353,20 +353,17 @@ main {
     overflow: hidden;
     width: fit-content;
 
-    td {
+    td,
+    th {
       padding: 0.4em 0.8em;
       border: 1px solid $header;
     }
 
-    // Typst doesn't output valid tables,
-    // (this is the header)
-    tr:first-child {
-      td {
-        font-weight: bold;
-        color: $alt-color;
-        text-align: left;
-        background: $header;
-      }
+    th {
+      font-weight: bold;
+      color: $alt-color;
+      text-align: left;
+      background: $header;
     }
 
     tr:nth-child(odd) {
@@ -387,6 +384,22 @@ main {
 
     tr:last-child td:last-child {
       border-bottom-right-radius: 0.5rem;
+    }
+
+    .good {
+      background-color: light-dark(hsl(152, 40%, 85%), hsl(152, 30%, 18%));
+    }
+
+    .okay {
+      background-color: light-dark(hsl(44, 60%, 85%), hsl(44, 30%, 18%));
+    }
+
+    .meh {
+      background-color: light-dark(hsl(25, 60%, 87%), hsl(25, 30%, 18%));
+    }
+
+    .bad {
+      background-color: light-dark(hsl(0, 50%, 88%), hsl(0, 30%, 18%));
     }
   }
 

@@ -102,22 +102,36 @@ In it, *each core* store a small amount of state for *every cache line*.
 
 == States
 
-#table(
-  columns: 2,
-  [*State*], [*Meaning*],
+#[
+  #import html: *
+  
+  #table()[
+    #tr[
+      #th[*State*]
+      #th[*Meaning*]
+    ]
 
-  [#strong[M]odifed],
-  [Dirty / differs from RAM, only this core has it],
+    #tr[
+      #td[#strong[M]odifed]
+      #td[Dirty / differs from RAM, only this core has it]
+    ]
 
-  [#strong[E]xclusive],
-  [Clean / matches RAM, only this core has it ],
+    #tr[
+      #td[#strong[E]xclusive]
+      #td[Clean / matches RAM, only this core has it ]
+    ]
 
-  [#strong[S]hared],
-  [Clean / matches RAM, multiple cores have it],
+    #tr[
+      #td[#strong[S]hared]
+      #td[Clean / matches RAM, multiple cores have it]
+    ]
 
-  [#strong[I]nvalid],
-  [This core doesn't have it (or the cached value is stale)],
-)
+    #tr[
+      #td[#strong[I]nvalid]
+      #td[This core doesn't have it (or the cached value is stale)]
+    ]
+  ]
+]
 
 == Operations
 === Read
