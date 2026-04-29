@@ -7,6 +7,11 @@
 #import "../_shared/template.typ": post, link-new-tab 
 #show: post
 
+== Jon Gjengset
++ #link-new-tab("impl Rust: One Billion Row Challenge", "https://www.youtube.com/watch?v=tCY7p6dVAGE")
++ #link-new-tab("Decrusting the serde crate", "https://www.youtube.com/watch?v=BI_bHCGRgMY")
++ A lot more
+
 == Graydon Hoare
 + #link-new-tab("The Rust I Wanted Had No Future", "https://graydon2.dreamwidth.org/307291.html")
 + #link-new-tab("Abstract machines and the compilers that love/hate them", "https://graydon2.dreamwidth.org/264181.html")
