@@ -1,0 +1,5 @@
+name = "blitz"
+compatibility_date = "2026-04-30"
+
+[assets]
+directory = "./_site"
