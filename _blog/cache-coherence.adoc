@@ -18,6 +18,7 @@ By understanding your hardware (and specifically the MESI cache coherence protoc
 
 == What do cache coherence protocols solve?
 On most multicore machines, all cores:
+
 * Have their own local caches
 * Share the same RAM
 

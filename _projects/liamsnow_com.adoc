@@ -12,7 +12,7 @@ links:
 homepage: true
 ---
 
-NOTE: This post is out-of-date. I don't have my HomeLab anymore, so it made sense to transfer over to Jekyll + AsciiDoc + Cloudflare Pages.
+NOTE: This post is out-of-date. The HomeLab is gone, and it's hosted on Cloudflare Pages. Additionally, I have experimentally switch to AsciiDoc.
 
 I've been reading other programmers' blogs for a long time and have made many attempts at my own. Now that I'm a lot better at programming and technical writing, I have a new version of the website which looks good, is fast, accessible, and a joy to write content for.
 
