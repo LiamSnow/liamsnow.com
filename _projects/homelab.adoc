@@ -1,0 +1,220 @@
+---
+title: HomeLab
+description: A server rack in my closet running NixOS & Helios illumos
+started: 2024-04-11
+ended: Now
+homepage: false
+---
+
+
+Once upon a time, I decided that I really wanted to start self-hosting
+many of services. Specifically, hosting my photos and files.
+I did this for a few reasons:
+
+ . I want to control of my data
+ . I was not happy with existing options (Google Drive, Proton Drive, etc. all have slow syncing and don't have ignore rules)
+
+== A First Version: Monolith
+
+I took a bunch of old PC parts I had lying around and scrapped
+together a mid-tower build. I set up Arch Linux on it and ran a few things in Docker containers:
+
+ . link:https://nextcloud.com/[NextCloud] for files, photos, and CalDAV
+ . link:https://tailscale.com/kb/1312/serve[Tailscale Serve] to expose services under a public URL which requires users to be on my Tailnet
+   - creates domains like `<service>.<tailnet name>.ts.net`
+
+link:https://tailscale.com[Tailscale] made remote management
+easy. But I had a problem - my disk is encrypted so what happens if my
+server reboots? It'll just be stuck at cryptlvm login.
+To fix this I added
+link:https://github.com/grazzolini/mkinitcpio-dropbear[mkinitcpio-dropbear] which adds
+link:https://matt.ucc.asn.au/dropbear/dropbear.html[Dropbear SSH] 
+into the `/boot` volume and runs it before the disk is decrypted.
+
+=== I Hate NextCloud
+NextCloud continuously frustrated me with how
+complex, slow, and overall just bad it was.
+File syncing was a horrible experience and it wouldn't let me add ignore
+rules (ex. for `node_modules`, `target`).
+It felt over-engineered for what I was doing.
+
+I tried a few competitors to NextCloud, but none of them really had what
+I wanted. So, I decided to scrap the frontend entirely, opting to use
+link:https://syncthing.net/[Syncthing] to host my files.
+This was genuinely an amazing experience. Not only did it allow great ignore rules, it
+was super fast. Combining it with link:https://www.gnu.org/software/stow/manual/stow.html[GNU Stow]
+enabled me to sync my dotfiles between my laptop and PC.
+
+=== More Services
+I added:
+
+ . link:https://immich.app/[Immich] for photos (very much like Google Photos)
+ . link:https://radicale.org/v3.html[Radicale] for CalDAV
+ . link:https://kanidm.com/[Kanidm] OIDC
+ . linkding, mealie, searxng, ..
+
+As I started adding services, I needed a way to manage them.
+I had a folder in `/home` which contained folders for each
+service. Each service had its own `docker-compose.yml`.
+I created a variety of bash scripts to update
+and manage all of them.
+
+While this worked fine, I wanted something more purpose built
+for what I was doing. Furthermore, I just did not
+feel good enough about the security of this to expose
+services to the internet.
+
+== Moving to Kubernetes: Blizzard
+=== Building a Rack
+I took apart my server PC and sold each component. With this money,
+I was able to find some great Facebook Marketplace deals for old
+servers.
+
+I made a rack in closet with the following:
+
+ . Ubiquiti Cable Internet (Cable Modem)
+ . Ubiquiti UDM Pro
+ . Ubiquiti 10G switch (from my Dad)
+ . 2x Dell PowerEdge R430
+   - dual E5-2640v3
+   - 128GB ECC DDR4 2133MHz 
+   - 4x 750GB SAS SSDs
+   - Intel(R) 10GbE 2P X710 Adapter 
+   - PERC H730P Mini (RAID controller I bought separately)
+   - Dual 550W power supplies
+   - Dual (redundant) SD card module (IDSDM)
+ . 1x Skullcandy Intel NUCs (from my Dad)
+ . Rack mount UPS
+
+=== OS
+I installed link:https://www.talos.dev/[Talos Linux]
+on all the 2 Dell servers and NUC. All were configured as both control planes and workers.
+
+Talos Linux is a super cool operating system, meant solely to run Kubernetes (k8s).
+It's an immutable OS with a very small attack surface.
+You simply just configure each node with a YAML file and boot it.
+It doesn't even have SSH!
+
+=== Services
+I used link:https://helm.sh/[Helm]
+and link:https://github.com/helmfile/helmfile[helmfile]
+to configure my cluster.
+
+I ran many of the same services I had on the old setup, but also:
+
+ - link:https://metallb.io/[metallb] to expose a virtual IP for the cluster (to port forward to)
+ - link:https://traefik.io/traefik[traefik] reverse proxy
+ - link:https://github.com/openebs/mayastor[openebs mayastor] to replicate storage across all machines for link:https://en.wikipedia.org/wiki/High_availability[high availability (HA)]
+ - Prometheus + Grafana + Ntfy (mobile notifications)
+ - link:https://github.com/mozilla-services/syncserver[Firefox syncserver]
+
+Getting all my old services running here took a *lot* of time.
+Very few self-hosters run Kubernetes, so almost none of the services
+make it easy to run in Kubernetes.
+
+=== Results
+Overall I was super happy with this setup.
+I was very happy with the security model of this,
+it had HA, and I publicly exposed it to the internet
+on `<service>.liamsnow.com` domains.
+
+However, it limited what services I could run.
+I gave up trying to run Jellyfin (and accompanying services).
+It was also quiet a pain to manage - because I am just
+not a Kubernetes expert. In many ways it taught me
+I never wanted to work in infrastructure lol.
+
+=== The Blizzard Revolution
+I made giant mistakes in this cluster.
+Since Talos was immutable, I placed the OS on the dual redundant SD cards
+and used the RAID array entirely for mayastor.
+
+While I was studying abroad in Morocco I noticed that randomly all
+my services went down. After a long investigation, I think I understand what happened:
+. Flake 1 (dell server) lost IDSDM SD card redundancy because 1 of the SD cards failed. Soon after, it lost the other SD card.
+
+  - While Talos is immutable, it has an ephemeral partition for logs, container data, and etcd data (in this case on the IDSDM) link:https://docs.siderolabs.com/talos/v1.10/configure-your-talos-cluster/storage-and-disk-management/disk-management[source]
+  - SD cards quickly degrade at this high of write frequency
+  - This never alerted me because I never finished setting up iDRAC alerts over Ntfy
+. Flake 1 didn't go out cleanly. It was holding on for dear life:
+  - Its corrupted SD card caused the WAL to become inconsistent. etcd lost track of what it had actually persisted, so its view of the Raft log diverged from what it had already communicated to Flake 2 & 3
+  - Before fully dying, it was sending stale or malformed AppendEntries RPCs to the other nodes, poisoning their view of the log
+  - Timing out as leader or failing heartbeats, triggering reelections
+  - Once Flake 1 was fully down, Flake 2 & 3 were left disagreeing with each other on the state of the cluster
+
+Some sources:
+
+ - link:https://raft.github.io[raft.github.io]
+ - link:https://kubernetes.io/blog/2019/08/30/announcing-etcd-3-4/[Announcing etcd 3.4]
+ - link:https://etcd.io/docs/v3.4/faq/[etcd 3.4 FAQ]
+ - link:https://etcd.io/docs/v3.4/tuning/[etcd 3.4 Tuning]
+ - link:https://www.datadoghq.com/blog/etcd-key-metrics/[Key metrics for monitoring etcd]
+
+So, I worked on getting Flake 1 back up and running. I had to:
+
+ . SSH tunnel iDRAC through my PC so I could remotely manage Flake1
+ . Split the RAID array into two parts (one for Talos, one for mayastor)
+ . Reinstall Talos, by using virtual media in iDRAC
+ . Set up the node back into the cluster
+
+But this didn't work. The cluster was broken and Flake 1 couldn't recover the damage it did.
+
+I was frustrated and wanted to give up. But I couldn't go back to
+a bunch of Docker containers...
+
+== NixOS
+NixOS seemed like everything I wanted.
+Everything was defined from config files,
+it made adding services easy, and had
+proper segmentation of services without needing Docker.
+
+It was quite a great experience. I basically got immich running with just:
+
+```nix
+services.immich.enable = true;
+```
+
+I could secure the machine easily, add anything I wanted with ease,
+rollback when things broke, add automatic updating, and more.
+
+But I soon encountered that NixOS is double-edged sword:
+
+ . Services work great when their popular. Their nixpkgs are maintained and constantly upgraded
+ . Unpopular services have either no nixpkg, it's out-of-date, or its link:https://github.com/NixOS/nixpkgs/issues/438433[completely broken]
+
+I do love self-hosting, but I can't always dedicate that much time to it.
+This means that I am just simply not very good at writing Nix derivations
+for services I want to run. It just makes the experience
+pretty horrible sometimes.
+
+Even with its faults, I still choose to host most of my of services on NixOS.
+
+== Helios
+Before applying to link:https://oxide.computer/[Oxide], I want to familiarize myself with
+link:https://github.com/oxidecomputer/helios[Helios]
+(an link:https://illumos.org/[illumos] distro).
+After following link:https://github.com/oxidecomputer/helios-engvm[helios-engvm] and a bunch of patching (see below), I managed to get _this website_ hosted on Helios!
+
+=== Fish
+Next, I attempted to compile my favorite shell, link:https://fishshell.com/[Fish], which completely failed.
+I found a long-standing link:https://github.com/fish-shell/fish-shell/issues/11099[issue] for illumos support that had been held up while waiting for changes to link:https://crates.io/crates/nix[nix], which had now been resolved.
+I spent time properly handling illumos-specific issues -- `POSIX_SPAWN` flags being `i16`, no good way to check whether a directory is remote, and missing `MEMLOCK`/`NPROC` limits.
+I noticed that `_CS_PATH` was missing from libc, so I added a workaround for Fish and a proper link:https://github.com/rust-lang/libc/pull/4956[PR back to libc].
+Finally, I put all of this into a link:https://github.com/fish-shell/fish-shell/pull/12410[PR], and now link:https://github.com/fish-shell/fish-shell/releases/tag/4.5.0[Fish 4.5.0] has illumos support.
+
+=== Zones
+The part I was most excited about in hosting on Helios was using zones. I spent some time link:../notes/illumos[learning about zones] and setting up a few of them. One of them hosts my website and has a simple continuous deployment system using GitHub webhooks. Another is for the reverse proxy.
+
+=== rust-rpxy
+I chose link:https://github.com/junkurihara/rust-rpxy[rust-rpxy] for the reverse proxy.
+It was close to compiling and only required gating out all `SO_REUSEPORT` calls in illumos.
+After compiling and running it, it would segfault due to an address boundary error.
+After tracing it with truss and exploring possible causes, I noticed it was probably link:https://github.com/microsoft/mimalloc[mimalloc].
+I couldn’t find any mention of illumos on mimalloc, and decided that gating it out for illumos was the right option.
+I put these changes back into a link:https://github.com/junkurihara/rust-rpxy/pull/478[PR to rust-rpxy].
+
+
+== Conclusion
+Self-hosting has been a long and interesting journey, teaching me invaluable skills outside of programming itself.
+I certainly don't expect this to end here, and I'm excited for the future holds for my homelab!
+

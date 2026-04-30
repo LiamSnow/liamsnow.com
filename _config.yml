@@ -1,0 +1,38 @@
+title: Liam Snow
+url: https://liamsnow.com
+
+plugins:
+  - jekyll-asciidoc
+  - jekyll-sitemap
+
+asciidoctor:
+  attributes:
+    source-highlighter: rouge
+
+sass:
+  sass_dir: _sass
+
+collections:
+  blog:
+    output: true
+    permalink: /blog/:title/
+  projects:
+    output: true
+    permalink: /projects/:title/
+  notes:
+    output: true
+    permalink: /notes/:title/
+
+defaults:
+  - scope:
+      type: blog
+    values:
+      layout: post
+  - scope:
+      type: projects
+    values:
+      layout: post
+  - scope:
+      type: notes
+    values:
+      layout: post

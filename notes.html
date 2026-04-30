@@ -1,0 +1,40 @@
+---
+layout: default
+title: Liam's Notes
+extra_css: listing
+---
+
+<div class="preface">
+  <h1>Liam's Notes</h1>
+  <p>I spend a lot of time reading and listening about programming, but had never taken notes. I’ve been making an effort to do this, and hopefully this collection will grow into a great database of knowledge.</p>
+</div>
+
+<ol class="posts">
+  {% assign notes = site.notes | sort: "written" | reverse %}
+  {% for note in notes %}
+  <li{% if note.highlight %} class="highlight"{% endif %}>
+    <div class="top">
+      <div class="info">
+        <a href="{{ note.url }}">{{ note.title }}</a>
+        <p>{{ note.description }}</p>
+      </div>
+      <div class="stats">
+        {% if note.written %}
+        <div>
+          <img src="/icons/written.svg" alt="Written date icon" width="22" height="22">
+          <p>Written:</p>
+          <p class="date">{{ note.written }}</p>
+        </div>
+        {% endif %}
+        {% if note.updated %}
+        <div>
+          <img src="/icons/updated.svg" alt="Updated icon" width="22" height="22">
+          <p>Updated:</p>
+          <p class="date">{{ note.updated }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </li>
+  {% endfor %}
+</ol>

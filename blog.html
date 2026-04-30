@@ -1,0 +1,46 @@
+---
+layout: default
+title: Liam's Blog
+extra_css: listing
+---
+
+<div class="preface">
+  <h1>Liam's Blog</h1>
+</div>
+
+<ol class="posts">
+  {% assign posts = site.blog | sort: "written" | reverse %}
+  {% for post in posts %}
+  <li{% if post.highlight %} class="highlight"{% endif %}>
+    <div class="top">
+      <div class="info">
+        <a href="{{ post.url }}">{{ post.title }}</a>
+        <p>{{ post.description }}</p>
+      </div>
+      <div class="stats">
+        <div>
+          <img src="/icons/written.svg" alt="Blog start date icon" width="22" height="22">
+          <p>Written:</p>
+          <p class="date">{{ post.written }}</p>
+        </div>
+        <div>
+          <img src="/icons/updated.svg" alt="Blog updated icon" width="22" height="22">
+          <p>Updated:</p>
+          <p class="date">{{ post.updated }}</p>
+        </div>
+      </div>
+    </div>
+    {% if post.links %}
+    <div class="quick-links">
+      {% for link in post.links %}
+      {% if link.url contains "." %}
+      <a target="_blank" href="{{ link.url }}">{{ link.text }}</a>
+      {% else %}
+      <a href="{{ link.url }}">{{ link.text }}</a>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ol>

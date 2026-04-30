@@ -1,0 +1,239 @@
+---
+title: Modeling Smart Home Devices
+description: "How existing platforms model devices, and how Igloo will"
+written: 2025-08-27
+updated: 2026-04-26
+links:
+  - text: Igloo
+    url: /projects/igloo
+homepage: true
+---
+
+== Introduction
+Automations and dashboards don't interact with vendor-specific interfaces for every device, but instead, a model the platform provides.
+This model determines how they can control devices and read their current state.
+
+I'm going to grade them on two scales:
+
+ * *Cohesion*:
+   * Allowing two lights from different vendors to be controlled together
+   * Allowing an RGBCT and normal light bulb to be turned off together
+ * *Coverage*:
+   * How many device features are exposed
+   * Exposing nonstandard features like reboot buttons, diagnostic sensors, light effects, etc.
+   * Allowing new/unplanned devices to be modeled   
+
+== Existing Solutions
+Interestingly, every popular platform's model uses composition in some regard.
+Devices are not simply modeled as a light or air conditioner, but composed of smaller units.
+How fine-grained the units are, how they are put together, and other implementation details vary drastically.
+
+=== Home Assistant, Amazon Alexa, Google Home
+https://developers.home-assistant.io/docs/core/entity/[Home Assistant],
+https://developer.amazon.com/en-US/docs/alexa/device-apis/smart-home-general-apis.html[Amazon Alexa], and
+https://developers.home.google.com/cloud-to-cloud/traits[Google Home]
+have surprisingly similar models, composing devices in a flat structure of strictly defined units.
+This approach is relatively simple and provides strong cohesion for devices which fit into the definitions.
+
+These definitions vary between platforms, but all hold a lot of information, and must balance coverage and bloat.
+With too much coverage, definitions become massive, and hold features which many devices don't have.
+
+When a device's feature cannot fit into an existing definitions, all provide three generic units: mode, number, and toggle.
+The mode unit contains all potential modes (a list of strings) and the current mode.
+Two vendors might represent the same functionality, with slightly different names, breaking cohesion.
+
+=== Apple HomeKit
+https://developer.apple.com/documentation/homekit/characteristic-types[HomeKit]
+introduces a hierarchy, where devices are composed services, which are further composed of fine-grained characteristics (`Brightness`, `Volume`, `TargetTemperature`).
+With the plethora of characteristics they define, many devices can be represented.
+This model achieves strong cohesion between all devices, regardless of if the model was explicitly designed for them.
+
+=== Samsung SmartThings & Matter
+Similarly,
+https://developer.smartthings.com/docs/devices/device-profiles[SmartThings] and
+https://docs.silabs.com/matter/latest/matter-fundamentals-data-model/[Matter]
+have a hierarchical model, but with significantly more flexible structures.
+This allows for nearly any device to be represented, but have zero cohesion in of themselves.
+Instead, they define standards for vendors to follow when implementing their devices (https://developer.smartthings.com/docs/devices/capabilities/proposed[1] https://csa-iot.org/wp-content/uploads/2023/10/Matter-1.2-Device-Library-Specification.pdf[2]).
+
+=== Comparison Table
+
+++++
+<table>
+  <tr>
+    <th></th>
+    <th>Home<br>Assistant</th>
+    <th>Amazon<br>Alexa</th>
+    <th>Google<br>Home</th>
+    <th>Smart<br>Things</th>
+    <th>Apple<br>HomeKit</th>
+    <th>Matter</th>
+  </tr>
+  <tr>
+    <td><strong>Levels of Hierarchy</strong></td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>2</td>
+    <td>3+</td>
+  </tr>
+  <tr>
+    <td><strong title="If device can contain multiples of the same unit, or a unit can contain multiples of the same sub-unit">Duplicate Units</strong></td>
+    <td>yes</td>
+    <td>generics</td>
+    <td>no</td>
+    <td>no</td>
+    <td>no</td>
+    <td>no</td>
+  </tr>
+  <tr>
+    <td><strong>Cohesion<br>Mechanism</strong></td>
+    <td>41 strict unit definitions</td>
+    <td>38 strict unit definitions</td>
+    <td>38 strict unit definitions</td>
+    <td>122 sub-unit standards</td>
+    <td>135 strict unit defns.</td>
+    <td>50 device standards</td>
+  </tr>
+  <tr>
+    <td><strong>Extended Coverage<br>Mechanism</strong></td>
+    <td>mode, number, toggle</td>
+    <td>mode, number, toggle</td>
+    <td>mode, number, toggle</td>
+    <td>unstructured<br>(no defns.)</td>
+    <td>---</td>
+    <td>mode</td>
+  </tr>
+  <tr>
+    <td><strong title="Hierarchical models are represented as units + total sub-units">Color Light</strong></td>
+    <td>1</td>
+    <td>4</td>
+    <td>3</td>
+    <td>1 + 4</td>
+    <td>1 + 5</td>
+    <td>1 + 3</td>
+  </tr>
+  <tr>
+    <td><strong title="Hierarchical models are represented as units + total sub-units">Fan with Light</strong></td>
+    <td>2</td>
+    <td>~6</td>
+    <td>~5</td>
+    <td>2 + ~7</td>
+    <td>2 + ~8</td>
+    <td>2 + ~6</td>
+  </tr>
+  <tr>
+    <td><strong title="Cohesion for devices which fit into the models defined structure.">Cohesion (defined)</strong></td>
+    <td class="okay">7</td>
+    <td class="good">9</td>
+    <td class="good">9</td>
+    <td class="meh">5</td>
+    <td class="good">9</td>
+    <td class="good">9</td>
+  </tr>
+  <tr>
+    <td><strong title="Cohesion for devices which do not fit into the models defined structure.">Cohesion (extended)</strong></td>
+    <td class="bad">1</td>
+    <td class="meh">4</td>
+    <td class="meh">4</td>
+    <td class="bad">0</td>
+    <td>---</td>
+    <td class="bad">3</td>
+  </tr>
+  <tr>
+    <td><strong>Coverage</strong></td>
+    <td class="bad">3</td>
+    <td class="bad">3</td>
+    <td class="bad">3</td>
+    <td class="good">9</td>
+    <td class="okay">6</td>
+    <td class="good">8</td>
+  </tr>
+</table>
+++++
+
+=== Conclusion
+
+Typing styles:
+
+ . Untyped / Flexible
+   * Suffers from cohesion → requires standards
+ . Typed with large units (ex. Home Assistant's `Light`)
+   * Opinionated definition must balance coverage & bloat
+   * Struggle with coverage → generic units (reduce cohesion)
+ . Typed with small units (ex. `Dimmable`)
+   * Cannot represent an N-channel relay without additional features
+   * Allowing duplicate `Switch` units → can't distinguish/identify them
+   * Hierarchy has each channel as unit composed of `Switch` and `Channel` → works well
+   * Additional hierarchy → too flexible → requires standards
+
+A strictly typed model with small units & one layer of hierarchy seems to be the best balance of cohesion and coverage.
+
+
+
+
+== Igloo's Solution
+
+The model we concluded with is freakishly similar to the  
+https://en.wikipedia.org/wiki/Entity_component_system[ECS (Entity-Component-System)]
+model!
+While it's really only used for games, it's a great reference to have, and we'll at least be using their naming scheme:
+
+ . *Entity*: a set of components (no duplicates) only
+ . *Component*: a primitive, strictly-typed data property
+   * Contains a name like `Dimmer`
+   * Optionally contains a value `Dimmer(f64)`
+   * Otherwise, acts as a tag
+
+An RGBCT light bulb becomes:
+
+[source,rust]
+----
+(Switch(true), Dimmer(1.0), Color(255, 0, 0),
+  ColorTemperature(2000), ColorMode(Temperature), Light),
+(Seconds(54), Uptime, Sensor),
+(Decibels(−57), WiFiSignal, Sensor),
+(Reset, Trigger),
+...
+----
+
+==== Never Bloated, Backward-Compatible
+If no existing components can model a feature, a new component is added, instead of modifying old ones.
+Bloating the model is never a concern, as adding a new `FancyLightComponent` never affects existing lights, and is only attached to entities which have that behavior.
+This append-only practice can easily be made backwards-compatible with automations or other code.
+
+
+==== Device-Entity Relation
+We have two primary options:
+
+ . Actual Hierarchy:
+   * Device entity exits, which relates to each entity which represents it
+   * This does exist in other ECS implementations, like https://bevy-cheatbook.github.io/fundamentals/hierarchy.html[Bevy]
+ . Flat Tagging:
+   * Give each entity something like a `Device(id)` component
+
+
+==== Systems
+*I don't want to force Igloo into a corner here -- it may choose to have systems like ECS, or it may only have the EC part.
+
+ECS separates data (entities and components) from logic (systems).
+These systems are composed together and non-hierarchical.
+They operate entirely independently, except for their interaction with entities and components.
+
+https://bevy-cheatbook.github.io/programming/queries.html[Queries]
+are the method in which systems specify what entities/components they want to read, and what they want to change.
+They define the shape of entity they are looking for, like ones with a `Dimmer` and `Switch`.
+Queries are intentionally broad, and may find multiple matching entities.
+
+When specificity is needed, tags (components with no values) can be used.
+Tags can mark an entity as a `Light`, it's physical location like `Kitchen`, or anything else.
+Notably, these tags give the user the option to use them, but doesn't require them to.
+
+
+== Conclusion
+
+I landed on the ECS-like device model before fully exploring what was out there.
+I've questioned if this choice was right for a long time, and struggled to find anything else better.
+But, going through and really understanding _what_ makes a model good (or bad) was worthwhile.
+Now, I can confidently say this is the right model.

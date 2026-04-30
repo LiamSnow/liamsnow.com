@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/projects/penguin/penguin-ad6253004af065fb.css" integrity="sha384-nFSOEp6CPTPEEFSpgyNSU+e8DdEEimxJre0tI3T3doHmE0hAsVu2EmJuiVqF0Zbd"/>
+    <title>Penguin</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: monospace;
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #main {
+        background: #111;
+        padding: 50px;
+        width: calc(100% - 100px);
+        height: calc(100% - 100px);
+      }
+    </style>
+  <link rel="modulepreload" href="/projects/penguin/penguin-editor-5ddeb5b8cebcd0a1.js" crossorigin="anonymous" integrity="sha384-7XPnIqXl+xo++oiTRWunUf9ASt3062lFeVNpI8dRF11Rvjuhe8t313u/+yd617u/"><link rel="modulepreload" href="/projects/penguin/snippets/penguin-editor-51132da1755e28de/src/dom/js.js" crossorigin="anonymous" integrity="sha384-PWzh1jwZwzdjeW4a14Gl9TuAV1O04osTz0ccxcWm/MWyVnO727d37J3k2gYDI+1o"><link rel="preload" href="/projects/penguin/penguin-editor-5ddeb5b8cebcd0a1_bg.wasm" crossorigin="anonymous" integrity="sha384-I1M1he83hRDZpT/zZOhspRFAxh9cpJhjUMD3sZj3cM1bCi2Z8GpZzFM+DNB8Q7Ex" as="fetch" type="application/wasm"></head>
+  <body>
+    <div id="main">
+      <div id="penguin"></div>
+    </div>
+
+    <script type="module">
+      window.addEventListener('TrunkApplicationStarted', () => {
+        window.wasmBindings.penguin_start();
+      });
+    </script>
+  
+<script type="module">
+import init, * as bindings from '/projects/penguin/penguin-editor-5ddeb5b8cebcd0a1.js';
+const wasm = await init({ module_or_path: '/projects/penguin/penguin-editor-5ddeb5b8cebcd0a1_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script></body>
+</html>

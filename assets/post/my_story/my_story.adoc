@@ -1,0 +1,201 @@
+---
+title: My Programming Journey
+description: 
+updated: 2026-04-10
+homepage: true
+---
+
+I started programming at a very young age, and over the years, I have explored many areas, experienced plenty of burnout, and even considered leaving it entirely. This is my recount of that journey, and what I've learned along the way.
+
+*TL;DR*: Minecraft got me into programming, I really got into it in high school, JavaScript and front-end made me hate it, and Rust made me love it again (and more than I had before). I also learned:
+ + Learning by doing is great, but it can never replace the need for plain learning
+ + Documenting is as important, if not more, than learning and doing
+ + I'd rather do less, but do it right. I wouldn't call myself a perfectionist, but I am quite restless about quality.
+
+= Elementary & Middle School
+
+.Minecraft got me into programming (Java)
+[%collapsible]
+====
+
+I started playing Minecraft in first grade, and fell in love. I quickly got into link:https://minecraft.wiki/w/Redstone[redstone] to build circuits. When link:https://minecraft.wiki/w/Command_Block[command blocks] were released, along with many more commands, they enabled building complex functionality into the game -- especially when combined with redstone. I’d build mini-games and adventure maps to play with my friends. I kept trying to make these better, using all sorts of weird workarounds.
+
+After fighting these limitations for a long time, I decided I would start making mods for the game (Java). I tried diving in headfirst, which inevitably failed. Eventually, I learned to code, making CLI games, then link:https://en.wikipedia.org/wiki/Java_applet[applets], and finally knew enough to make Minecraft mods.
+====
+
+In the years following, I picked up Python, experimented with Arduinos (C), and made games in link:https://en.wikipedia.org/wiki/Unreal_Engine_4[Unreal Engine 4].
+
+On of my teachers started an FLL (link:https://www.firstlegoleague.org/[FIRST Lego League]) team in 7th grade. I joined, did pretty well, and was invited to join the high school FRC (link:https://www.firstinspires.org/programs/frc/[FIRST Robotics Competition]) team the next year.
+
+= FIRST Robotics Competition
+FRC really sparked something in me; it was the happiest I had been in years.
+I would live and breathe FRC, spending 6 hours in the shop only to go home and work or learn more about it.
+
+I improved more than I ever had as a programmer in this time, and was quickly promoted to lead programmer.
+I learned more than just new Java concepts -- how to architect, make reliable & performant code, work with multiple programmers, control theory (!), and more.
+At this time, I also went beyond robotics programming, learning full-stack programming (HTML, JS, CSS, Google Cloud, Angular) to make dashboards for the robot and a website for the team.
+
+I started getting into the physical robot more -- leaning into the design side, and eventually learning CAD. By the time I was a Sophomore, I liked design more than programming, and started feeling like mechanical engineering was my path.
+
+== Extra Stories
+
+.Personal Growth
+[%collapsible]
+====
+FRC helped me improve as a person and learn to work well in a team. I started out as a pretty cocky kid who was toxic at times and couldn't take feedback. I'm not totally sure why I was this way -- maybe it was because of the friends I surrounded myself with, maybe it was my mental health, or maybe something else. But over time, and with many hard lessons, I really improved as a person and as a teammate. While this might have just been growing up, I really think my robotics team was a major influence.
+====
+
+.Riptide
+[%collapsible]
+====
+
+In my Freshman year, many active members graduated, making the team quite small.
+At the same time, we were struggling to recruit members.
+Although we were in California, STEM was not particularly highlighted at my school, and if anything, it was looked down upon.
+Along with that, most people at the school had no idea _what_ we were even doing (and how cool the robots were!).
+
+While we could show more people our robot, I knew we could do something better -- make a cooler robot (that was painted too).
+Over the summer, I convinced my team to build a t-shirt cannon robot. We spent months prototyping, planning, designing, and eventually, building it.
+
+When the school year started, we brought it to assemblies, football games, and parades. This massively helped the team with recruitment, getting a ton more people to our first meeting. I was particularly proud of this project because it brings robotics to people who would otherwise be uninterested and fosters a love of STEM.
+
+image::/assets/post/my_story/riptide.webp[width=600px]
+====
+
+.HighTide
+[%collapsible]
+====
+After my Freshman year, the team was more dedicated than ever. We met more than ever, even in the off-season. Over the summer, we not only built Riptide, but also HighTide.
+
+HighTide gave us a low stakes environment to try out new things:
+
+ - painting the robot
+ - a proper 2-state elevator with constant force springs
+ - CADing the *entire* robot
+ - CNCing many more parts, including custom gearboxes
+ - a new code architecture
+
+image::/assets/post/my_story/hightide.jpg[width=600px]
+
+I think HighTide is most impressive when compared to previous robots from our team:
+
+++++
+<div style="display: flex; flex-wrap: wrap">
+  <img src="/assets/post/my_story/nebula.webp" width="400px" />
+  <img src="/assets/post/my_story/athena.webp" width="400px" />
+</div>
+++++
+====
+
+.Tsunami
+[%collapsible]
+====
+Our 2020 season was set up perfectly.
+We had a great team, a ton of resources, and made two robots in our off-season (Riptide & HighTide -- see above). 
+
+We went even further than with HideTide -- CADing the entire robot down to each rivet and designing everything from scratch (every gearbox custom, even one with a PTO!). It was certainly my proudest work on the team, and I'm sure others felt that way.
+
+We showed up to the Central Valley Regional, set up our pit, talking to many teams, and went to bed. We were so excited, this was *our year*. But after waking up, we learned that the whole event was shut down for COVID-19. 
+
+image::/assets/post/my_story/tsunami.webp[width=600px]
+====
+
+.Teaching
+[%collapsible]
+====
+Over two summers, Mitali Chowdhury (the other lead programmer) and I ran programming classes for the local community (those on the team, looking to join the team, on another team, or just anyone looking to learn programming).
+She would focus on teaching Java fundamentals, and I would focus on programming for robotics (interfacing with hardware, architecture, state machines, control theory, ...).
+
+Teaching was a great experience for me, and it taught me a lot. I had to learn things on a much deeper level, both to be able to teach and to be able to answer questions.
+
+====
+
+
+= COVID-19
+
+Over COVID (my Junior year), my family decided to move to Maine.
+I continued to help out my FRC team as much as possible.
+I built out upgrades to the codebase, including full simulation (which was almost necessary in COVID) and an entirely new dashboard. 
+
+I met Julia Schatz on the FRC Discord, and she offered to help me learn PCB design.
+She gave me a ton of resources, direct help, and would review designs.
+Julia was an amazing mentor, and I am super appreciative of this.
+
+I slowly got better at PCB design and EE, building more and more ambitious boards.
+Later, I taught myself SystemVerilog and started working with FPGAs.
+With my CAD, PCB, and HDL skills, I was able to make link:../projects/virtex[Virtex], an 815fps IR machine vision camera, which does all image processing on an FPGA.
+It was an ambitious project, and _really_ pushed me.
+
+The start of COVID was a lot of web programming, which I grew to hate, and the rest was almost entirely ECE-related.
+This really *cemented my choice of major in college -- ECE*.
+It was a hard decision for me; I had always imagined myself as a programmer, but it felt right.
+
+
+
+= College
+== Freshman Year
+
+.I took a break from all projects
+[%collapsible]
+====
+Coming to college, I promised myself I was going to be social, which meant not spending all this time working alone on projects.
+This was probably the best decision I've ever made, and in that time, I managed to make some of the best friends I've ever had.
+====
+
+I couldn't get an ECE-related internship that summer, but, I did get a CS internship at Phreesia (C#/.NET).
+I began watching a lot of programming content on YouTube (notably ThePrimeagen), learned Go, started some small personal projects.
+After over a year off, I was back to programming!
+
+
+== Sophomore Year
+When the school year came around, I kept programming.
+One day, I decided I was going to *learn Rust*, simply because I thought it was cool.
+I knew it was going to be hard, so I took a different approach to learning it -- actually sitting down to learn it, before jumping into projects.
+
+I'd been interested in languages before (notably Go), but Rust really piqued my interest.
+I read Rust resources, blogs, and watched Rust content -- all the time.
+Every project I worked on was in Rust.
+It was a positive feedback loop: I spent so much time learning about and working in the language, that I became better at it, which made me want to spend more time learning and working in it.
+
+Coming back to seriously programming felt different this time; *I wasn’t programming or learning for a specific outcome, I genuinely loved doing it*.
+Realizing this, brought me to a hard decision: I still have time to change my career path to CS, should I?
+
+ - Across my life, I've been more interested in CS:
+   - Since I learned programming, I've really only taken ~1.5 years off (and part of that was Freshman year, where I took everything off)
+   - I only seriously did ECE outside of school for ~1.5 years in high school (nothing in college)
+ - I was a lot better at CS
+ - Was I really going to let my distaste for JavaScript and front-end spoil all of CS for me?
+ - Did I love FPGAs and chip design, or did I just love that SystemVerilog was low level?
+
+Obviously, a lot more went into this discussion.
+But I clearly already knew the answer, and *changed my MS to CS*.
+This is also when I started daily driving Arch Linux + NeoVim and started my homelab!
+
+
+== Junior Year
+Junior year, I seriously put the throttle down.
+I started big solo-projects, that I actually completed (which I hadn't really done before): an link:../projects/ical-rs[iCalendar library], an link:../projects/esphomebridge-rs[ESPHome library], link:../projects/opensleep[opensleep v1], and link:../projects/igloo[igloo v1].
+
+After taking CS 4536 (Programming Languages), I was hooked. I made a few experimental languages with various lexers (hand rolled, link:https://logos.maciej.codes/[Logos]) and various parsers (link:https://crates.io/crates/peg[rust-peg], link:https://lalrpop.github.io/lalrpop/[LALRPOP], hand rolled `LL(k)`).
+
+Before my summer internship started, my projects became a full time job. Notably, this is when I started link:../projects/opensleep[opensleep v2] and link:../projects/igloo[igloo v2].
+
+== Senior Year (Now)
+After wrapping up my internship, I completed link:../projects/opensleep[opensleep v2] and published it.
+I've spent of the rest of the of the year working on link:../projects/igloo[igloo v2] (which is my link:https://www.wpi.edu/project-based-learning/project-based-education/major-qualifying-project[Major Qualifying Project]) and both versions of link:../projects/liamsnow_com[this website].
+
+I've been super happy with all of these projects, and they've taught me a lot.
+I particularly loved the reverse-engineering and systems level programming in Opensleep.
+While it wasn't the intention of the project, Igloo (and Jon Gjengset!) made me fall in love with hyper-optimization, and I really got into the weeds. 
+
+This website was also super fun, from a technical perspective and because it got me into technical writing.
+I was bad it and didn't enjoy it, but *very* slowly improved.
+I still don't think I'm a great writer, but I'm a lot better a clearly explaining my ideas.
+Writing helped me more than I thought -- it serves as a reference for me, helps me think through decisions, forces me to justify those decisions, and highlights gaps in my knowledge.
+
+
+= Conclusion
+Sometimes I wish my CS journey went differently -- that I spent more time learning instead of doing, sought mentorship, was better at C++, tried harder to get better internships, or didn't always try to do massive projects which I couldn't complete.
+But, I can't be happier with where am I know and what I've accomplished.
+Through this extremely non-linear, mostly self-guided journey I've managed to achieve a lot.
+

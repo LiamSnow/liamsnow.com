@@ -1,0 +1,95 @@
+---
+layout: default
+---
+
+<div id="post-header">
+  <div id="post-info">
+    <h1>{{ page.title }}</h1>
+    <p>{{ page.description }}</p>
+  </div>
+
+  <ul id="post-stats">
+    {% if page.written %}
+    <li>
+      <img src="/icons/written.svg" alt="Written Icon" width="22" height="22">
+      <p>Written:</p>
+      <p class="date">{{ page.written }}</p>
+    </li>
+    {% endif %}
+
+    {% if page.updated %}
+    <li>
+      <img src="/icons/updated.svg" alt="Updated Icon" width="22" height="22">
+      <p>Updated:</p>
+      <p class="date">{{ page.updated }}</p>
+    </li>
+    {% endif %}
+
+    {% if page.started %}
+    <li>
+      <img src="/icons/rocket_launch.svg" alt="Started Icon" width="22" height="22">
+      <p>Started:</p>
+      <p class="date">{{ page.started }}</p>
+    </li>
+    {% endif %}
+
+    {% if page.ended %}
+    <li>
+      {% if page.ended == "Now" %}
+      <img src="/icons/infinite.svg" alt="Ongoing Project Icon" width="22" height="22">
+      <p>Ongoing</p>
+      {% else %}
+      <img src="/icons/done_all.svg" alt="Project End Date Icon" width="22" height="22">
+      <p>Ended:</p>
+      <p class="date">{{ page.ended }}</p>
+      {% endif %}
+    </li>
+    {% endif %}
+
+    {% if page.lang %}
+    <li class="lang">
+      {% if page.lang == "Rust" %}
+      <img src="/icons/cuddlyferris.svg" alt="Rust Icon" width="22" height="16">
+      {% elsif page.lang == "SystemVerilog" %}
+      <img src="/icons/xor.svg" alt="SystemVerilog Icon" width="22" height="15">
+      {% else %}
+      <img src="/icons/code.svg" alt="Code Icon" width="22" height="22">
+      {% endif %}
+      <p>Language:</p>
+      <p>{{ page.lang }}</p>
+    </li>
+    {% endif %}
+  </ul>
+
+  {% if page.links %}
+  <div id="post-quick-links">
+    {% for link in page.links %}
+    <div>
+      {% if link.url contains "github" %}
+        {% assign icon = "/icons/github.svg" %}
+        {% assign alt = "GitHub Icon" %}
+      {% else %}
+        {% assign icon = "/icons/link.svg" %}
+        {% assign alt = "Link Icon" %}
+      {% endif %}
+
+      {% if link.url contains "." %}
+      <a target="_blank" href="{{ link.url }}">
+        <img src="{{ icon }}" alt="{{ alt }}" width="20" height="20">
+        {{ link.text }}
+      </a>
+      {% else %}
+      <a href="{{ link.url }}">
+        <img src="{{ icon }}" alt="{{ alt }}" width="20" height="20">
+        {{ link.text }}
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div id="post-body">
+  {{ content }}
+</div>

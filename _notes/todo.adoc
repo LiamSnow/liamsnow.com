@@ -1,0 +1,140 @@
+---
+title: TODO
+description: Things I've read or listened to (or want to) and plan to take notes on.
+homepage: false
+---
+
+=== Jon Gjengset
+. link:https://www.youtube.com/watch?v=tCY7p6dVAGE[impl Rust: One Billion Row Challenge]
+. link:https://www.youtube.com/watch?v=BI_bHCGRgMY[Decrusting the serde crate]
+. A lot more
+
+=== Graydon Hoare
+. link:https://graydon2.dreamwidth.org/307291.html[The Rust I Wanted Had No Future]
+. link:https://graydon2.dreamwidth.org/264181.html[Abstract machines and the compilers that love/hate them]
+. link:https://graydon2.dreamwidth.org/247406.html[Rust is mostly safety]
+. TODO add more -- lots of interesting stuff here
+
+=== kernel.org
+. #link-new-tab("What is RCU? -- \"Read, Copy, Update\"", "https://docs.kernel.org/RCU/whatisRCU.html")
+. link:https://docs.kernel.org/locking/seqlock.html[Sequence counters and sequential locks]
+. TODO also add more here
+
+=== Cliffle (Cliff L. Biffle)
+. link:https://cliffle.com/p/dangerust/[Learn Rust the Dangerous Way]
+. link:https://cliffle.com/blog/async-inversion/[How to think about `async`/`await` in Rust] (combine into bigger note about Rust futures & async)
+. link:https://cliffle.com/blog/lilos-cancel-safety/[Mutex without lock, Queue without push: cancel safety in lilos]
+. link:https://cliffle.com/blog/composed-concurrency-in-drivers/[Composing concurrency in drivers]
+. link:https://cliffle.com/blog/on-hubris-and-humility/[On Hubris And Humility]
+. link:https://cliffle.com/blog/rust-mutexes/[Why Rust mutexes look like they do]
+. link:https://cliffle.com/blog/rust-first-mover/[The First-Mover Allocator Pattern]
+. link:https://cliffle.com/blog/bare-metal-wasm/[Making really tiny WebAssembly graphics demos]
+. link:https://cliffle.com/blog/rust-typestate/[The Typestate Pattern in Rust]
+. link:https://cliffle.com/blog/data-on-attacks/[Attacks on my Server: The Data]
+
+=== Rustonomicon
+. link:https://doc.rust-lang.org/nomicon/atomics.html[Atomics]
+. link:https://doc.rust-lang.org/nomicon/vec/vec.html[Implementing Vec]
+. link:https://doc.rust-lang.org/nomicon/arc-mutex/arc-and-mutex.html[Implementing Arc and Mutex]
+. link:https://doc.rust-lang.org/nomicon/uninitialized.html[Uninitialized Memory]
+
+=== Adrian Sampson
+. link:https://www.cs.cornell.edu/~asampson/blog/flattening.html#fn:inline[Flattening ASTs (and Other Compiler Data Structures)]
+. link:https://www.cs.cornell.edu/~asampson/blog/bril.html[Bril: An Intermediate Language for Teaching Compilers]
+. link:https://www.cs.cornell.edu/~asampson/blog/reduction.html[Manual Test-Case Reduction]
+. link:https://www.cs.cornell.edu/~asampson/blog/fpgaabstraction.html[FPGAs Have the Wrong Abstraction]
+. link:https://www.cs.cornell.edu/~asampson/blog/scope.html[Is JavaScript Statically or Dynamically Scoped?]
+
+=== Verdagon (Evan Ovadia)
+. link:https://verdagon.dev/grimoire/grimoire[Borrow checking, RC, GC, and the Eleven (!) Other Memory Safety Approaches]
+. link:https://verdagon.dev/blog/higher-raii-uses-linear-types[Higher RAII, and the Seven Arcane Uses of Linear Types]
+. link:https://verdagon.dev/blog/impossible-optimization[The Impossible Optimization, and the Metaprogramming To Achieve It]
+. link:https://verdagon.dev/blog/group-borrowing[Group Borrowing: Zero-Cost Memory Safety with Fewer Restrictions]
+. link:https://verdagon.dev/blog/exploring-seamless-rust-interop-part-1[Exploring Seamless Rust Interop for Newer Languages, Part 1]
+. link:https://verdagon.dev/blog/first-regions-prototype[Vale's First Prototype for Immutable Region Borrowing]
+. link:https://verdagon.dev/blog/generics-hash-codes-horrors[Hash Codes, Non-Determinism, and Other Eldritch Horrors]
+
+=== Faster than a Lime
+. link:https://www.youtube.com/watch?v=0mqFCqw_XvI&t=427s[Introducing facet: Reflection for Rust]
+. link:https://www.youtube.com/watch?v=YtbUzIQw-so&t=1s[The virtue of unsynn]
+. link:https://www.youtube.com/watch?v=engduNoI6DE&t=757s[strace feels like magic — let’s fix that (with Rust)]
+
+=== Oxide
+. link:https://rfd.shared.oxide.computer/rfd/0609[Futurelock]
+. Helios: link:https://rfd.shared.oxide.computer/rfd/0026[post], link:https://www.youtube.com/channel/UCFn4S3OexFT9YhxJ8GWdUYQ[video]
+. link:https://rfd.shared.oxide.computer/rfd/0400[Dealing with cancel safety in async Rust]
+. link:https://rfd.shared.oxide.computer/rfd/0241[Holistic Boot]
+. Propolis
+. TODO add other Oxide & Friends
+
+
+=== Blargh (Thomas Habets)
+. link:https://blog.habets.se/2025/04/io-uring-ktls-and-rust-for-zero-syscall-https-server.html[io_uring, kTLS and Rust for zero syscall HTTPS server]
+
+
+=== Hillel Wayne 
+. link:https://www.hillelwayne.com/post/influential-dead-languages/[10 Most(ly dead) Influential Programming Languages]
+. link:https://www.hillelwayne.com/post/picat/[Planner programming blows my mind]
+
+=== Mond
+. link:https://herecomesthemoon.net/2025/01/type-inference-in-rust-and-cpp/[Type Inference in Rust and C++]
+
+=== Sunshowers (Rain)
+. link:https://sunshowers.io/posts/rustc-segfault-illumos/[Debugging a rustc segfault on illumos]
+. link:https://rust-cli-recommendations.sunshowers.io/[Rain's Rust CLI recommendations]
+. link:https://lifetime-variance.sunshowers.io/[Lifetime variance in Rust] (combine with link:https://doc.rust-lang.org/nomicon/subtyping.html[Rustonomicon: Subtyping and Variance])
+. link:https://sunshowers.io/posts/types/[The social consequences of type systems]
+. link:https://github.com/sunshowers-code/borrow-complex-key-example[Example: implementing Borrow for complex keys]
+
+
+=== Ginger Bill
+. link:https://www.gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations/[On the Aesthetics of the Syntax of Declarations]
+=== Sebastian Bensusan
+. link:https://blog.sbensu.com/posts/demand-for-visual-programming/[We need visual programming. No, not like that.]
+
+
+=== Fernando Borretti
+. link:https://borretti.me/article/introducing-austral[Introducing Austral: A Systems Language with Linear Types and Capabilities]
+
+=== Chris Siebenmann
+. link:https://utcc.utoronto.ca/~cks/space/blog/programming/ErrorHandlingNotSolvedProblem[I don't think error handling is a solved problem in language design]
+
+=== Polybdenum
+. link:https://blog.polybdenum.com/2025/03/26/why-you-need-subtyping.html[Why You Need Subtyping]
+
+=== Ulrich Drepper
+. link:https://people.freebsd.org/~lstewart/articles/cpumemory.pdf[What Every Programmer Should Know About Memory] (long)
+
+=== Yorick Peterse
+. link:https://yorickpeterse.com/articles/the-inevitability-of-the-borrow-checker/[The inevitability of the borrow checker]
+
+
+=== Celes
+. link:https://blog.celes42.com/the_language_that_never_was.html[The Language That Never Was]
+
+=== Ryan Brewer
+. link:https://ryanbrewer.dev/posts/sequent-calculus[Par Part 1: Sequent Calculus]
+. link:https://ryanbrewer.dev/posts/linear-logic[Par Part 2: Linear Logic]
+
+=== Phantie
+. link:https://phantie.dev/articles/inventing_a_better_compression_algorithm_for_a_specific_problem?category=engineering[Inventing a Better Compression Algorithm for a Specific Problem]
+
+=== Mike Davis
+. link:https://the-mikedavis.github.io/posts/sparse-array-dst/#fighting-for-a-dst-a-fool-s-errand[Sparse arrays in Rust and creating custom DSTs.]
+
+=== Conviva
+. link:https://www.conviva.ai/resource/the-concurrency-trap-how-an-atomic-counter-stalled-a-pipeline/[The Concurrency Trap: How An Atomic Counter Stalled A Pipeline]
+
+
+== Other Topics
+- DTrace
+- eBPF
+- Async architectures (cooperative multitasking, work stealing, etc.) & Tokio specifically
+- LLVM
+- OS
+- VMs
+- PL topics (lexers, parsers, ..)
+- Hashing
+- Maybe also do some basic topics?
+
+

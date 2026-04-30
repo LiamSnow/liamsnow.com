@@ -1,0 +1,18 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "William Snow IV",
+  "alternateName": "Liam Snow",
+  "url": "https://liamsnow.com",
+  "email": "mail@liamsnow.com",
+  "jobTitle": "Software Engineer",
+  "alumniOf": {
+    "@type": "CollegeOrUniversity",
+    "name": "Worcester Polytechnic Institute"
+  },
+  "sameAs": [
+    "https://github.com/liamsnow",
+    "https://www.linkedin.com/in/william-snow-iv-140438169/"
+  ],
+  "description": "Computer Science MS and Electrical & Computer Engineering BS student with a passion for systems programming and backend development."
+}

@@ -1,0 +1,35 @@
+---
+layout: default
+title: Liam's Website
+extra_css: home
+---
+
+<div id="hero">
+  <h1>liam<wbr>snow</h1>
+
+  <div>
+    <h2>About me</h2>
+
+    <div>
+      <p>Hi, I'm William (Liam) Snow IV</p>
+      <ul>
+        <li>CS MS &amp; ECE BS @ Worcester Polytechnic Institute</li>
+        <li>Rust <img src="/icons/cuddlyferris.svg" width="23" height="17" alt="Rust icon">, systems, backend, &amp; more</li>
+      </ul>
+
+      <p>Everything on this website is written by me (not an AI).</p>
+
+      <p>I always love feedback/critiques; <a target="_blank" href="mailto:mail@liamsnow.com">email</a> is best for that!</p>
+
+      {% include social.html %}
+    </div>
+  </div>
+</div>
+
+<div id="sections">
+  {% assign projects = site.projects | where: "homepage", true | sort: "ended" | reverse %}
+  {% include section.html name="Projects" href="/projects" items=projects %}
+
+  {% assign blogs = site.blog | where: "homepage", true | sort: "written" | reverse %}
+  {% include section.html name="Blog" href="/blog" items=blogs %}
+</div>

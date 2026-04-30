@@ -1,0 +1,69 @@
+---
+layout: default
+title: Liam's Projects
+extra_css: listing
+---
+
+<div class="preface">
+  <h1>Liam's Projects</h1>
+  <p>My favorite and best projects I’ve worked on over the years. Many of my older projects are missing from here, but I’ve been slowly adding them.</p>
+</div>
+
+<ol class="posts">
+  {% assign projects = site.projects | sort: "ended" | reverse %}
+  {% for project in projects %}
+  <li{% if project.highlight %} class="highlight"{% endif %}>
+    <div class="top">
+      <div class="info">
+        <a href="{{ project.url }}">{{ project.title }}</a>
+        <p>{{ project.description }}</p>
+      </div>
+      <div class="stats">
+        {% if project.started %}
+        <div>
+          <img src="/icons/rocket_launch.svg" alt="Project start date icon" width="22" height="22">
+          <p>Started:</p>
+          <p class="date">{{ project.started }}</p>
+        </div>
+        {% endif %}
+        {% if project.ended %}
+        <div>
+          {% if project.ended == "Now" %}
+          <img src="/icons/infinite.svg" alt="Ongoing project icon" width="22" height="22">
+          <p>Ongoing</p>
+          {% else %}
+          <img src="/icons/done_all.svg" alt="Project end date icon" width="22" height="22">
+          <p>Ended:</p>
+          <p class="date">{{ project.ended }}</p>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if project.lang %}
+        <div class="lang">
+          {% if project.lang == "Rust" %}
+          <img src="/icons/cuddlyferris.svg" alt="Rust Icon" width="22" height="16">
+          {% elsif project.lang == "SystemVerilog" %}
+          <img src="/icons/xor.svg" alt="SystemVerilog Icon" width="22" height="15">
+          {% else %}
+          <img src="/icons/code.svg" alt="Code Icon" width="22" height="22">
+          {% endif %}
+          <p>Language:</p>
+          <p>{{ project.lang }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% if project.links %}
+    <div class="quick-links">
+      {% for link in project.links %}
+      {% if link.url contains "." %}
+      <a target="_blank" href="{{ link.url }}">{{ link.text }}</a>
+      {% else %}
+      <a href="{{ link.url }}">{{ link.text }}</a>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ol>

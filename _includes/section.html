@@ -1,0 +1,46 @@
+<section>
+  <div class="header">
+    <a href="{{ include.href }}">{{ include.name }}</a>
+  </div>
+  <ol class="posts">
+    {% for item in include.items %}
+    <li{% if item.highlight %} class="highlight"{% endif %}>
+      <div class="info">
+        <a href="{{ item.url }}">{{ item.title }}</a>
+
+        {% if item.lang %}
+        <div class="lang">
+          {% if item.lang == "Rust" %}
+          <img src="/icons/cuddlyferris.svg" alt="Rust Icon" width="22" height="16">
+          {% elsif item.lang == "SystemVerilog" %}
+          <img src="/icons/xor.svg" alt="SystemVerilog Icon" width="22" height="15">
+          {% else %}
+          <img src="/icons/code.svg" alt="Code Icon" width="22" height="22">
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if item.ended %}
+        <div>
+          {% if item.ended == "Now" %}
+          <img src="/icons/infinite.svg" alt="Ongoing project icon" width="22" height="22">
+          {% else %}
+          <img src="/icons/done_all.svg" alt="Completed project icon" width="22" height="22">
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <p class="desc">{{ item.description }}</p>
+      </div>
+
+      {% if item.links %}
+      <div class="quick-links">
+        {% for link in item.links %}
+        <a target="_blank" href="{{ link.url }}">{{ link.text }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
