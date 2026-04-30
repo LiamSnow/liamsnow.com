@@ -198,13 +198,13 @@ An RGBCT light bulb becomes:
 ...
 ----
 
-==== Never Bloated, Backward-Compatible
+=== Never Bloated, Backward-Compatible
 If no existing components can model a feature, a new component is added, instead of modifying old ones.
 Bloating the model is never a concern, as adding a new `FancyLightComponent` never affects existing lights, and is only attached to entities which have that behavior.
 This append-only practice can easily be made backwards-compatible with automations or other code.
 
 
-==== Device-Entity Relation
+=== Device-Entity Relation
 We have two primary options:
 
  . Actual Hierarchy:
@@ -214,7 +214,7 @@ We have two primary options:
    * Give each entity something like a `Device(id)` component
 
 
-==== Systems
+=== Systems
 *I don't want to force Igloo into a corner here -- it may choose to have systems like ECS, or it may only have the EC part.
 
 ECS separates data (entities and components) from logic (systems).
