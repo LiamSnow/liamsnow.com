@@ -4,7 +4,7 @@ description: A truly smart, smart home platform
 started: 2025-01-01
 ended: Now
 lang: Rust
-homepage: true
+homepage: false
 ---
 
 
